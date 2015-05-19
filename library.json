@@ -1,0 +1,24 @@
+{
+  "title": "Task",
+  "machineName": "H5P.Task",
+  "majorVersion": 1,
+  "minorVersion": 0,
+  "patchVersion": 0,
+  "runnable": 0,
+  "license": "MIT",
+  "author": "Joubel AS (icc)",
+  "coreApi": {
+    "majorVersion": 1,
+    "minorVersion": 5
+  },
+  "preloadedCss": [
+    {
+      "path": "styles/task.css"
+    }
+  ],
+  "preloadedJs": [
+    {
+      "path": "scripts/task.js"
+    }
+  ]
+}
