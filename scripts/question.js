@@ -1,13 +1,14 @@
-H5P.Task = (function ($, EventDispatcher) {
+H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
   /**
-   * Task
+   * Extending this class make it alot easier to create tasks for other
+   * content types.
    *
-   * @class H5P.Task
+   * @class H5P.Question
    * @extends H5P.EventDispatcher
    * @param {string} type
    */
-  function Task(type) {
+  function Question(type) {
     var self = this;
 
     // Inheritance
@@ -35,7 +36,7 @@ H5P.Task = (function ($, EventDispatcher) {
      */
     var register = function (section, content) {
       var $e = sections[section] = $('<div/>', {
-        'class': 'h5p-task-section h5p-task-' + section,
+        'class': 'h5p-question-' + section,
       });
       if (content) {
         $e[content instanceof $ ? 'append' : 'html'](content);
@@ -100,7 +101,7 @@ H5P.Task = (function ($, EventDispatcher) {
      */
     self.setImage = function (path, alt) {
       sections.image = $('<img/>', {
-        'class': 'h5p-task-section h5p-task-image',
+        'class': 'h5p-question-image',
         src: H5P.getPath(path, this.contentId),
         alt: (alt === undefined ? '' : alt),
         on: {
@@ -124,13 +125,14 @@ H5P.Task = (function ($, EventDispatcher) {
      * Add the content section.
      *
      * @param {(string|H5P.jQuery)} content
-     * @param {string} [extraClass]
+     * @param {Object} [options]
+     * @param {string} [options.class]
      */
-    self.setContent = function (content, extraClass) {
+    self.setContent = function (content, options) {
       register('content', content);
 
-      if (extraClass) {
-        sections.content.addClass(extraClass);
+      if (options.class) {
+        sections.content.addClass(options.class);
       }
     };
 
@@ -180,8 +182,8 @@ H5P.Task = (function ($, EventDispatcher) {
         register('buttons');
       }
 
-      var $e = buttons[id] = $('<button/>', {
-        'class': 'h5p-task-button h5p-task-' + id,
+      var $e = buttons[id] = JoubelUI.createButton({
+        'class': 'h5p-question-' + id,
         html: text,
         on: {
           click: function () {
@@ -216,9 +218,10 @@ H5P.Task = (function ($, EventDispatcher) {
 
       if (button.is(':focus')) {
         // Move focus to the first visible button.
-        sections.buttons.children(':visible:first').focus();
+        self.focusButton();
       }
 
+      // Using detach() vs hide() makes it harder to cheat.
       buttons[id].detach();
     };
 
@@ -231,7 +234,7 @@ H5P.Task = (function ($, EventDispatcher) {
     self.focusButton = function (id) {
       if (id === undefined) {
         // Find first button and give focus
-
+        sections.buttons.children(':visible:first').focus();
       }
       else if (buttons[id].is(':visible')) {
         // Set focus to requested button
@@ -245,22 +248,36 @@ H5P.Task = (function ($, EventDispatcher) {
      * @param {H5P.jQuery} $container
      */
     self.attach = function ($container) {
+      // The first time we attach we also create our DOM elements.
+      if ($wrapper === undefined &&
+          self.registerDomElements !== undefined &&
+          (self.registerDomElements instanceof Function ||
+           typeof self.registerDomElements === 'function')) {
+
+        // Give the question type a chance to register before attaching
+        self.registerDomElements();
+      }
+
+      // Prepare container
       $wrapper = $container;
-      $container.html('').addClass('h5p-task h5p-' + type);
+      $container.html('').addClass('h5p-question h5p-' + type);
 
       // Add sections in given order
+      var $sections = $();
       for (var i = 0; i < self.order.length; i++) {
         var section = self.order[i];
         if (sections[section]) {
-          sections[section].appendTo($container);
+          $sections = $sections.add(sections[section]);
         }
       }
+      // Only append once to DOM for optimal performance
+      $sections.appendTo($container);
     };
   }
 
   // Inheritance
-  Task.prototype = Object.create(EventDispatcher.prototype);
-  Task.prototype.constructor = Task;
+  Question.prototype = Object.create(EventDispatcher.prototype);
+  Question.prototype.constructor = Question;
 
-  return Task;
-})(H5P.jQuery, H5P.EventDispatcher);
+  return Question;
+})(H5P.jQuery, H5P.EventDispatcher, H5P.JoubelUI);

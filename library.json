@@ -1,6 +1,6 @@
 {
-  "title": "Task",
-  "machineName": "H5P.Task",
+  "title": "Question",
+  "machineName": "H5P.Question",
   "majorVersion": 1,
   "minorVersion": 0,
   "patchVersion": 0,
@@ -13,12 +13,12 @@
   },
   "preloadedCss": [
     {
-      "path": "styles/task.css"
+      "path": "styles/question.css"
     }
   ],
   "preloadedJs": [
     {
-      "path": "scripts/task.js"
+      "path": "scripts/question.js"
     }
   ]
 }

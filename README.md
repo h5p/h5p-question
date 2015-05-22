@@ -1,7 +1,7 @@
-H5P Task
+H5P Question
 ==========
 
-Gives a uniform way of dealing with tasks. Extend this class to make it eaiser
+Gives a uniform way of dealing with tasks. Extend this class to make it easier
 to create tasks that can be used inside other content types.
 
 ## License
