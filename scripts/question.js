@@ -131,7 +131,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     self.setContent = function (content, options) {
       register('content', content);
 
-      if (options.class) {
+      if (options && options.class) {
         sections.content.addClass(options.class);
       }
     };
