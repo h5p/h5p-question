@@ -5,7 +5,7 @@
 }
 
 .h5p-question .h5p-question-introduction {
-  padding: 1.5em 1em;
+  padding: 1em 1.5em;
 }
 
 .h5p-question .h5p-question-feedback {
@@ -24,14 +24,14 @@
 }
 
 .h5p-question .h5p-question-buttons {
-  padding: 0 1em 0em 1em;
+  padding: 0 1.5em 0em 1.5em;
   max-height: 0;
   opacity: 0;
   transition: max-height 0.15s ease, padding 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
 
 .h5p-question .h5p-question-buttons.show {
-  padding: 0 1em 1.5em 1em;
+  padding: 0 1.5em 1em 1.5em;
   opacity: 1;
   transition: max-height 0.15s ease, padding 0.15s ease, opacity 0.15s ease-in;
 }
