@@ -94,6 +94,23 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Set element max height, used for animations
+     * @param {jQuery} $element
+     */
+    var setElementHeight = function ($element) {
+      // Get natural element height
+      var $tmp = $element.clone()
+        .css({
+          'position': 'absolute',
+          'max-height': 'none'
+        }).appendTo($element.parent());
+
+      // Apply height to element
+      $element.css('max-height', $tmp.height());
+      $tmp.remove();
+    };
+
+    /**
      * Add task image.
      *
      * @param {string} path Relative
@@ -156,11 +173,24 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         if ($wrapper && !sections.feedback.is(':visible')) {
           // Make visible
           insert(self.order, 'feedback', sections, $wrapper);
+
+          // Show feedback section
+          setTimeout(function () {
+            sections.feedback.addClass('show');
+            setElementHeight(sections.feedback)
+          }, 0);
+
         }
       }
       else if (sections.feedback) {
-        // Remove feedback
-        sections.feedback.detach();
+        // Hide feedback section
+        sections.feedback.removeClass('show');
+        sections.feedback.css('max-height', 0);
+
+        // Detach after transition
+        H5P.Transition.onTransitionEnd(sections.feedback, function () {
+          sections.feedback.detach();
+        }, 150);
       }
     };
 
@@ -206,6 +236,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.showButton = function (id) {
       insert(buttonOrder, id, buttons, sections.buttons);
+
+      // Show button section
+      if (!sections.buttons.is(':empty')) {
+        sections.buttons.addClass('show');
+        setElementHeight(sections.buttons);
+      }
     };
 
     /**
@@ -221,8 +257,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         self.focusButton();
       }
 
-      // Using detach() vs hide() makes it harder to cheat.
-      buttons[id].detach();
+      // Hide button section when hiding last button
+      if (sections.buttons.children().length === 1 && sections.buttons.has(buttons[id]).length) {
+        // Hide button section
+        sections.buttons.removeClass('show');
+        sections.buttons.css('max-height', 0);
+
+        // Detach after transition
+        H5P.Transition.onTransitionEnd(sections.buttons, function () {
+          // Using detach() vs hide() makes it harder to cheat.
+          buttons[id].detach();
+        }, 150);
+      }
     };
 
     /**

@@ -3,3 +3,67 @@
   max-width: 100%;
   margin: 0 auto;
 }
+
+.h5p-question .h5p-question-introduction {
+  padding: 1em 1.5em;
+}
+
+.h5p-question .h5p-question-feedback {
+  font-weight: bold;
+  color: #1a73d9;
+  padding: 0em 1.5em;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.15s ease, padding 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
+}
+
+.h5p-question .h5p-question-feedback.show {
+  padding: 1em 1.5em;
+  opacity: 1;
+  transition: max-height 0.15s ease, padding 0.15s ease, opacity 0.15s ease-in;
+}
+
+.h5p-question .h5p-question-buttons {
+  padding: 0 1.5em 0em 1.5em;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.15s ease, padding 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
+}
+
+.h5p-question .h5p-question-buttons.show {
+  padding: 0 1.5em 1em 1.5em;
+  opacity: 1;
+  transition: max-height 0.15s ease, padding 0.15s ease, opacity 0.15s ease-in;
+}
+
+/* Styling of JoubelUI button, should be moved to JoubelUI */
+.h5p-question .h5p-joubelui-button {
+  cursor: pointer;
+  display: inline-block;
+  margin: 0.25em 0;
+  padding: 0.5em 1.2em;
+  border-radius: 2em;
+  background: #1a73d9;
+  color: #ffffff;
+  border: none;
+  box-shadow: none;
+}
+
+.h5p-question .h5p-joubelui-button:hover {
+  background: #1356a3;
+}
+
+.h5p-question .h5p-joubelui-button:active {
+  position: relative;
+  background: #104888;
+
+  -webkit-box-shadow: inset 0 4px 0 #0e407a;
+  -moz-box-shadow: inset 0 4px 0 #0e407a;
+  box-shadow: inset 0 4px 0 #0e407a;
+}
+
+.h5p-question .h5p-joubelui-button:active .h5p-joubelui-button-text {
+  position: relative;
+  top: 2px;
+}
+
