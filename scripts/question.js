@@ -1,4 +1,4 @@
-H5P.Question = (function ($, EventDispatcher, JoubelUI) {
+H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
 
   /**
    * Extending this class make it alot easier to create tasks for other
@@ -95,7 +95,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     /**
      * Set element max height, used for animations
-     * @param {jQuery} $element
+     * @param {H5P.jQuery} $element
      */
     var setElementHeight = function ($element) {
       // Get natural element height
@@ -181,14 +181,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }, 0);
 
         }
-      }
-      else if (sections.feedback) {
+      } else if (sections.feedback) {
         // Hide feedback section
         sections.feedback.removeClass('show');
         sections.feedback.css('max-height', 0);
 
         // Detach after transition
-        H5P.Transition.onTransitionEnd(sections.feedback, function () {
+        Transition.onTransitionEnd(sections.feedback, function () {
           sections.feedback.detach();
         }, 150);
       }
@@ -258,13 +257,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       // Hide button section when hiding last button
-      if (sections.buttons.children().length === 1 && sections.buttons.has(buttons[id]).length) {
+      if (sections.buttons && sections.buttons.children().length === 1 && sections.buttons.has(buttons[id]).length) {
         // Hide button section
         sections.buttons.removeClass('show');
         sections.buttons.css('max-height', 0);
 
         // Detach after transition
-        H5P.Transition.onTransitionEnd(sections.buttons, function () {
+        Transition.onTransitionEnd(sections.buttons, function () {
           // Using detach() vs hide() makes it harder to cheat.
           buttons[id].detach();
         }, 150);
@@ -326,4 +325,4 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
   Question.prototype.constructor = Question;
 
   return Question;
-})(H5P.jQuery, H5P.EventDispatcher, H5P.JoubelUI);
+})(H5P.jQuery, H5P.EventDispatcher, H5P.JoubelUI, H5P.Transition);
