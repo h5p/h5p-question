@@ -53,6 +53,11 @@
   background: #1356a3;
 }
 
+.h5p-question .h5p-joubelui-button:focus {
+  background: #1356a3;
+  outline: none;
+}
+
 .h5p-question .h5p-joubelui-button:active {
   position: relative;
   background: #104888;
