@@ -336,25 +336,25 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      * @param {string} id
      */
     self.showButton = function (id) {
+      if (buttons[id] === undefined) {
+        return;
+      }
+
       // Check if buttons is going to be hidden on next tick
-      var alreadyVisible = false;
       if (buttonsToHide.length) {
         for (var i = 0; i < buttonsToHide.length; i++) {
           if (buttonsToHide[i] === id) {
             // Just skip hiding it
             buttonsToHide.splice(i, 1);
-            alreadyVisible = true;
-            break;
+            return;
           }
         }
       }
 
-      if (!alreadyVisible) {
-        // Show button on next tick
-        buttonsToShow.push(id);
-        if (!showButtonsTimer) {
-          setTimeout(showButtons, 0);
-        }
+      // Show button on next tick
+      buttonsToShow.push(id);
+      if (!showButtonsTimer) {
+        setTimeout(showButtons, 0);
       }
     };
 
@@ -364,9 +364,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      * @param {string} id
      */
     self.hideButton = function (id) {
-      var button = buttons[id];
-      if (button === undefined) {
+      if (buttons[id] === undefined) {
         return;
+      }
+
+      // Check if buttons is going to be shown on next tick
+      if (buttonsToShow.length) {
+        for (var i = 0; i < buttonsToShow.length; i++) {
+          if (buttonsToShow[i] === id) {
+            // Just skip showing it
+            buttonsToShow.splice(i, 1);
+            return;
+          }
+        }
       }
 
       // Hide button on next tick.
