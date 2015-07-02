@@ -37,14 +37,14 @@
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
 .h5p-question-buttons.h5p-question-visible {
-  margin: 1.5em;
+  margin: 1.5em 1.5em 0;
   opacity: 1;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }
 
 /* Styling of JoubelUI button, should be moved to JoubelUI */
 .h5p-question .h5p-joubelui-button {
-  margin: 0 1.5em 0 0;
+  margin: 0 1.5em 1.5em 0;
   padding: 0.5em 1.25em;
   border-radius: 2em;
   background: #1a73d9;
@@ -54,7 +54,7 @@
   float: right;
 }
 .h5p-question .h5p-joubelui-button:first-child {
-  margin: 0;
+  margin: 0 0 1.5em;
 }
 .h5p-question .h5p-joubelui-button:hover {
   background: #1356a3;
