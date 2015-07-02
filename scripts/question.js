@@ -111,6 +111,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      * @param {H5P.jQuery} $element
      */
     var setElementHeight = function ($element) {
+      if (!$element.is(':visible')) {
+        // No animation
+        $element.css('max-height', 'none');
+        return;
+      }
+
       // Get natural element height
       var $tmp = $element.clone()
         .css({
