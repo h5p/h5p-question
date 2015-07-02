@@ -27,6 +27,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
     // Wrapper when attached
     var $wrapper;
 
+    // Keep track of the feedback's visual status. A must for animations.
+    var showFeedback;
+
+    // Keep track of which buttons are scheduled for hiding.
+    var buttonsToHide = [];
+
+    // Keep track of which buttons are scheduled for showing.
+    var buttonsToShow = [];
+
+    // Keep track of the hiding and showing of buttons.
+    var hideButtonsTimer;
+    var showButtonsTimer;
+
     /**
      * Register section with given content.
      *
@@ -111,6 +124,71 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
     };
 
     /**
+     * Does the actual job of hiding the buttons scheduled for hiding.
+     *
+     * @private
+     */
+    var hideButtons = function () {
+      for (var i = 0; i < buttonsToHide.length; i++) {
+        // Using detach() vs hide() makes it harder to cheat.
+        buttons[buttonsToHide[i]].detach();
+      }
+      buttonsToHide = [];
+    };
+
+    /**
+     * Runs one tick after self.hideButton. Determines if the whole button
+     * container should be animated away.
+     *
+     * @private
+     */
+    var hideButton = function () {
+      // Move focus away for buttons that are being hidden
+      for (var i = 0; i < buttonsToHide.length; i++) {
+        if (buttons[buttonsToHide[i]].is(':focus')) {
+          // Move focus to the first visible button.
+          self.focusButton();
+        }
+      }
+
+      if (sections.buttons && buttonsToHide.length === sections.buttons.children().length) {
+        // All buttons are going to be hidden. Hide container using transition.
+        sections.buttons.removeClass('h5p-question-visible');
+        sections.buttons.css('max-height', 0);
+
+        // Detach after transition
+        setTimeout(function () {
+          // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
+          hideButtons();
+        }, 150);
+      }
+      else {
+        hideButtons();
+      }
+      hideButtonsTimer = undefined;
+    };
+
+    /**
+     * Shows the buttons on the next tick. This is to avoid buttons flickering
+     * If they're both added and removed on the same tick.
+     *
+     * @private
+     */
+    var showButtons = function () {
+      for (var i = 0; i < buttonsToShow.length; i++) {
+        insert(buttonOrder, buttonsToShow[i], buttons, sections.buttons);
+      }
+      buttonsToShow = [];
+      showButtonsTimer = undefined;
+
+      // Show button section
+      if (!sections.buttons.is(':empty')) {
+        sections.buttons.addClass('h5p-question-visible');
+        setElementHeight(sections.buttons);
+      }
+    };
+
+    /**
      * Add task image.
      *
      * @param {string} path Relative
@@ -161,6 +239,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      */
     self.setFeedback = function (content) {
       if (content) {
+        showFeedback = true;
         if (sections.feedback) {
           // Update section
           update('feedback', content);
@@ -170,25 +249,32 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
           register('feedback', content);
         }
 
-        if ($wrapper && !sections.feedback.is(':visible')) {
+        if ($wrapper) {
           // Make visible
-          insert(self.order, 'feedback', sections, $wrapper);
+          if (!sections.feedback.is(':visible')) {
+            insert(self.order, 'feedback', sections, $wrapper);
+          }
 
           // Show feedback section
           setTimeout(function () {
-            sections.feedback.addClass('show');
-            setElementHeight(sections.feedback)
+            sections.feedback.addClass('h5p-question-visible');
+            setElementHeight(sections.feedback);
           }, 0);
-
         }
-      } else if (sections.feedback) {
+      }
+      else if (sections.feedback && showFeedback) {
+        showFeedback = false;
+
         // Hide feedback section
-        sections.feedback.removeClass('show');
+        sections.feedback.removeClass('h5p-question-visible');
         sections.feedback.css('max-height', 0);
 
         // Detach after transition
-        Transition.onTransitionEnd(sections.feedback, function () {
-          sections.feedback.detach();
+        setTimeout(function () {
+          // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
+          if (!showFeedback) {
+            sections.feedback.detach();
+          }
         }, 150);
       }
     };
@@ -234,12 +320,25 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      * @param {string} id
      */
     self.showButton = function (id) {
-      insert(buttonOrder, id, buttons, sections.buttons);
+      // Check if buttons is going to be hidden on next tick
+      var alreadyVisible = false;
+      if (buttonsToHide.length) {
+        for (var i = 0; i < buttonsToHide.length; i++) {
+          if (buttonsToHide[i] === id) {
+            // Just skip hiding it
+            buttonsToHide.splice(i, 1);
+            alreadyVisible = true;
+            break;
+          }
+        }
+      }
 
-      // Show button section
-      if (!sections.buttons.is(':empty')) {
-        sections.buttons.addClass('show');
-        setElementHeight(sections.buttons);
+      if (!alreadyVisible) {
+        // Show button on next tick
+        buttonsToShow.push(id);
+        if (!showButtonsTimer) {
+          setTimeout(showButtons, 0);
+        }
       }
     };
 
@@ -250,23 +349,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      */
     self.hideButton = function (id) {
       var button = buttons[id];
-
-      if (button.is(':focus')) {
-        // Move focus to the first visible button.
-        self.focusButton();
+      if (button === undefined) {
+        return;
       }
 
-      // Hide button section when hiding last button
-      if (sections.buttons && sections.buttons.children().length === 1 && sections.buttons.has(buttons[id]).length) {
-        // Hide button section
-        sections.buttons.removeClass('show');
-        sections.buttons.css('max-height', 0);
-
-        // Detach after transition
-        Transition.onTransitionEnd(sections.buttons, function () {
-          // Using detach() vs hide() makes it harder to cheat.
-          buttons[id].detach();
-        }, 150);
+      // Hide button on next tick.
+      buttonsToHide.push(id);
+      if (!hideButtonsTimer) {
+        hideButtonsTimer = setTimeout(hideButton, 0);
       }
     };
 
@@ -278,8 +368,22 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      */
     self.focusButton = function (id) {
       if (id === undefined) {
-        // Find first button and give focus
-        sections.buttons.children(':visible:first').focus();
+        // Find first button that are not being hidden.
+        for (var i in buttons) {
+          var hidden = false;
+          for (var j = 0; j < buttonsToHide.length; j++) {
+            if (buttonsToHide[j] === i) {
+              hidden = true;
+              break;
+            }
+          }
+
+          if (!hidden) {
+            // Give that button focus
+            buttons[i].focus();
+            break;
+          }
+        }
       }
       else if (buttons[id].is(':visible')) {
         // Set focus to requested button
@@ -315,6 +419,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
           $sections = $sections.add(sections[section]);
         }
       }
+
       // Only append once to DOM for optimal performance
       $sections.appendTo($container);
     };
