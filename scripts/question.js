@@ -286,6 +286,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
     };
 
     /**
+     * Checks to see if button is registered.
+     *
+     * @param {string} id
+     * @returns {boolean}
+     */
+    self.hasButton = function (id) {
+      return (buttons[id] !== undefined);
+    };
+
+    /**
      * Register buttons for the task.
      *
      * @param {string} id
