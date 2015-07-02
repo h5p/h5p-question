@@ -424,13 +424,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      */
     self.attach = function ($container) {
       // The first time we attach we also create our DOM elements.
-      if ($wrapper === undefined &&
-          self.registerDomElements !== undefined &&
-          (self.registerDomElements instanceof Function ||
+      if ($wrapper === undefined) {
+        if (self.registerDomElements !== undefined &&
+           (self.registerDomElements instanceof Function ||
            typeof self.registerDomElements === 'function')) {
 
-        // Give the question type a chance to register before attaching
-        self.registerDomElements();
+           // Give the question type a chance to register before attaching
+           self.registerDomElements();
+        }
+        self.trigger('registerDomElements');
       }
 
       // Prepare container
