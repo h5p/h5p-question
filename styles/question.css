@@ -35,6 +35,7 @@
   display: inline-block;
   position: relative;
   top: -1em;
+  margin-top: .8em;
 }
 
 .h5p-question-buttons {
