@@ -76,3 +76,17 @@
   position: relative;
   top: 2px;
 }
+
+.h5p-question .h5p-joubelui-button:before {
+  font-family: 'H5PFontAwesome4';
+  padding-right: 0.5em;
+}
+.h5p-question .h5p-question-try-again:before {
+  content: "\F01E";
+}
+.h5p-question .h5p-question-show-solution:before {
+  content: "\F06E";
+}
+.h5p-question .h5p-question-check-answer:before {
+  content: "\F058";
+}
