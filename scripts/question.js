@@ -37,8 +37,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
     var buttonsToShow = [];
 
     // Keep track of the hiding and showing of buttons.
-    var hideButtonsTimer;
-    var showButtonsTimer;
+    var toggleButtonsTimer;
 
     /**
      * Register section with given content.
@@ -143,15 +142,21 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
     };
 
     /**
-     * Runs one tick after self.hideButton. Determines if the whole button
-     * container should be animated away.
+     * Shows the buttons on the next tick. This is to avoid buttons flickering
+     * If they're both added and removed on the same tick.
      *
      * @private
      */
-    var hideButton = function () {
-      // Move focus away for buttons that are being hidden
-      for (var i = 0; i < buttonsToHide.length; i++) {
-        if (buttons[buttonsToHide[i]].is(':focus')) {
+    var toggleButtons = function () {
+      // Show buttons
+      for (var i = 0; i < buttonsToShow.length; i++) {
+        insert(buttonOrder, buttonsToShow[i], buttons, sections.buttons);
+      }
+      buttonsToShow = [];
+
+      // Hide buttons
+      for (var j = 0; j < buttonsToHide.length; j++) {
+        if (buttons[buttonsToHide[j]].is(':focus')) {
           // Move focus to the first visible button.
           self.focusButton();
         }
@@ -170,27 +175,41 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
       }
       else {
         hideButtons();
+
+        // Show button section
+        if (!sections.buttons.is(':empty')) {
+          sections.buttons.addClass('h5p-question-visible');
+          setElementHeight(sections.buttons);
+        }
       }
-      hideButtonsTimer = undefined;
+
+      toggleButtonsTimer = undefined;
     };
 
     /**
-     * Shows the buttons on the next tick. This is to avoid buttons flickering
-     * If they're both added and removed on the same tick.
+     * Allows for scaling of the question image.
      *
-     * @private
+     * @param {H5P.jQuery} $img
      */
-    var showButtons = function () {
-      for (var i = 0; i < buttonsToShow.length; i++) {
-        insert(buttonOrder, buttonsToShow[i], buttons, sections.buttons);
-      }
-      buttonsToShow = [];
-      showButtonsTimer = undefined;
+    var scaleImage = function ($img) {
+      if (!sections.image.hasClass('h5p-question-image-large')) {
+        // Find our target height
+        var $tmp = $img.clone()
+          .css('max-height', 'none').appendTo($img.parent());
+        var targetHeight = $tmp.height();
+        $tmp.remove();
 
-      // Show button section
-      if (!sections.buttons.is(':empty')) {
-        sections.buttons.addClass('h5p-question-visible');
-        setElementHeight(sections.buttons);
+        // Animate
+        setTimeout(function () {
+          $img.css('maxHeight', targetHeight);
+          sections.image.addClass('h5p-question-image-large');
+        }, 0);
+        thumb = false;
+      }
+      else {
+        sections.image.removeClass('h5p-question-image-large');
+        $img.css('maxHeight', '');
+        thumb = true;
       }
     };
 
@@ -201,15 +220,49 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      * @param {string} [alt] Text representation
      */
     self.setImage = function (path, alt) {
-      sections.image = $('<img/>', {
+      // Image container
+      sections.image = $('<div/>', {
         'class': 'h5p-question-image',
+      });
+
+      // Inner wrap
+      var $imgWrap = $('<div/>', {
+        'class': 'h5p-question-image-wrap',
+        appendTo: sections.image
+      });
+
+      // Image element
+      var $img = $('<img/>', {
         src: H5P.getPath(path, this.contentId),
         alt: (alt === undefined ? '' : alt),
         on: {
           load: function () {
+            // Determine max size
+            $img.css('maxHeight', 'none');
+            // var maxWidth = this.width;
+            var maxHeight = this.height;
+
+            // Determine thumb size
+            $img.css('maxHeight', '');
+            if (maxHeight > this.height) {
+              // We can do better. Add resize capability
+              $img.attr('role', 'button').attr('tabIndex', '0');
+              $imgWrap.addClass('h5p-question-image-scalable')
+                .on('click', function (event) {
+                  if (event.which === 1) {
+                    scaleImage($img); // Left mouse button click
+                  }
+                }).on('keypress', function (event) {
+                  if (event.which === 32) {
+                    scaleImage($img); // Space bar pressed
+                  }
+                });
+            }
+
             self.trigger('imageLoaded', this);
           }
-        }
+        },
+        appendTo: $imgWrap
       });
     };
 
@@ -327,6 +380,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
       if (visible === undefined || visible) {
         // Button should be visible
         $e.appendTo(sections.buttons);
+        sections.buttons.addClass('h5p-question-visible');
       }
     };
 
@@ -340,21 +394,28 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
         return;
       }
 
-      // Check if buttons is going to be hidden on next tick
-      if (buttonsToHide.length) {
-        for (var i = 0; i < buttonsToHide.length; i++) {
-          if (buttonsToHide[i] === id) {
-            // Just skip hiding it
-            buttonsToHide.splice(i, 1);
-            return;
-          }
-        }
+      // Skip if already being shown
+      if (buttonsToShow.indexOf(id) !== -1) {
+        return;
+      }
+
+      // Check if button is going to be hidden on next tick
+      var exists = buttonsToHide.indexOf(id);
+      if (exists !== -1) {
+        // Just skip hiding it
+        buttonsToHide.splice(exists, 1);
+        return;
+      }
+
+      // Skip if visible
+      if (buttons[id].is(':visible')) {
+        return;
       }
 
       // Show button on next tick
       buttonsToShow.push(id);
-      if (!showButtonsTimer) {
-        setTimeout(showButtons, 0);
+      if (!toggleButtonsTimer) {
+        toggleButtonsTimer = setTimeout(toggleButtons, 0);
       }
     };
 
@@ -368,21 +429,30 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
         return;
       }
 
+      // Skip if already being hidden
+      if (buttonsToHide.indexOf(id) !== -1) {
+        return;
+      }
+
       // Check if buttons is going to be shown on next tick
-      if (buttonsToShow.length) {
-        for (var i = 0; i < buttonsToShow.length; i++) {
-          if (buttonsToShow[i] === id) {
-            // Just skip showing it
-            buttonsToShow.splice(i, 1);
-            return;
-          }
-        }
+      var exists = buttonsToShow.indexOf(id);
+      if (exists !== -1) {
+        // Just skip showing it
+        buttonsToShow.splice(exists, 1);
+        return;
+      }
+
+      // Skip if not visible
+      if (!buttons[id].is(':visible')) {
+        // Make sure it is detached in case the container is hidden.
+        buttons[id].detach();
+        return;
       }
 
       // Hide button on next tick.
       buttonsToHide.push(id);
-      if (!hideButtonsTimer) {
-        hideButtonsTimer = setTimeout(hideButton, 0);
+      if (!toggleButtonsTimer) {
+        toggleButtonsTimer = setTimeout(toggleButtons, 0);
       }
     };
 
