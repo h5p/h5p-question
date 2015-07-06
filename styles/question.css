@@ -9,6 +9,8 @@
   border: 0;
   outline: none;
   -webkit-transition: max-height 0.3s;
+  -moz-transition: max-height 0.3s;
+  transition: max-height 0.3s;
 }
 .h5p-question-image-wrap {
   display: inline-block;
