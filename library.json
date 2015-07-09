@@ -31,11 +31,6 @@
       "machineName": "H5P.JoubelUI",
       "majorVersion": 1,
       "minorVersion": 2
-    },
-    {
-      "machineName": "H5P.Transition",
-      "majorVersion": 1,
-      "minorVersion": 1
     }
   ]
 }

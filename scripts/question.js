@@ -1,4 +1,4 @@
-H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
+H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
   /**
    * Extending this class make it alot easier to create tasks for other
@@ -547,4 +547,4 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
   Question.prototype.constructor = Question;
 
   return Question;
-})(H5P.jQuery, H5P.EventDispatcher, H5P.JoubelUI, H5P.Transition);
+})(H5P.jQuery, H5P.EventDispatcher, H5P.JoubelUI);
