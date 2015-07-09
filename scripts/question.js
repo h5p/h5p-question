@@ -27,6 +27,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
     // Wrapper when attached
     var $wrapper;
 
+    // ScoreBar
+    var scoreBar;
+
     // Keep track of the feedback's visual status. A must for animations.
     var showFeedback;
 
@@ -294,10 +297,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI, Transition) {
      * Set feedback message.
      * Setting the message to blank or undefined will hide it again.
      *
-     * @param {(string|H5P.jQuery)} [content]
+     * @param {string}  content
+     * @param {number}  score     The score
+     * @param {number}  maxScore  The maximum score for this question
      */
-    self.setFeedback = function (content) {
+    self.setFeedback = function (content, score, maxScore) {
       if (content) {
+        $feedback = $('<div>', {
+          'class': 'h5p-question-feedback-container'
+        });
+
+        if (scoreBar === undefined) {
+          scoreBar = JoubelUI.createScoreBar(maxScore);
+        }
+        scoreBar.appendTo($feedback);
+        scoreBar.setScore(score);
+        content = $feedback.append($('<div>', {
+          'class': 'h5p-question-feedback-content',
+          html: content
+        }));
+
         showFeedback = true;
         if (sections.feedback) {
           // Update section
