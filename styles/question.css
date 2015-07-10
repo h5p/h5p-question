@@ -126,7 +126,7 @@
   content: "\F058";
 }
 
-/* Remove left margin for h5p-no-frame */
+/* Remove side margin for h5p-no-frame */
 .h5p-no-frame > .h5p-question > .h5p-question-introduction,
 .h5p-no-frame > .h5p-question > .h5p-question-buttons,
 .h5p-no-frame > .h5p-question > .h5p-question-image,
@@ -134,4 +134,13 @@
 .h5p-no-frame > .h5p-question > .h5p-question-feedback {
   margin-left: 0;
   margin-right: 0;
+}
+
+/* Remove side margins for transparent cp elements */
+.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-introduction,
+.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-buttons,
+.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-image,
+.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-content,
+.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-feedback {
+  margin-left: 0;
 }
