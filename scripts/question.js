@@ -50,7 +50,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {(string|H5P.jQuery)} content
      */
     var register = function (section, content) {
-      var $e = sections[section] = $('<div/>', {
+      sections[section] = {};
+      var $e = sections[section].$element = $('<div/>', {
         'class': 'h5p-question-' + section,
       });
       if (content) {
@@ -67,10 +68,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     var update = function (section, content) {
       if (content instanceof $) {
-        sections[section].html('').append(content);
+        sections[section].$element.html('').append(content);
       }
       else {
-        sections[section].html(content);
+        sections[section].$element.html(content);
       }
     };
 
@@ -92,16 +93,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       for (var i = 0; i < order.length; i++) {
         if (order[i] === id) {
           // Found our pos
-          while (i > 0 && !elements[order[i - 1]].is(':visible')) {
+          while (i > 0 && !elements[order[i - 1]].$element.is(':visible')) {
             i--;
           }
           if (i === 0) {
             // We are on top.
-            elements[id].prependTo($container);
+            elements[id].$element.prependTo($container);
           }
           else {
             // Add after element
-            elements[id].insertAfter(elements[order[i - 1]]);
+            elements[id].$element.insertAfter(elements[order[i - 1]].$element);
           }
           break;
         }
@@ -139,7 +140,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var hideButtons = function () {
       for (var i = 0; i < buttonsToHide.length; i++) {
         // Using detach() vs hide() makes it harder to cheat.
-        buttons[buttonsToHide[i]].detach();
+        buttons[buttonsToHide[i]].$element.detach();
       }
       buttonsToHide = [];
     };
@@ -153,22 +154,22 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var toggleButtons = function () {
       // Show buttons
       for (var i = 0; i < buttonsToShow.length; i++) {
-        insert(buttonOrder, buttonsToShow[i], buttons, sections.buttons);
+        insert(buttonOrder, buttonsToShow[i], buttons, sections.buttons.$element);
       }
       buttonsToShow = [];
 
       // Hide buttons
       for (var j = 0; j < buttonsToHide.length; j++) {
-        if (buttons[buttonsToHide[j]].is(':focus')) {
+        if (buttons[buttonsToHide[j]].$element.is(':focus')) {
           // Move focus to the first visible button.
           self.focusButton();
         }
       }
 
-      if (sections.buttons && buttonsToHide.length === sections.buttons.children().length) {
+      if (sections.buttons && buttonsToHide.length === sections.buttons.$element.children().length) {
         // All buttons are going to be hidden. Hide container using transition.
-        sections.buttons.removeClass('h5p-question-visible');
-        sections.buttons.css('max-height', 0);
+        sections.buttons.$element.removeClass('h5p-question-visible');
+        sections.buttons.$element.css('max-height', 0);
 
         // Detach after transition
         setTimeout(function () {
@@ -180,11 +181,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         hideButtons();
 
         // Show button section
-        if (!sections.buttons.is(':empty')) {
-          sections.buttons.addClass('h5p-question-visible');
-          setElementHeight(sections.buttons);
+        if (!sections.buttons.$element.is(':empty')) {
+          sections.buttons.$element.addClass('h5p-question-visible');
+          setElementHeight(sections.buttons.$element);
         }
       }
+
+      // Resize buttons to fit container
+      resizeButtons();
 
       toggleButtonsTimer = undefined;
     };
@@ -195,7 +199,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $img
      */
     var scaleImage = function ($img) {
-      if (!sections.image.hasClass('h5p-question-image-large')) {
+      if (!sections.image.$element.hasClass('h5p-question-image-large')) {
         // Find our target height
         var $tmp = $img.clone()
           .css('max-height', 'none').appendTo($img.parent());
@@ -205,12 +209,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Animate
         setTimeout(function () {
           $img.css('maxHeight', targetHeight);
-          sections.image.addClass('h5p-question-image-large');
+          sections.image.$element.addClass('h5p-question-image-large');
         }, 0);
         thumb = false;
       }
       else {
-        sections.image.removeClass('h5p-question-image-large');
+        sections.image.$element.removeClass('h5p-question-image-large');
         $img.css('maxHeight', '');
         thumb = true;
       }
@@ -223,15 +227,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} [alt] Text representation
      */
     self.setImage = function (path, alt) {
+      sections.image = {};
       // Image container
-      sections.image = $('<div/>', {
+      sections.image.$element = $('<div/>', {
         'class': 'h5p-question-image',
       });
 
       // Inner wrap
       var $imgWrap = $('<div/>', {
         'class': 'h5p-question-image-wrap',
-        appendTo: sections.image
+        appendTo: sections.image.$element
       });
 
       // Image element
@@ -289,7 +294,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       register('content', content);
 
       if (options && options.class) {
-        sections.content.addClass(options.class);
+        sections.content.$element.addClass(options.class);
       }
     };
 
@@ -329,14 +334,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         if ($wrapper) {
           // Make visible
-          if (!sections.feedback.is(':visible')) {
+          if (!sections.feedback.$element.is(':visible')) {
             insert(self.order, 'feedback', sections, $wrapper);
           }
 
           // Show feedback section
           setTimeout(function () {
-            sections.feedback.addClass('h5p-question-visible');
-            setElementHeight(sections.feedback);
+            sections.feedback.$element.addClass('h5p-question-visible');
+            setElementHeight(sections.feedback.$element);
           }, 0);
         }
       }
@@ -344,14 +349,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         showFeedback = false;
 
         // Hide feedback section
-        sections.feedback.removeClass('h5p-question-visible');
-        sections.feedback.css('max-height', 0);
+        sections.feedback.$element.removeClass('h5p-question-visible');
+        sections.feedback.$element.css('max-height', 0);
 
         // Detach after transition
         setTimeout(function () {
           // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
           if (!showFeedback) {
-            sections.feedback.detach();
+            sections.feedback.$element.detach();
           }
         }, 150);
       }
@@ -385,7 +390,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         register('buttons');
       }
 
-      var $e = buttons[id] = JoubelUI.createButton({
+      buttons[id] = {
+        isTruncated: false,
+        text: text
+      };
+      var $e = buttons[id].$element = JoubelUI.createButton({
         'class': 'h5p-question-' + id,
         html: text,
         on: {
@@ -398,8 +407,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       if (visible === undefined || visible) {
         // Button should be visible
-        $e.appendTo(sections.buttons);
-        sections.buttons.addClass('h5p-question-visible');
+        $e.appendTo(sections.buttons.$element);
+        buttons[id].isVisible = true;
+        sections.buttons.$element.addClass('h5p-question-visible');
       }
     };
 
@@ -427,12 +437,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       // Skip if visible
-      if (buttons[id].is(':visible')) {
+      buttons[id].isVisible = true;
+      if (buttons[id].$element.is(':visible')) {
         return;
       }
 
       // Show button on next tick
       buttonsToShow.push(id);
+
       if (!toggleButtonsTimer) {
         toggleButtonsTimer = setTimeout(toggleButtons, 0);
       }
@@ -462,9 +474,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       // Skip if not visible
-      if (!buttons[id].is(':visible')) {
+      buttons[id].isVisible = false;
+      if (!buttons[id].$element.is(':visible')) {
         // Make sure it is detached in case the container is hidden.
-        buttons[id].detach();
+        buttons[id].$element.detach();
         return;
       }
 
@@ -495,14 +508,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
           if (!hidden) {
             // Give that button focus
-            buttons[i].focus();
+            buttons[i].$element.focus();
             break;
           }
         }
       }
-      else if (buttons[id].is(':visible')) {
+      else if (buttons[id].$element.is(':visible')) {
         // Set focus to requested button
-        buttons[id].focus();
+        buttons[id].$element.focus();
       }
     };
 
@@ -533,13 +546,137 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       for (var i = 0; i < self.order.length; i++) {
         var section = self.order[i];
         if (sections[section]) {
-          $sections = $sections.add(sections[section]);
+          $sections = $sections.add(sections[section].$element);
         }
       }
 
       // Only append once to DOM for optimal performance
       $sections.appendTo($container);
     };
+
+    /**
+     * Resize question
+     */
+    var resize = function () {
+      resizeButtons();
+      resizeSections();
+    };
+
+    /**
+     * Resize sections, used for resizing sections when question is resized.
+     */
+    var resizeSections = function () {
+      if (sections.feedback !== undefined) {
+        setElementHeight(sections.feedback.$element);
+      }
+    };
+
+    /**
+     * Resize buttons to fit container width
+     */
+    var resizeButtons = function () {
+      if (!buttons) {
+        return;
+      }
+
+      var buttonsWidth = 0;
+
+      for (var i in buttons) {
+        var $element = buttons[i].$element;
+        if (buttons[i].isVisible) {
+          var $tmp = $element.clone().css({
+            'position': 'absolute',
+            'white-space': 'nowrap',
+            'max-width': 'none'
+          }).appendTo($element.parent());
+
+          // Round up
+          buttonsWidth += $tmp.outerWidth(true);
+          $tmp.remove();
+        }
+      }
+
+      var buttonSectionWidth = sections.buttons.$element.width();
+      if (buttonsWidth >= buttonSectionWidth) {
+        removeButtonLabels(buttonsWidth, buttonSectionWidth)
+      } else {
+        restoreButtonLabels(buttonsWidth, buttonSectionWidth);
+      }
+    };
+
+    /**
+     * Remove button labels until they use less than max width
+     * @param {Number} buttonsWidth Total width of all buttons
+     * @param {Number} maxButtonsWidth Max width allowed for buttons
+     */
+    var removeButtonLabels = function (buttonsWidth, maxButtonsWidth) {
+      // Reverse traversal
+      for (var i = buttonOrder.length - 1; i >= 0; i--) {
+        var buttonId = buttonOrder[i];
+        if (!buttons[buttonId].isTruncated && buttons[buttonId].isVisible) {
+          var $button = buttons[buttonId].$element;
+          var oldButtonWidth = $button.outerWidth(true);
+
+          // Remove label
+          $button.html('');
+          buttons[buttonId].isTruncated = true;
+          $button.addClass('truncated');
+
+          // Calculate new total width of buttons
+          buttonsWidth = buttonsWidth - oldButtonWidth + $button.outerWidth(true);
+          if (buttonsWidth < maxButtonsWidth) {
+            return;
+          }
+        }
+      }
+    };
+
+    /**
+     * Restore button labels until it fills maximum possible width without exceeding the max width.
+     * @param {Number} buttonsWidth Total width of all buttons
+     * @param {Number} maxButtonsWidth Max width allowed for buttons
+     */
+    var restoreButtonLabels = function (buttonsWidth, maxButtonsWidth) {
+      for (var i = 0; i < buttonOrder.length; i++) {
+        var buttonId = buttonOrder[i];
+        if (buttons[buttonId].isTruncated && buttons[buttonId].isVisible) {
+          // Check if adding label exceeds allowed width
+          var $button = buttons[buttonId].$element;
+          var $tmp = $button
+            .clone()
+            .appendTo($button.parent());
+
+          var oldWidth = $tmp.outerWidth(true);
+
+        $tmp.css({
+            'position': 'absolute',
+            'white-space': 'nowrap',
+            'max-width': 'none'
+          }).removeClass('truncated')
+            .html(buttons[buttonId].text);
+
+          var newWidth = $tmp.outerWidth(true);
+
+          buttonsWidth = buttonsWidth - oldWidth + newWidth;
+          if (maxButtonsWidth - buttonsWidth < 5) {
+          }
+
+          if (buttonsWidth < maxButtonsWidth) {
+            // Restore label
+            $button.html(buttons[buttonId].text);
+            buttons[buttonId].isTruncated = false;
+            buttons[buttonId].$element.removeClass('truncated');
+            $tmp.remove();
+          } else {
+            $tmp.remove();
+            return;
+          }
+        }
+      }
+    };
+
+    // Listen for resize
+    this.on('resize', resize, this);
   }
 
   // Inheritance
