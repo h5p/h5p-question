@@ -103,6 +103,11 @@
   margin: 0 0 1.5em;
 }
 
+/* Remove margins for truncated buttons */
+.h5p-question .h5p-joubelui-button.truncated:before {
+  padding: 0;
+}
+
 .h5p-question .h5p-joubelui-button:hover,
 .h5p-question .h5p-joubelui-button:focus {
   background: #1356a3;
