@@ -542,16 +542,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $container.html('').addClass('h5p-question h5p-' + type);
 
       // Add sections in given order
-      var $sections = $();
+      var $sections = [];
       for (var i = 0; i < self.order.length; i++) {
         var section = self.order[i];
         if (sections[section]) {
-          $sections = $sections.add(sections[section].$element);
+          $sections.push(sections[section].$element);
         }
       }
 
       // Only append once to DOM for optimal performance
-      $sections.appendTo($container);
+      $container.append($sections);
     };
 
     /**
@@ -575,7 +575,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Resize buttons to fit container width
      */
     var resizeButtons = function () {
-      if (!buttons) {
+      if (!buttons || !sections.buttons) {
         return;
       }
 
