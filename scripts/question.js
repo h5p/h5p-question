@@ -558,8 +558,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Resize question
      */
     var resize = function () {
-      resizeButtons();
       resizeSections();
+      resizeButtons();
     };
 
     /**
@@ -579,8 +579,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return;
       }
 
+      // A static margin is added as buffer for smoother transitions
+      var staticMargins = 3;
       var buttonsWidth = 0;
-
       for (var i in buttons) {
         var $element = buttons[i].$element;
         if (buttons[i].isVisible) {
@@ -591,12 +592,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }).appendTo($element.parent());
 
           // Round up
-          buttonsWidth += $tmp.outerWidth(true);
+          buttonsWidth += $tmp.outerWidth(true) + staticMargins;
           $tmp.remove();
         }
       }
 
-      var buttonSectionWidth = sections.buttons.$element.width();
+      // Round up button width and down section width to closest em.
+      buttonsWidth = buttonsWidth + staticMargins;
+      var buttonSectionWidth = sections.buttons.$element.width() - staticMargins;
       if (buttonsWidth >= buttonSectionWidth) {
         removeButtonLabels(buttonsWidth, buttonSectionWidth)
       } else {
@@ -615,16 +618,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         var buttonId = buttonOrder[i];
         if (!buttons[buttonId].isTruncated && buttons[buttonId].isVisible) {
           var $button = buttons[buttonId].$element;
-          var oldButtonWidth = $button.outerWidth(true);
+          var $tmp = $button.clone()
+            .css({
+              'position': 'absolute',
+              'white-space': 'nowrap',
+              'max-width': 'none'
+            })
+            .addClass('truncated')
+            .html('')
+            .appendTo($button.parent());
+
+          // Calculate new total width of buttons
+          buttonsWidth = buttonsWidth - $tmp.outerWidth(true) + $button.outerWidth(true);
 
           // Remove label
           $button.html('');
-          buttons[buttonId].isTruncated = true;
           $button.addClass('truncated');
-
-          // Calculate new total width of buttons
-          buttonsWidth = buttonsWidth - oldButtonWidth + $button.outerWidth(true);
+          buttons[buttonId].isTruncated = true;
+          $tmp.remove();
           if (buttonsWidth < maxButtonsWidth) {
+            // Buttons are small enough.
             return;
           }
         }
@@ -642,30 +655,23 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         if (buttons[buttonId].isTruncated && buttons[buttonId].isVisible) {
           // Check if adding label exceeds allowed width
           var $button = buttons[buttonId].$element;
-          var $tmp = $button
-            .clone()
+          var $tmp = $button.clone()
+            .css({
+              'position': 'absolute',
+              'white-space': 'nowrap',
+              'max-width': 'none'
+            }).removeClass('truncated')
+            .html(buttons[buttonId].text)
             .appendTo($button.parent());
 
-          var oldWidth = $tmp.outerWidth(true);
-
-        $tmp.css({
-            'position': 'absolute',
-            'white-space': 'nowrap',
-            'max-width': 'none'
-          }).removeClass('truncated')
-            .html(buttons[buttonId].text);
-
-          var newWidth = $tmp.outerWidth(true);
-
-          buttonsWidth = buttonsWidth - oldWidth + newWidth;
-          if (maxButtonsWidth - buttonsWidth < 5) {
-          }
+          // Calculate new total width of buttons
+          buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
 
           if (buttonsWidth < maxButtonsWidth) {
             // Restore label
             $button.html(buttons[buttonId].text);
+            $button.removeClass('truncated');
             buttons[buttonId].isTruncated = false;
-            buttons[buttonId].$element.removeClass('truncated');
             $tmp.remove();
           } else {
             $tmp.remove();

@@ -1,6 +1,6 @@
 .h5p-question-image {
-  text-align: center;
-  margin: 1.5em auto;
+  text-align: left;
+  margin: 1.5em;
 }
 .h5p-question-image img {
   display: block;
@@ -16,18 +16,30 @@
   display: inline-block;
   position: relative;
 }
+
+.h5p-question-image-scalable {
+  cursor: pointer;
+}
+
 .h5p-question-image-scalable:before {
   position: absolute;
   font-family: 'H5PFontAwesome4';
   content: "\f067";
-  right: 0.5em;
-  top: 0.5em;
+  right: 7px;
+  top: 7px;
   color: #fff;
-  text-shadow: 0 0 0.25em rgba(0, 0, 0, 0.75);
-  width: 1em;
-  height: 1em;
-  line-height: 1em;
+  font-size: 10px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  width: 18px;
+  height: 18px;
+  line-height: 20px;
+  text-align: center;
+  vertical-align: middle;
 }
+
 .h5p-question-image-large .h5p-question-image-scalable:before {
   content: "\f068";
 }
@@ -103,7 +115,15 @@
   margin: 0 0 1.5em;
 }
 
-/* Remove margins for truncated buttons */
+/* Truncated buttons */
+.h5p-question .h5p-joubelui-button.truncated {
+  width: 2.235em;
+  height: 2.235em;
+  border-radius: 50%;
+  padding: 0;
+  text-align: center;
+}
+
 .h5p-question .h5p-joubelui-button.truncated:before {
   padding: 0;
 }
