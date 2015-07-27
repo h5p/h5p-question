@@ -629,7 +629,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             .appendTo($button.parent());
 
           // Calculate new total width of buttons
-          buttonsWidth = buttonsWidth - $tmp.outerWidth(true) + $button.outerWidth(true);
+          buttonsWidth = buttonsWidth + $tmp.outerWidth(true) - $button.outerWidth(true);
 
           // Remove label
           $button.html('');
