@@ -580,26 +580,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       // A static margin is added as buffer for smoother transitions
-      var staticMargins = 3;
+      var staticMargins = 2;
       var buttonsWidth = 0;
       for (var i in buttons) {
         var $element = buttons[i].$element;
         if (buttons[i].isVisible) {
-          var $tmp = $element.clone().css({
-            'position': 'absolute',
-            'white-space': 'nowrap',
-            'max-width': 'none'
-          }).appendTo($element.parent());
-
           // Round up
-          buttonsWidth += $tmp.outerWidth(true) + staticMargins;
-          $tmp.remove();
+          buttonsWidth += Math.ceil($element.outerWidth(true)) + staticMargins;
         }
       }
 
-      // Round up button width and down section width to closest em.
+      // Add static margins to final widths.
       buttonsWidth = buttonsWidth + staticMargins;
-      var buttonSectionWidth = sections.buttons.$element.width() - staticMargins;
+      var buttonSectionWidth = Math.floor(sections.buttons.$element.width()) - staticMargins;
       if (buttonsWidth >= buttonSectionWidth) {
         removeButtonLabels(buttonsWidth, buttonSectionWidth)
       } else {
@@ -629,7 +622,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             .appendTo($button.parent());
 
           // Calculate new total width of buttons
-          buttonsWidth = buttonsWidth + $tmp.outerWidth(true) - $button.outerWidth(true);
+          buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
 
           // Remove label
           $button.html('');
