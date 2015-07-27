@@ -132,8 +132,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }).appendTo($element.parent());
 
       // Apply height to element
-      $element.css('max-height', $tmp.height());
+      var h = $tmp.height();
+      $element.css('max-height', h);
       $tmp.remove();
+      return h;
     };
 
     /**
