@@ -7,10 +7,10 @@ to create tasks that can be used inside other content types.
 Typically your question type will need to do the following (examples from fill in the blanks)
 
 1. Call the constructor from your questiontypes constructor:
-Question.call(self, 'blanks');
+H5P.Question.call(self, 'blanks');
 
 2. Set your content type's prototype to use Question's prototype:
-Blanks.prototype = Object.create(Question.prototype);
+Blanks.prototype = Object.create(H5P.Question.prototype);
 2.1. But you still want to use your own constructor:
 Blanks.prototype.constructor = Blanks;
 
