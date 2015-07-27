@@ -76,7 +76,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Insert element with given the ID into the DOM.
+     * Insert element with given ID into the DOM.
      *
      * @private
      * @param {array} order
