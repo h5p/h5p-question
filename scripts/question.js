@@ -76,7 +76,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Insert element with given the ID into the DOM.
+     * Insert element with given ID into the DOM.
      *
      * @private
      * @param {array} order
@@ -525,6 +525,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $container
      */
     self.attach = function ($container) {
+      this.setActivityStarted();
       // The first time we attach we also create our DOM elements.
       if ($wrapper === undefined) {
         if (self.registerDomElements !== undefined &&
