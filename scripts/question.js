@@ -25,7 +25,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var buttonOrder = [];
 
     // Wrapper when attached
-    var $wrapper;
+    this.$questionContainer;
 
     // ScoreBar
     var scoreBar;
@@ -340,10 +340,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           register('feedback', content);
         }
 
-        if ($wrapper) {
+        if (this.$questionContainer) {
           // Make visible
           if (!sections.feedback.$element.is(':visible')) {
-            insert(self.order, 'feedback', sections, $wrapper);
+            insert(self.order, 'feedback', sections, this.$questionContainer);
           }
 
           // Show feedback section
@@ -552,7 +552,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     self.attach = function ($container) {
       this.setActivityStarted();
       // The first time we attach we also create our DOM elements.
-      if ($wrapper === undefined) {
+      if (this.$questionContainer === undefined) {
+        this.$questionContainer = $container;
         if (self.registerDomElements !== undefined &&
            (self.registerDomElements instanceof Function ||
            typeof self.registerDomElements === 'function')) {
@@ -564,7 +565,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       // Prepare container
-      $wrapper = $container;
       $container.html('').addClass('h5p-question h5p-' + type);
 
       // Add sections in given order
