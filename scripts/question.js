@@ -41,7 +41,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Keep track of the hiding and showing of buttons.
     var toggleButtonsTimer;
-    
+
     // Keep track of resizing of the entire question
     var resizeLoopsLeft = 0;
     var resizeTimerId;
@@ -97,7 +97,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       for (var i = 0; i < order.length; i++) {
         if (order[i] === id) {
           // Found our pos
-          while (i > 0 && !elements[order[i - 1]].$element.is(':visible')) {
+          while (i > 0 && !elements[order[i - 1]] && !elements[order[i - 1]].$element.is(':visible')) {
             i--;
           }
           if (i === 0) {
@@ -316,16 +316,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.setFeedback = function (content, score, maxScore) {
       if (content) {
-        $feedback = $('<div>', {
+        sections.feedback.$element = $('<div>', {
           'class': 'h5p-question-feedback-container'
         });
 
         if (scoreBar === undefined) {
           scoreBar = JoubelUI.createScoreBar(maxScore);
         }
-        scoreBar.appendTo($feedback);
+        scoreBar.appendTo(sections.feedback.$element);
         scoreBar.setScore(score);
-        content = $feedback.append($('<div>', {
+        content = sections.feedback.$element.append($('<div>', {
           'class': 'h5p-question-feedback-content',
           html: content
         }));
@@ -368,11 +368,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             sections.feedback.$element.detach();
           }
         }, 150);
-        self.resizeAnimation(150);
+        //self.resizeAnimation(150);
       }
     };
-    
-    self.resizeAnimation = function (time) {      
+
+    self.resizeAnimation = function (time) {
       if (time / 40 > resizeLoopsLeft) {
         resizeLoopsLeft = Math.ceil(time / 40);
         if (resizeTimerId === undefined) {
