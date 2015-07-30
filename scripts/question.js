@@ -316,6 +316,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.setFeedback = function (content, score, maxScore) {
       if (content) {
+        if (!sections.feedback) {
+          sections.feedback = {};
+        }
         sections.feedback.$element = $('<div>', {
           'class': 'h5p-question-feedback-container'
         });
