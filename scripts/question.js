@@ -128,7 +128,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $tmp = $element.clone()
         .css({
           'position': 'absolute',
-          'max-height': 'none'
+          'max-height': 'none',
+          'margin': 0,
+          'padding': 0
         }).appendTo($element.parent());
 
       // Apply height to element
@@ -596,8 +598,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Resize sections, used for resizing sections when question is resized.
      */
     var resizeSections = function () {
+      // Necessary when content changes, for example when entering full screen
       if (sections.feedback !== undefined) {
         setElementHeight(sections.feedback.$element);
+      }
+
+      if (sections.buttons !== undefined) {
+        setElementHeight(sections.buttons.$element);
       }
     };
 
