@@ -41,6 +41,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Keep track of the hiding and showing of buttons.
     var toggleButtonsTimer;
+    
+    // Keep track of resizing of the entire question
+    var resizeLoopsLeft = 0;
+    var resizeTimerId;
 
     /**
      * Register section with given content.
@@ -130,8 +134,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }).appendTo($element.parent());
 
       // Apply height to element
-      $element.css('max-height', $tmp.height());
+      var h = $tmp.height();
+      $element.css('max-height', h);
       $tmp.remove();
+      return h;
     };
 
     /**
@@ -345,6 +351,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             sections.feedback.$element.addClass('h5p-question-visible');
             setElementHeight(sections.feedback.$element);
           }, 0);
+          self.resizeAnimation(150);
         }
       }
       else if (sections.feedback && showFeedback) {
@@ -361,6 +368,22 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             sections.feedback.$element.detach();
           }
         }, 150);
+        self.resizeAnimation(150);
+      }
+    };
+    
+    self.resizeAnimation = function (time) {      
+      if (time / 40 > resizeLoopsLeft) {
+        resizeLoopsLeft = Math.ceil(time / 40);
+        if (resizeTimerId === undefined) {
+          resizeTimerId = setInterval(function() {
+            self.trigger('resize');
+            if (resizeLoopsLeft <= 0) {
+              clearInterval(resizeTimerId);
+            }
+            resizeLoopsLeft--;
+          }, 40);
+        }
       }
     };
 
@@ -555,6 +578,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Only append once to DOM for optimal performance
       $container.append($sections);
+      this.trigger('domChanged', {
+        '$target': $container,
+        'library': 'TODO',
+        'contentId': this.contentId,
+        'key': 'newLibrary'
+      }, {'bubbles': true, 'external': true});
     };
 
     /**
