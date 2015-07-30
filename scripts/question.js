@@ -316,31 +316,28 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.setFeedback = function (content, score, maxScore) {
       if (content) {
-        if (!sections.feedback) {
-          sections.feedback = {};
-        }
-        sections.feedback.$element = $('<div>', {
+        var $feedback = $('<div>', {
           'class': 'h5p-question-feedback-container'
         });
 
         if (scoreBar === undefined) {
           scoreBar = JoubelUI.createScoreBar(maxScore);
         }
-        scoreBar.appendTo(sections.feedback.$element);
+        scoreBar.appendTo($feedback);
         scoreBar.setScore(score);
-        content = sections.feedback.$element.append($('<div>', {
+        $feedback.append($('<div>', {
           'class': 'h5p-question-feedback-content',
-          html: content
+          'html': content
         }));
 
         showFeedback = true;
         if (sections.feedback) {
           // Update section
-          update('feedback', content);
+          update('feedback', $feedback);
         }
         else {
           // Create section
-          register('feedback', content);
+          register('feedback', $feedback);
         }
 
         if (this.$questionContainer) {
@@ -368,7 +365,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         setTimeout(function () {
           // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
           if (!showFeedback) {
-            sections.feedback.$element.detach();
+            sections.feedback.$element.children().detach();
           }
         }, 150);
         //self.resizeAnimation(150);
