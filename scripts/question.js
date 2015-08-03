@@ -46,6 +46,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var resizeLoopsLeft = 0;
     var resizeTimerId;
 
+    // Keeps track of initialization of question
+    var initialized = false;
+
     /**
      * Register section with given content.
      *
@@ -97,7 +100,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       for (var i = 0; i < order.length; i++) {
         if (order[i] === id) {
           // Found our pos
-          while (i > 0 && !elements[order[i - 1]] && !elements[order[i - 1]].$element.is(':visible')) {
+          while (i > 0 &&
+          (elements[order[i - 1]] === undefined ||
+          !elements[order[i - 1]].$element.is(':visible'))) {
             i--;
           }
           if (i === 0) {
@@ -413,6 +418,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (sections.buttons === undefined)  {
         // We have buttons, register wrapper
         register('buttons');
+        if (initialized) {
+          insert(self.order, 'buttons', sections, self.$questionContainer);
+        }
       }
 
       buttons[id] = {
@@ -584,6 +592,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         'contentId': this.contentId,
         'key': 'newLibrary'
       }, {'bubbles': true, 'external': true});
+
+      initialized = true;
     };
 
     /**
