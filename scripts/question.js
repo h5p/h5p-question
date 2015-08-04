@@ -597,6 +597,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Getter for question wrapper
+     */
+    self.getQuestionContainer = function () {
+      return self.$questionContainer;
+    };
+
+    /**
      * Resize question
      */
     var resize = function () {
