@@ -188,7 +188,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         setTimeout(function () {
           // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
           hideButtons();
-        }, 150);
+        }, 0);
       }
       else {
         hideButtons();
