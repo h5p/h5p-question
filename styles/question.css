@@ -50,8 +50,12 @@
 
 .h5p-question-introduction {
   margin: 1.5em;
+}
+
+.h5p-question-introduction > p {
   font-size: 1.125em;
   line-height: 1.25em;
+  margin: 0;
 }
 
 .h5p-question-content {
