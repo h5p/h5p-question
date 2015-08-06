@@ -714,16 +714,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Calculate new total width of buttons
           buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
 
-          if (buttonsWidth < maxButtonsWidth) {
-            // Restore label
-            $button.html(buttons[buttonId].text);
-            $button.removeClass('truncated');
-            buttons[buttonId].isTruncated = false;
-            $tmp.remove();
-          } else {
-            $tmp.remove();
+          $tmp.remove();
+          if (buttonsWidth >= maxButtonsWidth) {
             return;
           }
+          // Restore label
+          $button.html(buttons[buttonId].text);
+          $button.removeClass('truncated');
+          buttons[buttonId].isTruncated = false;
         }
       }
     };
