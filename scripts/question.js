@@ -343,21 +343,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         else {
           // Create section
           register('feedback', $feedback);
-        }
-
-        if (this.$questionContainer) {
-          // Make visible
-          if (!sections.feedback.$element.is(':visible')) {
+          if (initialized && this.$questionContainer) {
             insert(self.order, 'feedback', sections, this.$questionContainer);
           }
-
-          // Show feedback section
-          setTimeout(function () {
-            sections.feedback.$element.addClass('h5p-question-visible');
-            setElementHeight(sections.feedback.$element);
-          }, 0);
-          self.resizeAnimation(150);
         }
+        // Show feedback section
+        setTimeout(function () {
+          sections.feedback.$element.addClass('h5p-question-visible');
+          setElementHeight(sections.feedback.$element);
+        }, 0);
+        self.resizeAnimation(150);
+
       }
       else if (sections.feedback && showFeedback) {
         showFeedback = false;
@@ -550,6 +546,21 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Set focus to requested button
         buttons[id].$element.focus();
       }
+    };
+
+    /**
+     * Set new element for section
+     * @param {String} id
+     * @param {H5P.jQuery} $element
+     */
+    self.insertSectionAtElement = function (id, $element) {
+      if (sections[id] === undefined) {
+        register(id);
+      }
+      // Queue, in case we are attaching
+      setTimeout(function () {
+        insert([id], id, sections, $element);
+      }, 0);
     };
 
     /**
