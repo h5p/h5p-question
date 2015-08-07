@@ -615,6 +615,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Detach all sections from their parents
+     */
+    self.detachSections = function () {
+      // Deinit Question
+      initialized = false;
+
+      // Detach sections
+      for (var section in sections) {
+        sections[section].$element.detach();
+      }
+    };
+
+    /**
      * Getter for question wrapper
      */
     self.getQuestionContainer = function () {
