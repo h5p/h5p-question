@@ -557,10 +557,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (sections[id] === undefined) {
         register(id);
       }
-      // Queue, in case we are attaching
-      setTimeout(function () {
+      sections[id].parent = $element;
+
+      // Insert section if question is not initialized
+      if (!initialized) {
         insert([id], id, sections, $element);
-      }, 0);
+      }
     };
 
     /**
@@ -591,7 +593,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       for (var i = 0; i < self.order.length; i++) {
         var section = self.order[i];
         if (sections[section]) {
-          $sections.push(sections[section].$element);
+          if (sections[section].parent) {
+            // Section has a different parent
+            sections[section].$element.appendTo(sections[section].parent);
+          } else {
+            $sections.push(sections[section].$element);
+          }
         }
       }
 
