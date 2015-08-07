@@ -618,8 +618,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Resize question
      */
     var resize = function () {
-      resizeSections();
-      resizeButtons();
+      // Allow elements to attach and set their height before resizing
+      setTimeout(function () {
+        resizeSections();
+        resizeButtons();
+      }, 0);
     };
 
     /**
@@ -659,7 +662,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       buttonsWidth = buttonsWidth + staticMargins;
       var buttonSectionWidth = Math.floor(sections.buttons.$element.width()) - staticMargins;
       if (buttonsWidth >= buttonSectionWidth) {
-        removeButtonLabels(buttonsWidth, buttonSectionWidth)
+        removeButtonLabels(buttonsWidth, buttonSectionWidth);
       } else {
         restoreButtonLabels(buttonsWidth, buttonSectionWidth);
       }
