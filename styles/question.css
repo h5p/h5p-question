@@ -166,21 +166,30 @@
   content: "\F058";
 }
 
-/* Remove side margin for h5p-no-frame */
-.h5p-no-frame > .h5p-question > .h5p-question-introduction,
-.h5p-no-frame > .h5p-question > .h5p-question-buttons,
-.h5p-no-frame > .h5p-question > .h5p-question-image,
-.h5p-no-frame > .h5p-question > .h5p-question-content,
-.h5p-no-frame > .h5p-question > .h5p-question-feedback {
+/* Remove margins when no frame */
+.h5p-no-frame > .h5p-question > * {
   margin-left: 0;
   margin-right: 0;
 }
 
-/* Remove side margins for transparent cp elements */
-.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-introduction,
-.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-buttons,
-.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-image,
-.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-content,
-.h5p-course-presentation .h5p-question.h5p-transparent > .h5p-question-feedback {
+.h5p-no-frame > .h5p-question > *:first-child {
+  margin-top: 0;
+}
+
+.h5p-no-frame > .h5p-question > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Remove margins when transparent */
+.h5p-question.h5p-transparent > * {
   margin-left: 0;
 }
+
+.h5p-question.h5p-transparent > *:first-child {
+  margin-top: 0;
+}
+
+.h5p-question.h5p-transparent > *:last-child {
+  margin-bottom: 0;
+}
+
