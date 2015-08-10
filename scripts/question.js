@@ -351,6 +351,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         setTimeout(function () {
           sections.feedback.$element.addClass('h5p-question-visible');
           setElementHeight(sections.feedback.$element);
+
+          // Scroll to bottom after showing feedback
+          scrollToBottom();
         }, 0);
         self.resizeAnimation(150);
 
@@ -583,6 +586,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
            self.registerDomElements();
         }
         self.trigger('registerDomElements');
+      } else {
+        // Update container
+        this.$questionContainer = $container;
       }
 
       // Prepare container
@@ -632,6 +638,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.getQuestionContainer = function () {
       return self.$questionContainer;
+    };
+
+    /**
+     * Scroll to bottom of Question.
+     */
+    var scrollToBottom = function () {
+      if (self.$questionContainer) {
+        self.$questionContainer.parent().animate({
+          scrollTop: self.$questionContainer.css('height')
+        }, "slow");
+      }
     };
 
     /**
