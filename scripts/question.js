@@ -49,6 +49,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Keeps track of initialization of question
     var initialized = false;
 
+    var behaviour = {
+      disableFeedback: false
+    };
+
+    /**
+     * Set behaviour for question
+     * @param options An object containing behaviour that will be extended by Question
+     */
+    self.setBehaviour = function (options) {
+      $.extend(behaviour, options);
+    };
+
     /**
      * Register section with given content.
      *
@@ -318,6 +330,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {number}  maxScore  The maximum score for this question
      */
     self.setFeedback = function (content, score, maxScore) {
+
+      // Feedback is disabled
+      if (behaviour.disableFeedback) {
+        return;
+      }
+
       if (content) {
         var $feedback = $('<div>', {
           'class': 'h5p-question-feedback-container'
