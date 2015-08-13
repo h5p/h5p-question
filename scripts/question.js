@@ -322,6 +322,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Set feedback content (no animation)
+     *
+     * @param {string} content
+     */
+    self.updateFeedbackContent = function (content) {
+      if (sections.feedback && sections.feedback.$element) {
+
+        // Update feedback content html
+        $('.h5p-question-feedback-content', sections.feedback.$element).html(content);
+      }
+    };
+
+    /**
      * Set feedback message.
      * Setting the message to blank or undefined will hide it again.
      *
