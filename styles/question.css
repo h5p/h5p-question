@@ -124,6 +124,7 @@
 /* Remove margins when transparent */
 .h5p-question.h5p-transparent > * {
   margin-left: 0;
+  margin-right: 0;
 }
 
 .h5p-question.h5p-transparent > *:first-child {
