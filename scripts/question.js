@@ -1,3 +1,4 @@
+/*global H5P*/
 H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
   /**
@@ -674,9 +675,36 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     var scrollToBottom = function () {
       if (self.$questionContainer) {
-        self.$questionContainer.parent().animate({
-          scrollTop: self.$questionContainer.css('height')
-        }, "slow");
+        if (!self.$questionContainer.is('.h5p-standalone') || H5P.isFullscreen) {
+          /**
+           * Get scrollable ancestor of element
+           *
+           * @param {jQuery} $element
+           * @returns {jQuery} Parent element that is scrollable
+           */
+          var findScrollableAncestor = function ($element) {
+
+            // Not found
+            if (!$element) {
+              return;
+            }
+
+            if ($element.css('overflow-y') === 'auto') {
+              return $element;
+            } else {
+              return findScrollableAncestor($element.parent());
+            }
+          };
+
+          var scrollableAncestor = findScrollableAncestor(self.$questionContainer);
+
+          // Scroll to bottom of scrollable ancestor
+          if (scrollableAncestor) {
+            scrollableAncestor.animate({
+              scrollTop: self.$questionContainer.css('height')
+            }, "slow");
+          }
+        }
       }
     };
 
