@@ -50,6 +50,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Keeps track of initialization of question
     var initialized = false;
 
+    /**
+     * @type {Object} behaviour Behaviour of Question
+     * @property {Boolean} behaviour.disableFeedback Set to true to disable feedback section
+     */
     var behaviour = {
       disableFeedback: false
     };
@@ -296,6 +300,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         },
         appendTo: $imgWrap
       });
+
+      return self;
     };
 
     /**
@@ -305,6 +311,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.setIntroduction = function (content) {
       register('introduction', content);
+
+      return self;
     };
 
     /**
@@ -320,6 +328,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (options && options.class) {
         sections.content.$element.addClass(options.class);
       }
+
+      return self;
     };
 
     /**
@@ -333,6 +343,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Update feedback content html
         $('.h5p-question-feedback-content', sections.feedback.$element).html(content);
       }
+
+      return self;
     };
 
     /**
@@ -347,7 +359,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Feedback is disabled
       if (behaviour.disableFeedback) {
-        return;
+        return self;
       }
 
       if (content) {
@@ -404,6 +416,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }, 150);
         //self.resizeAnimation(150);
       }
+
+      return self;
     };
 
     self.resizeAnimation = function (time) {
@@ -441,7 +455,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.addButton = function (id, text, clicked, visible) {
       if (buttons[id]) {
-        return; // Already registered
+        return self; // Already registered
       }
 
       if (sections.buttons === undefined)  {
@@ -473,6 +487,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         buttons[id].isVisible = true;
         sections.buttons.$element.addClass('h5p-question-visible');
       }
+
+      return self;
     };
 
     /**
@@ -482,12 +498,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.showButton = function (id) {
       if (buttons[id] === undefined) {
-        return;
+        return self;
       }
 
       // Skip if already being shown
       if (buttonsToShow.indexOf(id) !== -1) {
-        return;
+        return self;
       }
 
       // Check if button is going to be hidden on next tick
@@ -495,13 +511,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (exists !== -1) {
         // Just skip hiding it
         buttonsToHide.splice(exists, 1);
-        return;
+        return self;
       }
 
       // Skip if visible
       buttons[id].isVisible = true;
       if (buttons[id].$element.is(':visible')) {
-        return;
+        return self;
       }
 
       // Show button on next tick
@@ -510,6 +526,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (!toggleButtonsTimer) {
         toggleButtonsTimer = setTimeout(toggleButtons, 0);
       }
+
+      return self;
     };
 
     /**
@@ -519,12 +537,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.hideButton = function (id) {
       if (buttons[id] === undefined) {
-        return;
+        return self;
       }
 
       // Skip if already being hidden
       if (buttonsToHide.indexOf(id) !== -1) {
-        return;
+        return self;
       }
 
       // Check if buttons is going to be shown on next tick
@@ -532,7 +550,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (exists !== -1) {
         // Just skip showing it
         buttonsToShow.splice(exists, 1);
-        return;
+        return self;
       }
 
       // Skip if not visible
@@ -540,7 +558,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (!buttons[id].$element.is(':visible')) {
         // Make sure it is detached in case the container is hidden.
         buttons[id].$element.detach();
-        return;
+        return self;
       }
 
       // Hide button on next tick.
@@ -548,6 +566,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (!toggleButtonsTimer) {
         toggleButtonsTimer = setTimeout(toggleButtons, 0);
       }
+
+      return self;
     };
 
     /**
@@ -579,6 +599,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Set focus to requested button
         buttons[id].$element.focus();
       }
+
+      return self;
     };
 
     /**
@@ -596,6 +618,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (!initialized) {
         insert([id], id, sections, $element);
       }
+
+      return self;
     };
 
     /**
@@ -648,6 +672,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }, {'bubbles': true, 'external': true});
 
       initialized = true;
+
+      return self;
     };
 
     /**
@@ -661,6 +687,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       for (var section in sections) {
         sections[section].$element.detach();
       }
+
+      return self;
     };
 
     /**
