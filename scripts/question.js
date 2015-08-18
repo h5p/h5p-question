@@ -336,9 +336,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Set feedback content (no animation)
      *
      * @param {string} content
+     * @param {boolean} [extendContent] Optional. True will extend content, instead of replacing it
      */
-    self.updateFeedbackContent = function (content) {
+    self.updateFeedbackContent = function (content, extendContent) {
       if (sections.feedback && sections.feedback.$element) {
+
+        if (extendContent) {
+          content = $('.h5p-question-feedback-content', sections.feedback.$element).html() + ' ' + content;
+        }
 
         // Update feedback content html
         $('.h5p-question-feedback-content', sections.feedback.$element).html(content);
