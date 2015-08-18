@@ -402,6 +402,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
       else if (sections.feedback && showFeedback) {
         showFeedback = false;
+        scoreBar.setScore(0);
 
         // Hide feedback section
         sections.feedback.$element.removeClass('h5p-question-visible');
