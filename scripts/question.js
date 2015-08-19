@@ -61,6 +61,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Keeps track of thumb state
     var imageThumb = true;
 
+    // Keeps track of image transitions
+    var imageTransitionTimer;
+
     /**
      * Set behaviour for question
      * @param options An object containing behaviour that will be extended by Question
@@ -230,6 +233,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $img
      */
     var scaleImage = function ($img) {
+      var transitionTimer;
       if (imageThumb) {
         // Find our target height
         var $tmp = $img.clone()
@@ -237,22 +241,41 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         var targetHeight = $tmp.height();
         var targetWidth = $tmp.width();
         var canUseTotalWidth = targetWidth >= sections.image.$element.width();
+        transitionTimer = 0;
         $tmp.remove();
 
-        // Animate
-        setTimeout(function () {
-          $img.css('maxHeight', targetHeight);
+        clearTimeout(imageTransitionTimer);
 
-          // Only remove margins of section if image can use it.
-          if (canUseTotalWidth) {
-            sections.image.$element.addClass('h5p-question-image-large');
-          }
-        }, 0);
+        // Only remove margins of section if image can use it.
+        if (canUseTotalWidth && !sections.image.$element.hasClass('h5p-question-image-fill-width')) {
+          transitionTimer = 300;
+          sections.image.$element.addClass('h5p-question-image-fill-width');
+        }
+
+        // Animate to full size after animating it into place
+        imageTransitionTimer = setTimeout(function () {
+          $img.css('maxHeight', targetHeight);
+          sections.image.$element.addClass('h5p-question-image-large');
+        }, transitionTimer);
         imageThumb = false;
       }
       else {
-        sections.image.$element.removeClass('h5p-question-image-large');
+        clearTimeout(imageTransitionTimer);
+        transitionTimer = 0;
         $img.css('maxHeight', '');
+
+        // Let image scale down before repositioning it
+        if (sections.image.$element.hasClass('h5p-question-image-large')) {
+          transitionTimer = 300;
+        }
+        sections.image.$element.removeClass('h5p-question-image-large');
+
+        // Reposition image after scaling it
+        imageTransitionTimer = setTimeout(function () {
+          sections.image.$element.removeClass('h5p-question-image-fill-width');
+        }, transitionTimer);
+
+
         imageThumb = true;
       }
     };
