@@ -203,13 +203,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (sections.buttons && buttonsToHide.length === sections.buttons.$element.children().length) {
         // All buttons are going to be hidden. Hide container using transition.
         sections.buttons.$element.removeClass('h5p-question-visible');
-        sections.buttons.$element.css('max-height', 0);
-
-        // Detach after transition
-        setTimeout(function () {
-          // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
-          hideButtons();
-        }, 0);
+        sections.buttons.$element.css('max-height', '');
+        hideButtons();
       }
       else {
         hideButtons();
@@ -218,6 +213,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         if (!sections.buttons.$element.is(':empty')) {
           sections.buttons.$element.addClass('h5p-question-visible');
           setElementHeight(sections.buttons.$element);
+
+          // Trigger resize after animation
+          setTimeout(function () {
+            self.trigger('resize');
+          }, 150);
         }
       }
 
@@ -433,8 +433,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
           // Scroll to bottom after showing feedback
           scrollToBottom();
+
+          // Trigger resize after animation
+          setTimeout(function () {
+            self.trigger('resize');
+          }, 150);
         }, 0);
-        self.resizeAnimation(150);
 
       }
       else if (sections.feedback && showFeedback) {
@@ -443,34 +447,21 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Hide feedback section
         sections.feedback.$element.removeClass('h5p-question-visible');
-        sections.feedback.$element.css('max-height', 0);
+        sections.feedback.$element.css('max-height', '');
 
         // Detach after transition
         setTimeout(function () {
           // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
           if (!showFeedback) {
             sections.feedback.$element.children().detach();
+
+            // Trigger resize after animation
+            self.trigger('resize');
           }
         }, 150);
-        //self.resizeAnimation(150);
       }
 
       return self;
-    };
-
-    self.resizeAnimation = function (time) {
-      if (time / 40 > resizeLoopsLeft) {
-        resizeLoopsLeft = Math.ceil(time / 40);
-        if (resizeTimerId === undefined) {
-          resizeTimerId = setInterval(function() {
-            self.trigger('resize');
-            if (resizeLoopsLeft <= 0) {
-              clearInterval(resizeTimerId);
-            }
-            resizeLoopsLeft--;
-          }, 40);
-        }
-      }
     };
 
     /**
