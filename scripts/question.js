@@ -245,6 +245,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         $tmp.remove();
 
         clearTimeout(imageTransitionTimer);
+        sections.image.$element.addClass('h5p-question-image-large');
 
         // Only remove margins of section if image can use it.
         if (canUseTotalWidth && !sections.image.$element.hasClass('h5p-question-image-fill-width')) {
@@ -255,7 +256,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Animate to full size after animating it into place
         imageTransitionTimer = setTimeout(function () {
           $img.css('maxHeight', targetHeight);
-          sections.image.$element.addClass('h5p-question-image-large');
         }, transitionTimer);
         imageThumb = false;
       }
