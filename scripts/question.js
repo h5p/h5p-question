@@ -58,6 +58,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       disableFeedback: false
     };
 
+    // Keeps track of thumb state
+    var imageThumb = true;
+
     /**
      * Set behaviour for question
      * @param options An object containing behaviour that will be extended by Question
@@ -227,24 +230,30 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $img
      */
     var scaleImage = function ($img) {
-      if (!sections.image.$element.hasClass('h5p-question-image-large')) {
+      if (imageThumb) {
         // Find our target height
         var $tmp = $img.clone()
           .css('max-height', 'none').appendTo($img.parent());
         var targetHeight = $tmp.height();
+        var targetWidth = $tmp.width();
+        var canUseTotalWidth = targetWidth >= sections.image.$element.width();
         $tmp.remove();
 
         // Animate
         setTimeout(function () {
           $img.css('maxHeight', targetHeight);
-          sections.image.$element.addClass('h5p-question-image-large');
+
+          // Only remove margins of section if image can use it.
+          if (canUseTotalWidth) {
+            sections.image.$element.addClass('h5p-question-image-large');
+          }
         }, 0);
-        thumb = false;
+        imageThumb = false;
       }
       else {
         sections.image.$element.removeClass('h5p-question-image-large');
         $img.css('maxHeight', '');
-        thumb = true;
+        imageThumb = true;
       }
     };
 
