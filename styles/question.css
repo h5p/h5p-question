@@ -1,6 +1,6 @@
 .h5p-question-image {
   text-align: left;
-  margin: 0 0 1.5em;
+  margin: 0 0 1em;
   line-height: 0.8125em;
 }
 .h5p-question-image img {
@@ -16,9 +16,9 @@
 .h5p-question-image-wrap {
   display: inline-block;
   position: relative;
-  margin-bottom: 1.5em;
-  -webkit-transform: translate(1.5em, 1.5em);
-  transform: translate(1.5em, 1.5em);
+  margin-bottom: 1em;
+  -webkit-transform: translate(1em, 1em);
+  transform: translate(1em, 1em);
   -webkit-transition: -webkit-transform 0.3s, margin 0.3s;
   -moz-transition: transform 0.3s, margin 0.3s;
   transition: transform 0.3s, margin 0.3s;
@@ -57,7 +57,7 @@
 }
 
 .h5p-question-introduction {
-  margin: 1.5em;
+  margin: 1em;
 }
 
 .h5p-question-introduction > p {
@@ -67,18 +67,18 @@
 }
 
 .h5p-question-content {
-  margin: 1.5em;
+  margin: 1em;
 }
 .h5p-question-feedback {
   font-weight: bold;
   color: #1a73d9;
-  margin: 0 1.5em;
+  margin: 0 1em;
   max-height: 0;
   opacity: 0;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
 .h5p-question-feedback.h5p-question-visible {
-  margin: 1.5em;
+  margin: 1em;
   opacity: 1;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }
@@ -95,14 +95,14 @@
 
 .h5p-question-buttons {
   overflow: hidden;
-  margin: 0 1.5em;
+  margin: 0 1em;
   max-height: 0;
   opacity: 0;
   transition: none;
 }
 .h5p-question-buttons.h5p-question-visible {
   max-height: none;
-  margin: 1.5em 1.5em 0;
+  margin: 1em 1em 0;
   opacity: 1;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }
