@@ -102,7 +102,6 @@
 }
 .h5p-question-buttons.h5p-question-visible {
   max-height: none;
-  margin: 1em 1em 0;
   opacity: 1;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }

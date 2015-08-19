@@ -1,4 +1,3 @@
-/*global H5P*/
 H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
   /**
@@ -26,7 +25,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var buttonOrder = [];
 
     // Wrapper when attached
-    this.$questionContainer;
+    var $wrapper;
 
     // ScoreBar
     var scoreBar;
@@ -63,14 +62,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Keeps track of image transitions
     var imageTransitionTimer;
-
-    /**
-     * Set behaviour for question
-     * @param options An object containing behaviour that will be extended by Question
-     */
-    self.setBehaviour = function (options) {
-      $.extend(behaviour, options);
-    };
 
     /**
      * Register section with given content.
@@ -142,7 +133,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Set element max height, used for animations
+     * Set element max height, used for animations.
+     *
      * @param {H5P.jQuery} $element
      */
     var setElementHeight = function ($element) {
@@ -203,13 +195,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (sections.buttons && buttonsToHide.length === sections.buttons.$element.children().length) {
         // All buttons are going to be hidden. Hide container using transition.
         sections.buttons.$element.removeClass('h5p-question-visible');
-        sections.buttons.$element.css('max-height', 0);
-
-        // Detach after transition
-        setTimeout(function () {
-          // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
-          hideButtons();
-        }, 0);
+        sections.buttons.$element.css('max-height', '');
+        hideButtons();
       }
       else {
         hideButtons();
@@ -218,6 +205,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         if (!sections.buttons.$element.is(':empty')) {
           sections.buttons.$element.addClass('h5p-question-visible');
           setElementHeight(sections.buttons.$element);
+
+          // Trigger resize after animation
+          setTimeout(function () {
+            self.trigger('resize');
+          }, 150);
         }
       }
 
@@ -278,6 +270,183 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         imageThumb = true;
       }
+    };
+
+    /**
+     * Get scrollable ancestor of element
+     *
+     * @private
+     * @param {H5P.jQuery} $element
+     * @returns {H5P.jQuery} Parent element that is scrollable
+     */
+    var findScrollableAncestor = function ($element) {
+      if (!$element) {
+        return; // Not found
+      }
+
+      if ($element.css('overflow-y') === 'auto') {
+        return $element;
+      }
+      else {
+        return findScrollableAncestor($element.parent());
+      }
+    };
+
+    /**
+     * Scroll to bottom of Question.
+     *
+     * @private
+     */
+    var scrollToBottom = function () {
+      if (!$wrapper || ($wrapper.hasClass('h5p-standalone') && !H5P.isFullscreen)) {
+        return; // No scroll
+      }
+
+      var scrollableAncestor = findScrollableAncestor($wrapper);
+
+      // Scroll to bottom of scrollable ancestor
+      if (scrollableAncestor) {
+        scrollableAncestor.animate({
+          scrollTop: $wrapper.css('height')
+        }, "slow");
+      }
+    };
+
+    /**
+     * Resize sections, used for resizing sections when question is resized.
+     *
+     * @private
+     */
+    var resizeSections = function () {
+      // Necessary when content changes, for example when entering full screen
+      if (sections.feedback !== undefined) {
+        setElementHeight(sections.feedback.$element);
+      }
+
+      if (sections.buttons !== undefined) {
+        setElementHeight(sections.buttons.$element);
+      }
+    };
+
+    /**
+     * Resize buttons to fit container width
+     *
+     * @private
+     */
+    var resizeButtons = function () {
+      if (!buttons || !sections.buttons) {
+        return;
+      }
+
+      // A static margin is added as buffer for smoother transitions
+      var staticMargins = 2;
+      var buttonsWidth = 0;
+      for (var i in buttons) {
+        var $element = buttons[i].$element;
+        if (buttons[i].isVisible) {
+          // Round up
+          buttonsWidth += Math.ceil($element.outerWidth(true)) + staticMargins;
+        }
+      }
+
+      // Add static margins to final widths.
+      buttonsWidth = buttonsWidth + staticMargins;
+
+      // Allow button section to attach before getting width
+      setTimeout(function () {
+        var buttonSectionWidth = Math.floor(sections.buttons.$element.width()) - staticMargins;
+        if (buttonsWidth >= buttonSectionWidth) {
+          removeButtonLabels(buttonsWidth, buttonSectionWidth);
+        }
+        else {
+          restoreButtonLabels(buttonsWidth, buttonSectionWidth);
+        }
+      }, 0);
+    };
+
+    /**
+     * Remove button labels until they use less than max width.
+     *
+     * @private
+     * @param {Number} buttonsWidth Total width of all buttons
+     * @param {Number} maxButtonsWidth Max width allowed for buttons
+     */
+    var removeButtonLabels = function (buttonsWidth, maxButtonsWidth) {
+      // Reverse traversal
+      for (var i = buttonOrder.length - 1; i >= 0; i--) {
+        var buttonId = buttonOrder[i];
+        if (!buttons[buttonId].isTruncated && buttons[buttonId].isVisible) {
+          var $button = buttons[buttonId].$element;
+          var $tmp = $button.clone()
+            .css({
+              'position': 'absolute',
+              'white-space': 'nowrap',
+              'max-width': 'none'
+            })
+            .addClass('truncated')
+            .html('')
+            .appendTo($button.parent());
+
+          // Calculate new total width of buttons
+          buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
+
+          // Remove label
+          $button.html('');
+          $button.addClass('truncated');
+          buttons[buttonId].isTruncated = true;
+          $tmp.remove();
+          if (buttonsWidth < maxButtonsWidth) {
+            // Buttons are small enough.
+            return;
+          }
+        }
+      }
+    };
+
+    /**
+     * Restore button labels until it fills maximum possible width without exceeding the max width.
+     *
+     * @private
+     * @param {Number} buttonsWidth Total width of all buttons
+     * @param {Number} maxButtonsWidth Max width allowed for buttons
+     */
+    var restoreButtonLabels = function (buttonsWidth, maxButtonsWidth) {
+      for (var i = 0; i < buttonOrder.length; i++) {
+        var buttonId = buttonOrder[i];
+        if (buttons[buttonId].isTruncated && buttons[buttonId].isVisible) {
+          // Check if adding label exceeds allowed width
+          var $button = buttons[buttonId].$element;
+          var $tmp = $button.clone()
+            .css({
+              'position': 'absolute',
+              'white-space': 'nowrap',
+              'max-width': 'none'
+            }).removeClass('truncated')
+            .html(buttons[buttonId].text)
+            .appendTo($button.parent());
+
+          // Calculate new total width of buttons
+          buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
+
+          $tmp.remove();
+          if (buttonsWidth >= maxButtonsWidth) {
+            return;
+          }
+          // Restore label
+          $button.html(buttons[buttonId].text);
+          $button.removeClass('truncated');
+          buttons[buttonId].isTruncated = false;
+        }
+      }
+    };
+
+    /**
+     * Set behaviour for question.
+     *
+     * @param {Object} options An object containing behaviour that will be extended by Question
+     */
+    self.setBehaviour = function (options) {
+      $.extend(behaviour, options);
     };
 
     /**
@@ -365,32 +534,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Set feedback content (no animation)
-     *
-     * @param {string} content
-     * @param {boolean} [extendContent] Optional. True will extend content, instead of replacing it
-     */
-    self.updateFeedbackContent = function (content, extendContent) {
-      if (sections.feedback && sections.feedback.$element) {
-
-        if (extendContent) {
-          content = $('.h5p-question-feedback-content', sections.feedback.$element).html() + ' ' + content;
-        }
-
-        // Update feedback content html
-        $('.h5p-question-feedback-content', sections.feedback.$element).html(content);
-      }
-
-      return self;
-    };
-
-    /**
      * Set feedback message.
      * Setting the message to blank or undefined will hide it again.
      *
-     * @param {string}  content
-     * @param {number}  score     The score
-     * @param {number}  maxScore  The maximum score for this question
+     * @param {string} content
+     * @param {number} score The score
+     * @param {number} maxScore The maximum score for this question
      */
     self.setFeedback = function (content, score, maxScore) {
 
@@ -422,8 +571,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         else {
           // Create section
           register('feedback', $feedback);
-          if (initialized && this.$questionContainer) {
-            insert(self.order, 'feedback', sections, this.$questionContainer);
+          if (initialized && $wrapper) {
+            insert(self.order, 'feedback', sections, $wrapper);
           }
         }
         // Show feedback section
@@ -433,8 +582,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
           // Scroll to bottom after showing feedback
           scrollToBottom();
+
+          // Trigger resize after animation
+          setTimeout(function () {
+            self.trigger('resize');
+          }, 150);
         }, 0);
-        self.resizeAnimation(150);
 
       }
       else if (sections.feedback && showFeedback) {
@@ -443,34 +596,41 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Hide feedback section
         sections.feedback.$element.removeClass('h5p-question-visible');
-        sections.feedback.$element.css('max-height', 0);
+        sections.feedback.$element.css('max-height', '');
 
         // Detach after transition
         setTimeout(function () {
           // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
           if (!showFeedback) {
             sections.feedback.$element.children().detach();
+
+            // Trigger resize after animation
+            self.trigger('resize');
           }
         }, 150);
-        //self.resizeAnimation(150);
       }
 
       return self;
     };
 
-    self.resizeAnimation = function (time) {
-      if (time / 40 > resizeLoopsLeft) {
-        resizeLoopsLeft = Math.ceil(time / 40);
-        if (resizeTimerId === undefined) {
-          resizeTimerId = setInterval(function() {
-            self.trigger('resize');
-            if (resizeLoopsLeft <= 0) {
-              clearInterval(resizeTimerId);
-            }
-            resizeLoopsLeft--;
-          }, 40);
+    /**
+     * Set feedback content (no animation).
+     *
+     * @param {string} content
+     * @param {boolean} [extendContent] True will extend content, instead of replacing it
+     */
+    self.updateFeedbackContent = function (content, extendContent) {
+      if (sections.feedback && sections.feedback.$element) {
+
+        if (extendContent) {
+          content = $('.h5p-question-feedback-content', sections.feedback.$element).html() + ' ' + content;
         }
+
+        // Update feedback content html
+        $('.h5p-question-feedback-content', sections.feedback.$element).html(content);
       }
+
+      return self;
     };
 
     /**
@@ -500,7 +660,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // We have buttons, register wrapper
         register('buttons');
         if (initialized) {
-          insert(self.order, 'buttons', sections, self.$questionContainer);
+          insert(self.order, 'buttons', sections, $wrapper);
         }
       }
 
@@ -642,7 +802,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Set new element for section
+     * Set new element for section.
+     *
      * @param {String} id
      * @param {H5P.jQuery} $element
      */
@@ -667,9 +828,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.attach = function ($container) {
       this.setActivityStarted();
+
       // The first time we attach we also create our DOM elements.
-      if (this.$questionContainer === undefined) {
-        this.$questionContainer = $container;
+      if ($wrapper === undefined) {
         if (self.registerDomElements !== undefined &&
            (self.registerDomElements instanceof Function ||
            typeof self.registerDomElements === 'function')) {
@@ -678,12 +839,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
            self.registerDomElements();
         }
         self.trigger('registerDomElements');
-      } else {
-        // Update container
-        this.$questionContainer = $container;
       }
 
       // Prepare container
+      $wrapper = $container;
       $container.html('').addClass('h5p-question h5p-' + type);
 
       // Add sections in given order
@@ -702,6 +861,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Only append once to DOM for optimal performance
       $container.append($sections);
+
+      // ??
       this.trigger('domChanged', {
         '$target': $container,
         'library': 'TODO',
@@ -709,6 +870,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         'key': 'newLibrary'
       }, {'bubbles': true, 'external': true});
 
+      // ??
       initialized = true;
 
       return self;
@@ -733,177 +895,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Getter for question wrapper
      */
     self.getQuestionContainer = function () {
-      return self.$questionContainer;
-    };
-
-    /**
-     * Scroll to bottom of Question.
-     */
-    var scrollToBottom = function () {
-      if (self.$questionContainer) {
-        if (!self.$questionContainer.is('.h5p-standalone') || H5P.isFullscreen) {
-          /**
-           * Get scrollable ancestor of element
-           *
-           * @param {jQuery} $element
-           * @returns {jQuery} Parent element that is scrollable
-           */
-          var findScrollableAncestor = function ($element) {
-
-            // Not found
-            if (!$element) {
-              return;
-            }
-
-            if ($element.css('overflow-y') === 'auto') {
-              return $element;
-            } else {
-              return findScrollableAncestor($element.parent());
-            }
-          };
-
-          var scrollableAncestor = findScrollableAncestor(self.$questionContainer);
-
-          // Scroll to bottom of scrollable ancestor
-          if (scrollableAncestor) {
-            scrollableAncestor.animate({
-              scrollTop: self.$questionContainer.css('height')
-            }, "slow");
-          }
-        }
-      }
-    };
-
-    /**
-     * Resize question
-     */
-    var resize = function () {
-      // Allow elements to attach and set their height before resizing
-      resizeSections();
-      resizeButtons();
-    };
-
-    /**
-     * Resize sections, used for resizing sections when question is resized.
-     */
-    var resizeSections = function () {
-      // Necessary when content changes, for example when entering full screen
-      if (sections.feedback !== undefined) {
-        setElementHeight(sections.feedback.$element);
-      }
-
-      if (sections.buttons !== undefined) {
-        setElementHeight(sections.buttons.$element);
-      }
-    };
-
-    /**
-     * Resize buttons to fit container width
-     */
-    var resizeButtons = function () {
-      if (!buttons || !sections.buttons) {
-        return;
-      }
-
-      // A static margin is added as buffer for smoother transitions
-      var staticMargins = 2;
-      var buttonsWidth = 0;
-      for (var i in buttons) {
-        var $element = buttons[i].$element;
-        if (buttons[i].isVisible) {
-          // Round up
-          buttonsWidth += Math.ceil($element.outerWidth(true)) + staticMargins;
-        }
-      }
-
-      // Add static margins to final widths.
-      buttonsWidth = buttonsWidth + staticMargins;
-
-      // Allow button section to attach before getting width
-      setTimeout(function () {
-        var buttonSectionWidth = Math.floor(sections.buttons.$element.width()) - staticMargins;
-        if (buttonsWidth >= buttonSectionWidth) {
-          removeButtonLabels(buttonsWidth, buttonSectionWidth);
-        } else {
-          restoreButtonLabels(buttonsWidth, buttonSectionWidth);
-        }
-      }, 0);
-    };
-
-    /**
-     * Remove button labels until they use less than max width
-     * @param {Number} buttonsWidth Total width of all buttons
-     * @param {Number} maxButtonsWidth Max width allowed for buttons
-     */
-    var removeButtonLabels = function (buttonsWidth, maxButtonsWidth) {
-      // Reverse traversal
-      for (var i = buttonOrder.length - 1; i >= 0; i--) {
-        var buttonId = buttonOrder[i];
-        if (!buttons[buttonId].isTruncated && buttons[buttonId].isVisible) {
-          var $button = buttons[buttonId].$element;
-          var $tmp = $button.clone()
-            .css({
-              'position': 'absolute',
-              'white-space': 'nowrap',
-              'max-width': 'none'
-            })
-            .addClass('truncated')
-            .html('')
-            .appendTo($button.parent());
-
-          // Calculate new total width of buttons
-          buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
-
-          // Remove label
-          $button.html('');
-          $button.addClass('truncated');
-          buttons[buttonId].isTruncated = true;
-          $tmp.remove();
-          if (buttonsWidth < maxButtonsWidth) {
-            // Buttons are small enough.
-            return;
-          }
-        }
-      }
-    };
-
-    /**
-     * Restore button labels until it fills maximum possible width without exceeding the max width.
-     * @param {Number} buttonsWidth Total width of all buttons
-     * @param {Number} maxButtonsWidth Max width allowed for buttons
-     */
-    var restoreButtonLabels = function (buttonsWidth, maxButtonsWidth) {
-      for (var i = 0; i < buttonOrder.length; i++) {
-        var buttonId = buttonOrder[i];
-        if (buttons[buttonId].isTruncated && buttons[buttonId].isVisible) {
-          // Check if adding label exceeds allowed width
-          var $button = buttons[buttonId].$element;
-          var $tmp = $button.clone()
-            .css({
-              'position': 'absolute',
-              'white-space': 'nowrap',
-              'max-width': 'none'
-            }).removeClass('truncated')
-            .html(buttons[buttonId].text)
-            .appendTo($button.parent());
-
-          // Calculate new total width of buttons
-          buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
-
-          $tmp.remove();
-          if (buttonsWidth >= maxButtonsWidth) {
-            return;
-          }
-          // Restore label
-          $button.html(buttons[buttonId].text);
-          $button.removeClass('truncated');
-          buttons[buttonId].isTruncated = false;
-        }
-      }
+      return $wrapper;
     };
 
     // Listen for resize
-    this.on('resize', resize, this);
+    this.on('resize', function () {
+      // Allow elements to attach and set their height before resizing
+      resizeSections();
+      resizeButtons();
+    });
   }
 
   // Inheritance
