@@ -709,26 +709,23 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       // Skip if already being shown
-      if (buttonsToShow.indexOf(id) !== -1) {
+      if (buttonsToShow.indexOf(id) !== -1 || buttons[id].$element.is(':visible')) {
         return self;
       }
+
+      buttons[id].isVisible = true;
 
       // Check if button is going to be hidden on next tick
       var exists = buttonsToHide.indexOf(id);
       if (exists !== -1) {
+
         // Just skip hiding it
         buttonsToHide.splice(exists, 1);
-        return self;
-      }
+      } else {
 
-      // Skip if visible
-      buttons[id].isVisible = true;
-      if (buttons[id].$element.is(':visible')) {
-        return self;
+        // Show button on next tick
+        buttonsToShow.push(id);
       }
-
-      // Show button on next tick
-      buttonsToShow.push(id);
 
       if (!toggleButtonsTimer) {
         toggleButtonsTimer = setTimeout(toggleButtons, 0);
@@ -752,24 +749,24 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return self;
       }
 
+      buttons[id].isVisible = false;
+
       // Check if buttons is going to be shown on next tick
       var exists = buttonsToShow.indexOf(id);
       if (exists !== -1) {
+
         // Just skip showing it
         buttonsToShow.splice(exists, 1);
-        return self;
-      }
+      } else if (!buttons[id].$element.is(':visible')) {
 
-      // Skip if not visible
-      buttons[id].isVisible = false;
-      if (!buttons[id].$element.is(':visible')) {
         // Make sure it is detached in case the container is hidden.
         buttons[id].$element.detach();
-        return self;
+      } else {
+
+        // Hide button on next tick.
+        buttonsToHide.push(id);
       }
 
-      // Hide button on next tick.
-      buttonsToHide.push(id);
       if (!toggleButtonsTimer) {
         toggleButtonsTimer = setTimeout(toggleButtons, 0);
       }
