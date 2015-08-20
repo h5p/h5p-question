@@ -30,7 +30,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // ScoreBar
     var scoreBar;
 
-    // Keep track of the feedback's visual status. A must for animations.
+    // Keep track of the feedback's visual status.
     var showFeedback;
 
     // Keep track of which buttons are scheduled for hiding.
@@ -41,10 +41,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Keep track of the hiding and showing of buttons.
     var toggleButtonsTimer;
-
-    // Keep track of resizing of the entire question
-    var resizeLoopsLeft = 0;
-    var resizeTimerId;
 
     // Keeps track of initialization of question
     var initialized = false;
@@ -62,6 +58,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Keeps track of image transitions
     var imageTransitionTimer;
+
+    // Keep track of whether sections is transitioning.
+    var sectionsIsTransitioning = false;
 
     /**
      * Register section with given content.
@@ -196,7 +195,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // All buttons are going to be hidden. Hide container using transition.
         sections.buttons.$element.removeClass('h5p-question-visible');
         sections.buttons.$element.css('max-height', '');
-        hideButtons();
+        sectionsIsTransitioning = true;
+
+        // Wait for animations before detaching buttons
+        setTimeout(function () {
+          hideButtons();
+          sectionsIsTransitioning = false;
+        }, 150);
       }
       else {
         hideButtons();
@@ -319,11 +324,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     var resizeSections = function () {
       // Necessary when content changes, for example when entering full screen
-      if (sections.feedback !== undefined) {
+      if (sections.feedback && showFeedback) {
         setElementHeight(sections.feedback.$element);
       }
 
-      if (sections.buttons !== undefined) {
+      if (sections.buttons) {
         setElementHeight(sections.buttons.$element);
       }
     };
@@ -579,12 +584,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         setTimeout(function () {
           sections.feedback.$element.addClass('h5p-question-visible');
           setElementHeight(sections.feedback.$element);
+          sectionsIsTransitioning = true;
 
           // Scroll to bottom after showing feedback
           scrollToBottom();
 
           // Trigger resize after animation
           setTimeout(function () {
+            sectionsIsTransitioning = false;
             self.trigger('resize');
           }, 150);
         }, 0);
@@ -592,11 +599,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
       else if (sections.feedback && showFeedback) {
         showFeedback = false;
-        scoreBar.setScore(0);
 
         // Hide feedback section
         sections.feedback.$element.removeClass('h5p-question-visible');
         sections.feedback.$element.css('max-height', '');
+        sectionsIsTransitioning = true;
 
         // Detach after transition
         setTimeout(function () {
@@ -607,6 +614,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             // Trigger resize after animation
             self.trigger('resize');
           }
+          sectionsIsTransitioning = false;
+          scoreBar.setScore(0);
         }, 150);
       }
 
@@ -776,19 +785,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.focusButton = function (id) {
       if (id === undefined) {
-        // Find first button that are not being hidden.
-        for (var i in buttons) {
-          var hidden = false;
-          for (var j = 0; j < buttonsToHide.length; j++) {
-            if (buttonsToHide[j] === i) {
-              hidden = true;
-              break;
-            }
-          }
-
-          if (!hidden) {
+        // Find first button that is visible.
+        for (var i = 0; i < buttonOrder.length; i++) {
+          if (buttons[buttonOrder[i]].isVisible) {
             // Give that button focus
-            buttons[i].$element.focus();
+            buttons[buttonOrder[i]].$element.focus();
             break;
           }
         }
@@ -901,7 +902,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Listen for resize
     this.on('resize', function () {
       // Allow elements to attach and set their height before resizing
-      resizeSections();
+      if (!sectionsIsTransitioning) {
+        resizeSections();
+      }
+
       resizeButtons();
     });
   }
