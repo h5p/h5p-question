@@ -892,13 +892,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       return self;
     };
 
-    /**
-     * Getter for question wrapper
-     */
-    self.getQuestionContainer = function () {
-      return $wrapper;
-    };
-
     // Listen for resize
     this.on('resize', function () {
       // Allow elements to attach and set their height before resizing
