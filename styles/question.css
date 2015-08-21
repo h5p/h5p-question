@@ -98,7 +98,7 @@
   margin: 0 1em;
   max-height: 0;
   opacity: 0;
-  transition: none;
+  transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
 .h5p-question-buttons.h5p-question-visible {
   max-height: none;

@@ -41,6 +41,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Keep track of the hiding and showing of buttons.
     var toggleButtonsTimer;
+    var toggleButtonsTransitionTimer;
 
     // Keeps track of initialization of question
     var initialized = false;
@@ -177,6 +178,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @private
      */
     var toggleButtons = function () {
+
+      // Clear transition timer, reevaluate if buttons will be detached
+      clearTimeout(toggleButtonsTransitionTimer);
+
       // Show buttons
       for (var i = 0; i < buttonsToShow.length; i++) {
         insert(buttonOrder, buttonsToShow[i], buttons, sections.buttons.$element);
@@ -198,7 +203,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         sectionsIsTransitioning = true;
 
         // Wait for animations before detaching buttons
-        setTimeout(function () {
+        toggleButtonsTransitionTimer = setTimeout(function () {
           hideButtons();
           sectionsIsTransitioning = false;
         }, 150);
@@ -212,7 +217,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           setElementHeight(sections.buttons.$element);
 
           // Trigger resize after animation
-          setTimeout(function () {
+          toggleButtonsTransitionTimer = setTimeout(function () {
             self.trigger('resize');
           }, 150);
         }
@@ -710,7 +715,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       // Skip if already being shown
-      if (buttonsToShow.indexOf(id) !== -1 || buttons[id].$element.is(':visible')) {
+      if (buttonsToShow.indexOf(id) !== -1) {
         return self;
       }
 
@@ -722,7 +727,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Just skip hiding it
         buttonsToHide.splice(exists, 1);
-      } else {
+      } // If button is not shown
+      else if (!buttons[id].$element.is(':visible')) {
 
         // Show button on next tick
         buttonsToShow.push(id);
@@ -758,11 +764,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Just skip showing it
         buttonsToShow.splice(exists, 1);
-      } else if (!buttons[id].$element.is(':visible')) {
+      }
+      else if (!buttons[id].$element.is(':visible')) {
 
         // Make sure it is detached in case the container is hidden.
         buttons[id].$element.detach();
-      } else {
+      }
+      else {
 
         // Hide button on next tick.
         buttonsToHide.push(id);
@@ -852,7 +860,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           if (sections[section].parent) {
             // Section has a different parent
             sections[section].$element.appendTo(sections[section].parent);
-          } else {
+          }
+          else {
             $sections.push(sections[section].$element);
           }
         }
