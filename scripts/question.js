@@ -680,6 +680,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $e = buttons[id].$element = JoubelUI.createButton({
         'class': 'h5p-question-' + id,
         html: text,
+        title: text,
         on: {
           click: function () {
             clicked();
