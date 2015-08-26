@@ -290,8 +290,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @returns {H5P.jQuery} Parent element that is scrollable
      */
     var findScrollableAncestor = function ($element) {
-      if (!$element) {
-        return; // Not found
+
+      // Check validation of element or if we have reached document root
+      if (!$element || !($element instanceof $) || document === $element.get(0)) {
+        return;
       }
 
       if ($element.css('overflow-y') === 'auto') {
