@@ -242,7 +242,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           .css('max-height', 'none').appendTo($img.parent());
         var targetHeight = $tmp.height();
         var targetWidth = $tmp.width();
-        var canUseTotalWidth = targetWidth >= sections.image.$element.width();
+        var canUseTotalWidth = targetWidth >= sections.image.$element.width() && 
+          !$wrapper.hasClass('h5p-transparent') &&
+          !$wrapper.parent().hasClass('h5p-no-frame');
         transitionTimer = 0;
         $tmp.remove();
 
