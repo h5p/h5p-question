@@ -23,7 +23,9 @@
   -moz-transition: transform 0.3s, margin 0.3s;
   transition: transform 0.3s, margin 0.3s;
 }
-.h5p-question-image-fill-width .h5p-question-image-wrap {
+.h5p-question-image-fill-width .h5p-question-image-wrap,
+.h5p-no-frame > .h5p-question .h5p-question-image-wrap,
+.h5p-question.h5p-transparent .h5p-question-image-wrap {
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
   margin: 0;
@@ -32,7 +34,6 @@
 .h5p-question-image-scalable {
   cursor: pointer;
 }
-
 .h5p-question-image-scalable:before {
   position: absolute;
   font-family: 'H5PFontAwesome4';
@@ -106,30 +107,19 @@
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }
 
-/* Remove margins when no frame */
-.h5p-no-frame > .h5p-question > * {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.h5p-no-frame > .h5p-question > *:first-child {
-  margin-top: 0;
-}
-
-.h5p-no-frame > .h5p-question > *:last-child {
-  margin-bottom: 0;
-}
-
-/* Remove margins when transparent */
+/* Remove margins when no frame or transparent */
+.h5p-no-frame > .h5p-question > *,
 .h5p-question.h5p-transparent > * {
   margin-left: 0;
   margin-right: 0;
 }
 
+.h5p-no-frame > .h5p-question > *:first-child,
 .h5p-question.h5p-transparent > *:first-child {
   margin-top: 0;
 }
 
+.h5p-no-frame > .h5p-question > *:last-child,
 .h5p-question.h5p-transparent > *:last-child {
   margin-bottom: 0;
 }

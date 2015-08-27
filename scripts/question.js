@@ -70,7 +70,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} section ID of the section
      * @param {(string|H5P.jQuery)} content
      */
-    var register = function (section, content) {
+    var register = function (section, content) {
       sections[section] = {};
       var $e = sections[section].$element = $('<div/>', {
         'class': 'h5p-question-' + section,
@@ -163,7 +163,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      *
      * @private
      */
-    var hideButtons = function () {
+    var hideButtons = function () {
       for (var i = 0; i < buttonsToHide.length; i++) {
         // Using detach() vs hide() makes it harder to cheat.
         buttons[buttonsToHide[i]].$element.detach();
@@ -177,7 +177,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      *
      * @private
      */
-    var toggleButtons = function () {
+    var toggleButtons = function () {
 
       // Clear transition timer, reevaluate if buttons will be detached
       clearTimeout(toggleButtonsTransitionTimer);
@@ -234,7 +234,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      *
      * @param {H5P.jQuery} $img
      */
-    var scaleImage = function ($img) {
+    var scaleImage = function ($img) {
       var transitionTimer;
       if (imageThumb) {
         // Find our target height
@@ -242,7 +242,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           .css('max-height', 'none').appendTo($img.parent());
         var targetHeight = $tmp.height();
         var targetWidth = $tmp.width();
-        var canUseTotalWidth = targetWidth >= sections.image.$element.width();
+        var canUseTotalWidth = targetWidth >= sections.image.$element.width() &&
+          !$wrapper.hasClass('h5p-transparent') &&
+          !$wrapper.parent().hasClass('h5p-no-frame');
         if (canUseTotalWidth) {
           $tmp.width(sections.image.$element.width());
           targetHeight = $tmp.height();
@@ -261,7 +263,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
 
         // Animate to full size after animating it into place
-        imageTransitionTimer = setTimeout(function () {
+        imageTransitionTimer = setTimeout(function () {
           $img.css('maxHeight', targetHeight);
         }, transitionTimer);
         imageThumb = false;
@@ -479,7 +481,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} path Relative
      * @param {string} [alt] Text representation
      */
-    self.setImage = function (path, alt) {
+    self.setImage = function (path, alt) {
       sections.image = {};
       // Image container
       sections.image.$element = $('<div/>', {
@@ -498,33 +500,43 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         alt: (alt === undefined ? '' : alt),
         on: {
           load: function () {
-            // Determine max size
-            $img.css('maxHeight', 'none');
-            // var maxWidth = this.width;
-            var maxHeight = this.height;
-
-            // Determine thumb size
-            $img.css('maxHeight', '');
-            if (maxHeight > this.height) {
-              // We can do better. Add resize capability
-              $img.attr('role', 'button').attr('tabIndex', '0');
-              $imgWrap.addClass('h5p-question-image-scalable')
-                .on('click', function (event) {
-                  if (event.which === 1) {
-                    scaleImage($img); // Left mouse button click
-                  }
-                }).on('keypress', function (event) {
-                  if (event.which === 32) {
-                    scaleImage($img); // Space bar pressed
-                  }
-                });
-            }
-
             self.trigger('imageLoaded', this);
+            self.trigger('resize');
           }
         },
         appendTo: $imgWrap
       });
+
+      var sizeDetermined = false;
+      var determineSize = function () {
+        if (sizeDetermined || !$img.is(':visible')) {
+          return; // Try again next time.
+        }
+
+        // Determine max size
+        $img.css('maxHeight', 'none');
+        var maxHeight = $img[0].height;
+
+        // Determine thumb size
+        $img.css('maxHeight', '');
+        if (maxHeight > $img[0].height) {
+          // We can do better. Add resize capability
+          $img.attr('role', 'button').attr('tabIndex', '0');
+          $imgWrap.addClass('h5p-question-image-scalable')
+            .on('click', function (event) {
+              if (event.which === 1) {
+                scaleImage($img); // Left mouse button click
+              }
+            }).on('keypress', function (event) {
+              if (event.which === 32) {
+                scaleImage($img); // Space bar pressed
+              }
+            });
+        }
+
+        sizeDetermined  = true; // Prevent any futher events
+      };
+      self.on('resize', determineSize);
 
       return self;
     };
@@ -609,7 +621,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           scrollToBottom();
 
           // Trigger resize after animation
-          setTimeout(function () {
+          setTimeout(function () {
             sectionsIsTransitioning = false;
             self.trigger('resize');
           }, 150);
@@ -684,7 +696,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return self; // Already registered
       }
 
-      if (sections.buttons === undefined)  {
+      if (sections.buttons === undefined)  {
         // We have buttons, register wrapper
         register('buttons');
         if (initialized) {
@@ -723,7 +735,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      *
      * @param {string} id
      */
-    self.showButton = function (id) {
+    self.showButton = function (id) {
       if (buttons[id] === undefined) {
         return self;
       }
@@ -760,7 +772,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      *
      * @param {string} id
      */
-    self.hideButton = function (id) {
+    self.hideButton = function (id) {
       if (buttons[id] === undefined) {
         return self;
       }
@@ -847,7 +859,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      *
      * @param {H5P.jQuery} $container
      */
-    self.attach = function ($container) {
+    self.attach = function ($container) {
       this.setActivityStarted();
 
       // The first time we attach we also create our DOM elements.
