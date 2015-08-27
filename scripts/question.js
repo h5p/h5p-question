@@ -292,12 +292,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      *
      * @private
      * @param {H5P.jQuery} $element
+     * @param {Number} [currDepth=0] Current recursive calls to ancestor, stop at maxDepth
+     * @param {Number} [maxDepth=5] Maximum depth for finding ancestor.
      * @returns {H5P.jQuery} Parent element that is scrollable
      */
-    var findScrollableAncestor = function ($element) {
-
+    var findScrollableAncestor = function ($element, currDepth, maxDepth) {
+      if (!currDepth) {
+        currDepth = 0;
+      }
+      if (!maxDepth) {
+        maxDepth = 5;
+      }
       // Check validation of element or if we have reached document root
-      if (!$element || !($element instanceof $) || document === $element.get(0)) {
+      if (!$element || !($element instanceof $) || document === $element.get(0) || currDepth >= maxDepth) {
         return;
       }
 
@@ -305,7 +312,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return $element;
       }
       else {
-        return findScrollableAncestor($element.parent());
+        return findScrollableAncestor($element.parent(), currDepth, maxDepth);
       }
     };
 
