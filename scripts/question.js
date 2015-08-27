@@ -243,6 +243,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         var targetHeight = $tmp.height();
         var targetWidth = $tmp.width();
         var canUseTotalWidth = targetWidth >= sections.image.$element.width();
+        if (canUseTotalWidth) {
+          $tmp.width(sections.image.$element.width());
+          targetHeight = $tmp.height();
+        }
+
         transitionTimer = 0;
         $tmp.remove();
 
