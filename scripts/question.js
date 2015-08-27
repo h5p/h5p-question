@@ -314,7 +314,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return $element;
       }
       else {
-        return findScrollableAncestor($element.parent(), currDepth, maxDepth);
+        return findScrollableAncestor($element.parent(), currDepth + 1, maxDepth);
       }
     };
 
