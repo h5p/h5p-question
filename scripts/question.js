@@ -486,33 +486,43 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         alt: (alt === undefined ? '' : alt),
         on: {
           load: function () {
-            // Determine max size
-            $img.css('maxHeight', 'none');
-            // var maxWidth = this.width;
-            var maxHeight = this.height;
-
-            // Determine thumb size
-            $img.css('maxHeight', '');
-            if (maxHeight > this.height) {
-              // We can do better. Add resize capability
-              $img.attr('role', 'button').attr('tabIndex', '0');
-              $imgWrap.addClass('h5p-question-image-scalable')
-                .on('click', function (event) {
-                  if (event.which === 1) {
-                    scaleImage($img); // Left mouse button click
-                  }
-                }).on('keypress', function (event) {
-                  if (event.which === 32) {
-                    scaleImage($img); // Space bar pressed
-                  }
-                });
-            }
-
             self.trigger('imageLoaded', this);
+            self.trigger('resize');
           }
         },
         appendTo: $imgWrap
       });
+
+      var sizeDetermined = false;
+      var determineSize = function () {
+        if (sizeDetermined || !$img.is(':visible')) {
+          return; // Try again next time.
+        }
+
+        // Determine max size
+        $img.css('maxHeight', 'none');
+        var maxHeight = $img[0].height;
+
+        // Determine thumb size
+        $img.css('maxHeight', '');
+        if (maxHeight > $img[0].height) {
+          // We can do better. Add resize capability
+          $img.attr('role', 'button').attr('tabIndex', '0');
+          $imgWrap.addClass('h5p-question-image-scalable')
+            .on('click', function (event) {
+              if (event.which === 1) {
+                scaleImage($img); // Left mouse button click
+              }
+            }).on('keypress', function (event) {
+              if (event.which === 32) {
+                scaleImage($img); // Space bar pressed
+              }
+            });
+        }
+
+        sizeDetermined  = true; // Prevent any futher events
+      };
+      self.on('resize', determineSize);
 
       return self;
     };
