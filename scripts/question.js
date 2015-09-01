@@ -230,6 +230,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Get size of element, including decimals.
+     *
+     * @private
+     * @param {Element} element
+     * @param {string} size
+     * @returns {number}
+     */
+    var getAccurateSize = function (element, size) {
+      return parseFloat(window.getComputedStyle(element)[size]);
+    };
+
+    /**
      * Allows for scaling of the question image.
      *
      * @param {H5P.jQuery} $img
@@ -240,15 +252,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Find our target height
         var $tmp = $img.clone()
           .css('max-height', 'none').appendTo($img.parent());
-        var targetHeight = $tmp.height();
-        var targetWidth = $tmp.width();
-        var canUseTotalWidth = targetWidth >= sections.image.$element.width() &&
-          !$wrapper.hasClass('h5p-transparent') &&
-          !$wrapper.parent().hasClass('h5p-no-frame');
+        var targetHeight = getAccurateSize($tmp[0], 'height');
+        var targetWidth = getAccurateSize($tmp[0], 'width');
+        var elementWidth = getAccurateSize(sections.image.$element[0], 'width');
+        var canUseTotalWidth = (targetWidth >= elementWidth);
         if (canUseTotalWidth) {
-          $tmp.width(sections.image.$element.width());
-          targetHeight = $tmp.height();
+          $tmp.css('width', elementWidth + 'px');
+          targetHeight = getAccurateSize($tmp[0], 'height');
         }
+        canUseTotalWidth = (canUseTotalWidth &&
+          !$wrapper.hasClass('h5p-transparent') &&
+          !$wrapper.parent().hasClass('h5p-no-frame'));
 
         transitionTimer = 0;
         $tmp.remove();
