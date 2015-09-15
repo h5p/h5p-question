@@ -14,7 +14,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Inheritance
     EventDispatcher.call(this);
 
-    // Register default order
+    // Register default section order
     self.order = ['image', 'introduction', 'content', 'feedback', 'buttons'];
 
     // Keep track of registered sections
