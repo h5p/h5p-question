@@ -129,8 +129,13 @@
 }
 
 /* CP specific styles */
-.h5p-course-presentation .h5p-question-introduction > p {
+.h5p-course-presentation .h5p-question-introduction {
   font-size: 1.125em;
-  line-height: 1.25em;
+  line-height: 1.125em;
+}
+
+.h5p-course-presentation .h5p-question-introduction > p {
+  font-size: 1em;
+  line-height: 1em;
   margin: 0;
 }
