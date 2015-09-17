@@ -1,5 +1,6 @@
 .h5p-question {
   background: rgba(255, 255, 255, 0.9);
+  position: relative;
 }
 
 .h5p-question-image {
