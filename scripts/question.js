@@ -42,6 +42,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Keep track of the hiding and showing of buttons.
     var toggleButtonsTimer;
     var toggleButtonsTransitionTimer;
+    var buttonTruncationTimer;
 
     // Keeps track of initialization of question
     var initialized = false;
@@ -379,28 +380,37 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       // A static margin is added as buffer for smoother transitions
-      var staticMargins = 2;
       var buttonsWidth = 0;
       for (var i in buttons) {
         var $element = buttons[i].$element;
         if (buttons[i].isVisible) {
-          // Round up
-          buttonsWidth += Math.ceil($element.outerWidth(true)) + staticMargins;
+
+          //Calculate exact button width
+          buttonsWidth += $element.get(0).getBoundingClientRect().width +
+            parseFloat($element.css('margin-left')) +
+            parseFloat($element.css('margin-right'));
         }
       }
 
-      // Add static margins to final widths.
-      buttonsWidth = buttonsWidth + staticMargins;
+
+
+      // Clear button truncation timer if within a button truncation function
+      if (buttonTruncationTimer) {
+        clearTimeout(buttonTruncationTimer);
+      }
 
       // Allow button section to attach before getting width
-      setTimeout(function () {
-        var buttonSectionWidth = Math.floor(sections.buttons.$element.width()) - staticMargins;
+      buttonTruncationTimer = setTimeout(function () {
+        var buttonSectionWidth = sections.buttons.$element.get(0).getBoundingClientRect().width;
+
+        // Remove button labels if width of buttons are too wide
         if (buttonsWidth >= buttonSectionWidth) {
           removeButtonLabels(buttonsWidth, buttonSectionWidth);
         }
         else {
           restoreButtonLabels(buttonsWidth, buttonSectionWidth);
         }
+        buttonTruncationTimer = undefined;
       }, 0);
     };
 
