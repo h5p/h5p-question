@@ -167,7 +167,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var hideButtons = function () {
       for (var i = 0; i < buttonsToHide.length; i++) {
         // Using detach() vs hide() makes it harder to cheat.
-        buttons[buttonsToHide[i]].$element.detach();
+        buttons[buttonsToHide[i].id].$element.detach();
       }
       buttonsToHide = [];
     };
@@ -185,13 +185,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Show buttons
       for (var i = 0; i < buttonsToShow.length; i++) {
-        insert(buttonOrder, buttonsToShow[i], buttons, sections.buttons.$element);
+        insert(buttonOrder, buttonsToShow[i].id, buttons, sections.buttons.$element);
       }
       buttonsToShow = [];
 
       // Hide buttons
       for (var j = 0; j < buttonsToHide.length; j++) {
-        if (buttons[buttonsToHide[j]].$element.is(':focus')) {
+        if (buttons[buttonsToHide[j].id].$element.is(':focus')) {
           // Move focus to the first visible button.
           self.focusButton();
         }
@@ -491,6 +491,24 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Helper function for finding index of keyValue in array
+     *
+     * @param {String} keyValue Value to be found
+     * @param {String} key In key
+     * @param {Array} array In array
+     * @returns {number}
+     */
+    var existsInArray = function (keyValue, key, array) {
+      var i;
+      for (i = 0; i < array.length; i++) {
+        if (array[i][key] === keyValue) {
+          return i;
+        }
+      }
+      return -1;
+    };
+
+    /**
      * Set behaviour for question.
      *
      * @param {Object} options An object containing behaviour that will be extended by Question
@@ -758,30 +776,44 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Show registered button with given identifier.
      *
      * @param {string} id
+     * @param {Number} [priority]
      */
-    self.showButton = function (id) {
+    self.showButton = function (id, priority) {
       if (buttons[id] === undefined) {
         return self;
       }
 
+      priority = priority || 0;
+
       // Skip if already being shown
-      if (buttonsToShow.indexOf(id) !== -1) {
+      var indexToShow = existsInArray(id, 'id', buttonsToShow);
+      if (indexToShow !== -1) {
+
+        // Update priority
+        if (buttonsToShow[indexToShow].priority < priority) {
+          buttonsToShow[indexToShow].priority = priority;
+        }
+
         return self;
       }
 
       buttons[id].isVisible = true;
 
       // Check if button is going to be hidden on next tick
-      var exists = buttonsToHide.indexOf(id);
+      var exists = existsInArray(id, 'id', buttonsToHide);
       if (exists !== -1) {
 
-        // Just skip hiding it
-        buttonsToHide.splice(exists, 1);
+        // Skip hiding if higher priority
+        if (buttonsToHide[exists].priority <= priority) {
+          buttonsToHide.splice(exists, 1);
+          buttonsToShow.push({id: id, priority: priority});
+        }
+
       } // If button is not shown
       else if (!buttons[id].$element.is(':visible')) {
 
         // Show button on next tick
-        buttonsToShow.push(id);
+        buttonsToShow.push({id: id, priority: priority});
       }
 
       if (!toggleButtonsTimer) {
@@ -795,25 +827,38 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Hide registered button with given identifier.
      *
      * @param {string} id
+     * @param {number} [priority]
      */
-    self.hideButton = function (id) {
+    self.hideButton = function (id, priority) {
       if (buttons[id] === undefined) {
         return self;
       }
 
+      priority = priority || 0;
+
       // Skip if already being hidden
-      if (buttonsToHide.indexOf(id) !== -1) {
+      var indexToHide = existsInArray(id, 'id', buttonsToHide);
+      if (indexToHide !== -1) {
+
+        // Update priority
+        if (buttonsToHide[indexToHide].priority < priority) {
+          buttonsToHide[indexToHide].priority = priority;
+        }
+
         return self;
       }
 
       buttons[id].isVisible = false;
 
       // Check if buttons is going to be shown on next tick
-      var exists = buttonsToShow.indexOf(id);
+      var exists = existsInArray(id, 'id', buttonsToShow);
       if (exists !== -1) {
 
-        // Just skip showing it
-        buttonsToShow.splice(exists, 1);
+        // Skip showing if higher priority
+        if (buttonsToShow[exists].priority <= priority) {
+          buttonsToShow.splice(exists, 1);
+          buttonsToHide.push({id: id, priority: priority});
+        }
       }
       else if (!buttons[id].$element.is(':visible')) {
 
@@ -823,7 +868,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       else {
 
         // Hide button on next tick.
-        buttonsToHide.push(id);
+        buttonsToHide.push({id: id, priority: priority});
       }
 
       if (!toggleButtonsTimer) {
