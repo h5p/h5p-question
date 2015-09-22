@@ -156,6 +156,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var h = Math.round($tmp.get(0).getBoundingClientRect().height);
       $element.css('max-height', h + 'px');
       $tmp.remove();
+
+      // Resize buttons after resizing element
+      setTimeout(function () {
+        resizeButtons();
+      }, 10);
       return h;
     };
 
@@ -392,8 +397,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
-
-
       // Clear button truncation timer if within a button truncation function
       if (buttonTruncationTimer) {
         clearTimeout(buttonTruncationTimer);
@@ -401,7 +404,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Allow button section to attach before getting width
       buttonTruncationTimer = setTimeout(function () {
-        var buttonSectionWidth = sections.buttons.$element.get(0).getBoundingClientRect().width;
+        var buttonSectionWidth = getAccurateSize(sections.buttons.$element.get(0), 'width');
 
         // Remove button labels if width of buttons are too wide
         if (buttonsWidth >= buttonSectionWidth) {
