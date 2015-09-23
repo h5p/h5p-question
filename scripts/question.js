@@ -157,7 +157,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $element.css('max-height', h + 'px');
       $tmp.remove();
 
-      if (h > 0 && sections.buttons.$element === $element) {
+      if (h > 0 && sections.buttons && sections.buttons.$element === $element) {
 
         // Make sure buttons section is visible
         sections.buttons.$element.addClass('h5p-question-visible');
