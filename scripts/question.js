@@ -157,20 +157,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $element.css('max-height', h + 'px');
       $tmp.remove();
 
-      if (h > 0) {
+      if (h > 0 && sections.buttons.$element === $element) {
+
+        // Make sure buttons section is visible
+        sections.buttons.$element.addClass('h5p-question-visible');
+
+        // Resize buttons after resizing button section
         setTimeout(function () {
-          var i;
-          for (var section in sections) {
-            if (sections.hasOwnProperty(section) && sections[section].$element === $element) {
-
-              // Make sure section is visible
-              sections[section].$element.addClass('h5p-question-visible');
-
-              // Resize buttons after resizing element
-              resizeButtons();
-            }
-          }
-        }, 10);
+          resizeButtons();
+        }, 150);
       }
       return h;
     };
