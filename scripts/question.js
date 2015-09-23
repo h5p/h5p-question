@@ -974,10 +974,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Only append once to DOM for optimal performance
       $container.append($sections);
 
-      // ??
+      // Let others react to dom changes
       this.trigger('domChanged', {
         '$target': $container,
-        'library': 'TODO',
+        'library': this.libraryInfo.machineName,
         'contentId': this.contentId,
         'key': 'newLibrary'
       }, {'bubbles': true, 'external': true});
