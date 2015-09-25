@@ -405,13 +405,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           if (buttons[i].isVisible) {
 
             //Calculate exact button width
-            buttonsWidth += $element.get(0).getBoundingClientRect().width +
+            var buttonInstanceWidth = getAccurateSize($element.get(0), 'width') +
               parseFloat($element.css('margin-left')) +
               parseFloat($element.css('margin-right'));
+            buttonsWidth += Math.ceil(buttonInstanceWidth);
           }
         }
 
-        var buttonSectionWidth = getAccurateSize(sections.buttons.$element.get(0), 'width');
+
+        // Button section reduced by 1 pixel for cross-broswer consistency.
+        var buttonSectionWidth = Math.floor(getAccurateSize(sections.buttons.$element.get(0), 'width')) - 1;
 
         // Remove button labels if width of buttons are too wide
         if (buttonsWidth >= buttonSectionWidth) {
@@ -474,6 +477,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       for (var i = 0; i < buttonOrder.length; i++) {
         var buttonId = buttonOrder[i];
         if (buttons[buttonId].isTruncated && buttons[buttonId].isVisible) {
+
           // Check if adding label exceeds allowed width
           var $button = buttons[buttonId].$element;
           var $tmp = $button.clone()
@@ -485,8 +489,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             .html(buttons[buttonId].text)
             .appendTo($button.parent());
 
-          // Calculate new total width of buttons
-          buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
+          var oldButtonSize = (getAccurateSize($button.get(0), 'width') +
+            parseFloat($button.css('margin-left')) +
+            parseFloat($button.css('margin-right')));
+          var newButtonSize = (getAccurateSize($tmp.get(0), 'width') +
+            parseFloat($tmp.css('margin-left')) +
+            parseFloat($tmp.css('margin-right')));
+
+          // Calculate new total width of buttons with a static pixel for consistency cross-browser
+          buttonsWidth = buttonsWidth - Math.floor(oldButtonSize) + Math.ceil(newButtonSize) + 1;
 
           $tmp.remove();
           if (buttonsWidth >= maxButtonsWidth) {
