@@ -408,7 +408,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             var buttonInstanceWidth = getAccurateSize($element.get(0), 'width') +
               parseFloat($element.css('margin-left')) +
               parseFloat($element.css('margin-right'));
-            buttonsWidth += Math.ceil(buttonInstanceWidth);
+            buttonsWidth += Math.ceil(buttonInstanceWidth) + 1;
           }
         }
 
