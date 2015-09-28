@@ -117,7 +117,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Found our pos
           while (i > 0 &&
           (elements[order[i - 1]] === undefined ||
-          !elements[order[i - 1]].$element)) {
+          !elements[order[i - 1]].isVisible)) {
             i--;
           }
           if (i === 0) {
@@ -179,6 +179,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       for (var i = 0; i < buttonsToHide.length; i++) {
         // Using detach() vs hide() makes it harder to cheat.
         buttons[buttonsToHide[i].id].$element.detach();
+        buttons[buttonsToHide[i].id].isVisible = false;
       }
       buttonsToHide = [];
     };
@@ -197,6 +198,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Show buttons
       for (var i = 0; i < buttonsToShow.length; i++) {
         insert(buttonOrder, buttonsToShow[i].id, buttons, sections.buttons.$element);
+        buttonsToShow[i].isVisible = true;
       }
       buttonsToShow = [];
 
@@ -831,8 +833,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return self;
       }
 
-      buttons[id].isVisible = true;
-
       // Check if button is going to be hidden on next tick
       var exists = existsInArray(id, 'id', buttonsToHide);
       if (exists !== -1) {
@@ -881,8 +881,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         return self;
       }
-
-      buttons[id].isVisible = false;
 
       // Check if buttons is going to be shown on next tick
       var exists = existsInArray(id, 'id', buttonsToShow);
@@ -993,6 +991,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           else {
             $sections.push(sections[section].$element);
           }
+          sections[section].isVisible = true;
         }
       }
 
