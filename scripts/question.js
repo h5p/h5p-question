@@ -117,7 +117,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Found our pos
           while (i > 0 &&
           (elements[order[i - 1]] === undefined ||
-          !elements[order[i - 1]].$element.is(':visible'))) {
+          !elements[order[i - 1]].$element)) {
             i--;
           }
           if (i === 0) {
@@ -959,7 +959,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
            typeof self.registerDomElements === 'function')) {
 
            // Give the question type a chance to register before attaching
-           self.registerDomElements();
+          self.registerDomElements();
         }
         self.trigger('registerDomElements');
       }
