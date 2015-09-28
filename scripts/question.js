@@ -291,6 +291,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Animate to full size after animating it into place
         imageTransitionTimer = setTimeout(function () {
           $img.css('maxHeight', targetHeight);
+
+          // Trigger resize on Question after transition to adapt to new height if embeded.
+          setTimeout(function () {
+            self.trigger('resize');
+          }, 300);
         }, transitionTimer);
         imageThumb = false;
       }
@@ -308,11 +313,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Reposition image after scaling it
         imageTransitionTimer = setTimeout(function () {
           sections.image.$element.removeClass('h5p-question-image-fill-width');
+
+          // Trigger resize on Question after transition to adapt to new height if embeded.
+          setTimeout(function () {
+            self.trigger('resize');
+          }, 300);
+
         }, transitionTimer);
 
 
         imageThumb = true;
       }
+
+
     };
 
     /**
