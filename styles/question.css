@@ -114,18 +114,18 @@
 
 /* Remove margins when no frame or transparent */
 .h5p-no-frame > .h5p-question > *,
-.h5p-transparent .h5p-question > * {
+.h5p-transparent > div > .h5p-question > * {
   margin-left: 0;
   margin-right: 0;
 }
 
 .h5p-no-frame > .h5p-question > *:first-child,
-.h5p-transparent .h5p-question > *:first-child {
+.h5p-transparent > div > .h5p-question > *:first-child {
   margin-top: 0;
 }
 
 .h5p-no-frame > .h5p-question > *:last-child,
-.h5p-transparent .h5p-question > *:last-child {
+.h5p-transparent > div > .h5p-question > *:last-child {
   margin-bottom: 0;
 }
 
