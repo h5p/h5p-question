@@ -505,12 +505,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             .html(buttons[buttonId].text)
             .appendTo($button.parent());
 
-          var oldButtonSize = Math.floor($button.get(0).offsetWidth) +
-            parseFloat($button.css('margin-left')) +
-            parseFloat($button.css('margin-right')) - 1;
-          var newButtonSize = Math.ceil($tmp.get(0).offsetWidth) +
-            parseFloat($tmp.css('margin-left')) +
-            parseFloat($tmp.css('margin-right')) + 1;
+          var oldButtonSize = Math.floor($button.get(0).offsetWidth) - 1;
+          var newButtonSize = Math.ceil($tmp.get(0).offsetWidth) + 1;
 
           // Calculate new total width of buttons with a static pixel for consistency cross-browser
           buttonsWidth = buttonsWidth - Math.floor(oldButtonSize) + Math.ceil(newButtonSize) + 1;
