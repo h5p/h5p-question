@@ -421,7 +421,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           if (buttons[i].isVisible) {
 
             //Calculate exact button width
-            var buttonInstanceWidth = getAccurateSize($element.get(0), 'width') +
+            var buttonInstanceWidth = $element.get(0).offsetWidth +
               parseFloat($element.css('margin-left')) +
               parseFloat($element.css('margin-right'));
             buttonsWidth += Math.ceil(buttonInstanceWidth) + 1;
@@ -430,7 +430,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
 
         // Button section reduced by 1 pixel for cross-broswer consistency.
-        var buttonSectionWidth = Math.floor(getAccurateSize(sections.buttons.$element.get(0), 'width')) - 1;
+        var buttonSectionWidth = Math.floor(sections.buttons.$element.get(0).offsetWidth) - 1;
 
         // Remove button labels if width of buttons are too wide
         if (buttonsWidth >= buttonSectionWidth) {
@@ -505,12 +505,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             .html(buttons[buttonId].text)
             .appendTo($button.parent());
 
-          var oldButtonSize = Math.floor((getAccurateSize($button.get(0), 'width') +
+          var oldButtonSize = Math.floor($button.get(0).offsetWidth) +
             parseFloat($button.css('margin-left')) +
-            parseFloat($button.css('margin-right')))) - 1;
-          var newButtonSize = Math.ceil((getAccurateSize($tmp.get(0), 'width') +
+            parseFloat($button.css('margin-right')) - 1;
+          var newButtonSize = Math.ceil($tmp.get(0).offsetWidth) +
             parseFloat($tmp.css('margin-left')) +
-            parseFloat($tmp.css('margin-right')))) + 1;
+            parseFloat($tmp.css('margin-right')) + 1;
 
           // Calculate new total width of buttons with a static pixel for consistency cross-browser
           buttonsWidth = buttonsWidth - Math.floor(oldButtonSize) + Math.ceil(newButtonSize) + 1;
