@@ -505,6 +505,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             .html(buttons[buttonId].text)
             .appendTo($button.parent());
 
+          // Make sure clone was successfull
+          if(!$button.length || !$tmp.length) {
+            return;
+          }
+
           var oldButtonSize = Math.floor($button.get(0).offsetWidth) - 1;
           var newButtonSize = Math.ceil($tmp.get(0).offsetWidth) + 1;
 
