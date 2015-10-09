@@ -178,11 +178,20 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     var hideButtons = function () {
       for (var i = 0; i < buttonsToHide.length; i++) {
-        // Using detach() vs hide() makes it harder to cheat.
-        buttons[buttonsToHide[i].id].$element.detach();
-        buttons[buttonsToHide[i].id].isVisible = false;
+        hideButton(buttonsToHide[i].id);
       }
       buttonsToHide = [];
+    };
+
+    /**
+     * Does the actual hiding.
+     * @private
+     * @param {string} buttonId
+     */
+    var hideButton = function (buttonId) {
+      // Using detach() vs hide() makes it harder to cheat.
+      buttons[buttonId].$element.detach();
+      buttons[buttonId].isVisible = false;
     };
 
     /**
@@ -897,7 +906,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       else if (!buttons[id].$element.is(':visible')) {
 
         // Make sure it is detached in case the container is hidden.
-        buttons[id].$element.detach();
+        hideButton(id);
       }
       else {
 
