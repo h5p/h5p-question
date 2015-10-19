@@ -267,6 +267,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Find our target height
         var $tmp = $img.clone()
           .css('max-height', 'none').appendTo($img.parent());
+        var fontSize = parseFloat($img.css('font-size'));
         var targetHeight = getAccurateSize($tmp[0], 'height');
         var targetWidth = getAccurateSize($tmp[0], 'width');
         var elementWidth = getAccurateSize(sections.image.$element[0], 'width');
@@ -293,7 +294,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Animate to full size after animating it into place
         imageTransitionTimer = setTimeout(function () {
-          $img.css('maxHeight', targetHeight);
+          var relativeHeight = targetHeight / fontSize;
+          $img.css('maxHeight', relativeHeight + 'em');
 
           // Trigger resize on Question after transition to adapt to new height if embeded.
           setTimeout(function () {
