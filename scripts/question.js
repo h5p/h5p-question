@@ -270,6 +270,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         var fontSize = parseFloat($img.css('font-size'));
         var targetHeight = getAccurateSize($tmp[0], 'height');
         var targetWidth = getAccurateSize($tmp[0], 'width');
+
         var elementWidth = getAccurateSize(sections.image.$element[0], 'width');
         var canUseTotalWidth = (targetWidth >= elementWidth);
         if (canUseTotalWidth) {
@@ -329,8 +330,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         imageThumb = true;
       }
-
-
     };
 
     /**
@@ -589,8 +588,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         appendTo: $imgWrap
       });
 
+      var $imgOverlay = $('<div>', {
+        'class': 'h5p-question-image-overlay'
+      }).click(function () {
+        return false;
+      }).appendTo(sections.image.$element);
+
       var sizeDetermined = false;
       var determineSize = function () {
+
+
         if (sizeDetermined || !$img.is(':visible')) {
           return; // Try again next time.
         }
@@ -618,7 +625,86 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         sizeDetermined  = true; // Prevent any futher events
       };
+
+      /**
+       * Toggles image scaling functionality for the question image.
+       */
+      var toggleImageScale = function () {
+
+        var tempHeight;
+        var $tmp = $img.clone()
+          .css({
+            'transition': 'none',
+            '-webkit-transition': 'none'
+          }).appendTo($img.parent());
+
+        // Check if scalability should be disabled
+        if ($imgWrap.hasClass('h5p-question-image-scalable')) {
+
+          // Image is expanded
+          if (sections.image.$element.hasClass('h5p-question-image-large')) {
+
+            // Measure with thumbnail
+            $tmp.css('max-height', '');
+            tempHeight = getAccurateSize($tmp[0], 'height');
+
+            // Image same as thumbnail, remove scalability
+            if (tempHeight >= getAccurateSize($img[0], 'height')) {
+              $imgWrap.removeClass('h5p-question-image-scalable');
+              $imgOverlay.addClass('show');
+            }
+          }
+          else { // Image is thumbnail
+
+            // Measure with image
+            $tmp.css('max-height', 'none');
+            tempHeight = getAccurateSize($tmp[0], 'height');
+
+            // Expanded image is same as small, remove scalability
+            if (getAccurateSize($img[0], 'height') >= tempHeight) {
+              $imgWrap.removeClass('h5p-question-image-scalable');
+              $imgOverlay.addClass('show');
+            }
+          }
+        }
+        else { // Scalability removed, check if we should add it
+
+          //  Image is expanded
+          if (sections.image.$element.hasClass('h5p-question-image-large')) {
+
+            // Measure with thumbnail
+            $tmp.css('max-height', '');
+            tempHeight = getAccurateSize($tmp[0], 'height');
+
+            // Image larger than thumbnail, add scalability
+            if (getAccurateSize($img[0], 'height') > tempHeight) {
+              $imgWrap.addClass('h5p-question-image-scalable');
+              $imgOverlay.removeClass('show');
+            }
+          }
+          else { // Image is thumbnail
+
+            // Measure with image
+            $tmp.css('max-height', 'none');
+            tempHeight = getAccurateSize($tmp[0], 'height');
+
+            // Expanded image is same as small, remove scalability
+            if (tempHeight > getAccurateSize($img[0], 'height')) {
+              $imgWrap.addClass('h5p-question-image-scalable');
+              $imgOverlay.removeClass('show');
+            }
+          }
+        }
+
+        $tmp.remove();
+      };
+
       self.on('resize', determineSize);
+      self.on('resize', function () {
+        setTimeout(function () {
+          toggleImageScale();
+        }, 100);
+      });
 
       return self;
     };
