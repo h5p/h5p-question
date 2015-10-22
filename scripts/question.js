@@ -560,9 +560,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Add task image.
      *
      * @param {string} path Relative
-     * @param {string} [alt] Text representation
+     * @param {Object} [options] Options object
+     * @param {string} [options.alt] Text representation
+     * @param {Boolean} [options.disableImageZooming] Set as true to disable image zooming
      */
-    self.setImage = function (path, alt) {
+    self.setImage = function (path, options) {
+      options = options ? options : {};
       sections.image = {};
       // Image container
       sections.image.$element = $('<div/>', {
@@ -578,7 +581,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Image element
       var $img = $('<img/>', {
         src: H5P.getPath(path, this.contentId),
-        alt: (alt === undefined ? '' : alt),
+        alt: (options.alt === undefined ? '' : options.alt),
         on: {
           load: function () {
             self.trigger('imageLoaded', this);
@@ -593,6 +596,28 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }).click(function () {
         return false;
       }).appendTo(sections.image.$element);
+
+      // Disable image zooming
+      if (options.disableImageZooming) {
+        $img.css('maxHeight', 'none');
+
+        // Make sure we are using the correct amount of width at all times
+        self.on('resize', function () {
+
+          // Remove margins if natural image width is bigger than section width
+          if ($img.get(0).naturalWidth >= sections.image.$element.width()) {
+            sections.image.$element.addClass('h5p-question-image-fill-width');
+          }
+          else { // Use margin for small res images
+            sections.image.$element.removeClass('h5p-question-image-fill-width');
+          }
+        });
+
+        self.trigger('resize');
+
+        // Skip adding zoom functionality
+        return;
+      }
 
       var sizeDetermined = false;
       var determineSize = function () {
@@ -701,6 +726,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       self.on('resize', determineSize);
       self.on('resize', function () {
+        // Wait for ongoing resizing (etc full screen).
         setTimeout(function () {
           toggleImageScale();
         }, 100);
