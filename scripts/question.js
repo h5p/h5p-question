@@ -188,7 +188,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @private
      * @param {string} buttonId
      */
-    var hideButton = function (buttonId) {
+    var hideButton = function (buttonId) {
       // Using detach() vs hide() makes it harder to cheat.
       buttons[buttonId].$element.detach();
       buttons[buttonId].isVisible = false;
