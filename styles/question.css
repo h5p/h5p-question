@@ -57,19 +57,18 @@
   position: absolute;
   font-family: 'H5PFontAwesome4';
   content: "\f067";
-  right: 7px;
-  top: 7px;
+  right: 0.7em;
+  top: 0.7em;
   color: #fff;
   font-size: 10px;
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.5);
-  width: 18px;
-  height: 18px;
-  line-height: 20px;
+  width: 1.8em;
+  height: 1.8em;
+  line-height: 1.8em;
   text-align: center;
-  vertical-align: middle;
 }
 
 .h5p-question-image-large .h5p-question-image-scalable:before {
