@@ -619,12 +619,25 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         self.on('resize', function () {
 
           // Remove margins if natural image width is bigger than section width
-          if ($img.get(0).naturalWidth >= sections.image.$element.width()) {
+          var imageSectionWidth = sections.image.$element.get(0).getBoundingClientRect().width;
+
+          var $clone = $imgWrap.clone().css({
+            '-webkit-transition': 'none',
+            'transition': 'none'
+          }).appendTo($imgWrap.parent());
+
+          // Margin as translateX on both sides of image.
+          var diffX = 2 * ($clone.get(0).getBoundingClientRect().left -
+              sections.image.$element.get(0).getBoundingClientRect().left);
+
+          if ($img.get(0).naturalWidth >= imageSectionWidth - diffX) {
             sections.image.$element.addClass('h5p-question-image-fill-width');
           }
           else { // Use margin for small res images
             sections.image.$element.removeClass('h5p-question-image-fill-width');
           }
+
+          $clone.remove();
         });
 
         self.trigger('resize');
