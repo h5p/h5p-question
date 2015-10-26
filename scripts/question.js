@@ -259,58 +259,40 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Get size of element, including decimals.
-     *
-     * @private
-     * @param {Element} element
-     * @param {string} size
-     * @returns {number}
-     */
-    var getAccurateSize = function (element, size) {
-      return parseFloat(window.getComputedStyle(element)[size]);
-    };
-
-    /**
      * Allows for scaling of the question image.
      *
      * @param {H5P.jQuery} $img
+     * @param {Number} max Relative measurement of max image width
      */
-    var scaleImage = function ($img) {
+    var scaleImage = function ($img, max) {
+
       var transitionTimer;
       if (imageThumb) {
-        // Find our target height
-        var $tmp = $img.clone()
-          .css('max-height', 'none').appendTo($img.parent());
-        var fontSize = parseFloat($img.css('font-size'));
-        var targetHeight = getAccurateSize($tmp[0], 'height');
-        var targetWidth = getAccurateSize($tmp[0], 'width');
 
-        var elementWidth = getAccurateSize(sections.image.$element[0], 'width');
-        var canUseTotalWidth = (targetWidth >= elementWidth);
-        if (canUseTotalWidth) {
-          $tmp.css('width', elementWidth + 'px');
-          targetHeight = getAccurateSize($tmp[0], 'height');
-        }
-        canUseTotalWidth = (canUseTotalWidth &&
-          !$wrapper.hasClass('h5p-transparent') &&
-          !$wrapper.parent().hasClass('h5p-no-frame'));
+        // Find image translateX
+        var diffX = 2 * ($img.get(0).getBoundingClientRect().left -
+          sections.image.$element.get(0).getBoundingClientRect().left);
+
+        var sectionWidth = sections.image.$element.get(0).getBoundingClientRect().width;
+        var sectionWidthWithMargins = sections.image.$element.get(0).getBoundingClientRect().width - diffX;
+        var relativeSectionWidth = sectionWidthWithMargins / parseFloat(sections.image.$element.css('font-size'));
 
         transitionTimer = 0;
-        $tmp.remove();
-
         clearTimeout(imageTransitionTimer);
-        sections.image.$element.addClass('h5p-question-image-large');
 
-        // Only remove margins of section if image can use it.
-        if (canUseTotalWidth && !sections.image.$element.hasClass('h5p-question-image-fill-width')) {
+        // Cap img to section width
+        if (max >= relativeSectionWidth) {
+          var imgRatio = $img.get(0).naturalHeight / $img.get(0).naturalWidth;
+          max = (sectionWidth * imgRatio) / parseFloat(sections.image.$element.css('font-size'));
+
           transitionTimer = 300;
           sections.image.$element.addClass('h5p-question-image-fill-width');
         }
+        sections.image.$element.addClass('h5p-question-image-large');
 
         // Animate to full size after animating it into place
         imageTransitionTimer = setTimeout(function () {
-          var relativeHeight = targetHeight / fontSize;
-          $img.css('maxHeight', relativeHeight + 'em');
+          $img.css('maxHeight', max + 'em');
 
           // Trigger resize on Question after transition to adapt to new height if embeded.
           setTimeout(function () {
@@ -318,6 +300,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }, 300);
         }, transitionTimer);
         imageThumb = false;
+
       }
       else {
         clearTimeout(imageTransitionTimer);
@@ -583,7 +566,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       sections.image = {};
       // Image container
       sections.image.$element = $('<div/>', {
-        'class': 'h5p-question-image',
+        'class': 'h5p-question-image h5p-question-image-fill-width'
       });
 
       // Inner wrap
@@ -605,18 +588,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         appendTo: $imgWrap
       });
 
-      var $imgOverlay = $('<div>', {
-        'class': 'h5p-question-image-overlay'
-      }).click(function () {
-        return false;
-      }).appendTo(sections.image.$element);
-
       // Disable image zooming
       if (options.disableImageZooming) {
         $img.css('maxHeight', 'none');
 
         // Make sure we are using the correct amount of width at all times
-        self.on('resize', function () {
+        var determineImgWidth = function () {
 
           // Remove margins if natural image width is bigger than section width
           var imageSectionWidth = sections.image.$element.get(0).getBoundingClientRect().width;
@@ -628,7 +605,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
           // Margin as translateX on both sides of image.
           var diffX = 2 * ($clone.get(0).getBoundingClientRect().left -
-              sections.image.$element.get(0).getBoundingClientRect().left);
+            sections.image.$element.get(0).getBoundingClientRect().left);
 
           if ($img.get(0).naturalWidth >= imageSectionWidth - diffX) {
             sections.image.$element.addClass('h5p-question-image-fill-width');
@@ -638,9 +615,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
 
           $clone.remove();
-        });
+        };
 
-        self.trigger('resize');
+        // Determine image width
+        if ($img.is(':visible')) {
+          determineImgWidth();
+        }
+        else {
+          $img.load(function () {
+            determineImgWidth();
+          });
+        }
 
         // Skip adding zoom functionality
         return;
@@ -649,115 +634,41 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var sizeDetermined = false;
       var determineSize = function () {
 
-
         if (sizeDetermined || !$img.is(':visible')) {
           return; // Try again next time.
         }
 
         // Determine max size
-        $img.css('maxHeight', 'none');
-        var maxHeight = $img[0].height;
+        var maxHeight = $img[0].naturalHeight;
+
+        // Keep relative dimensions for consistent resizing.
+        var relativeWidth = $img.get(0).naturalWidth / parseFloat($img.css('font-size'));
+        var relativeHeight = maxHeight / parseFloat($img.css('font-size'));
 
         // Determine thumb size
-        $img.css('maxHeight', '');
-        if (maxHeight > $img[0].height) {
+        if (maxHeight > sections.image.$element.get(0).getBoundingClientRect().height) {
           // We can do better. Add resize capability
           $img.attr('role', 'button').attr('tabIndex', '0');
           $imgWrap.addClass('h5p-question-image-scalable')
             .on('click', function (event) {
               if (event.which === 1) {
-                scaleImage($img); // Left mouse button click
+                scaleImage($img, relativeWidth); // Left mouse button click
               }
             }).on('keypress', function (event) {
               if (event.which === 32) {
-                scaleImage($img); // Space bar pressed
+                scaleImage($img, relativeWidth); // Space bar pressed
               }
             });
+          sections.image.$element.removeClass('h5p-question-image-fill-width');
         }
+
+        // Set natural height
+        $img.css('height', relativeHeight + 'em');
 
         sizeDetermined  = true; // Prevent any futher events
       };
 
-      /**
-       * Toggles image scaling functionality for the question image.
-       */
-      var toggleImageScale = function () {
-
-        var tempHeight;
-        var $tmp = $img.clone()
-          .css({
-            'transition': 'none',
-            '-webkit-transition': 'none'
-          }).appendTo($img.parent());
-
-        // Check if scalability should be disabled
-        if ($imgWrap.hasClass('h5p-question-image-scalable')) {
-
-          // Image is expanded
-          if (sections.image.$element.hasClass('h5p-question-image-large')) {
-
-            // Measure with thumbnail
-            $tmp.css('max-height', '');
-            tempHeight = getAccurateSize($tmp[0], 'height');
-
-            // Image same as thumbnail, remove scalability
-            if (tempHeight >= getAccurateSize($img[0], 'height')) {
-              $imgWrap.removeClass('h5p-question-image-scalable');
-              $imgOverlay.addClass('show');
-            }
-          }
-          else { // Image is thumbnail
-
-            // Measure with image
-            $tmp.css('max-height', 'none');
-            tempHeight = getAccurateSize($tmp[0], 'height');
-
-            // Expanded image is same as small, remove scalability
-            if (getAccurateSize($img[0], 'height') >= tempHeight) {
-              $imgWrap.removeClass('h5p-question-image-scalable');
-              $imgOverlay.addClass('show');
-            }
-          }
-        }
-        else { // Scalability removed, check if we should add it
-
-          //  Image is expanded
-          if (sections.image.$element.hasClass('h5p-question-image-large')) {
-
-            // Measure with thumbnail
-            $tmp.css('max-height', '');
-            tempHeight = getAccurateSize($tmp[0], 'height');
-
-            // Image larger than thumbnail, add scalability
-            if (getAccurateSize($img[0], 'height') > tempHeight) {
-              $imgWrap.addClass('h5p-question-image-scalable');
-              $imgOverlay.removeClass('show');
-            }
-          }
-          else { // Image is thumbnail
-
-            // Measure with image
-            $tmp.css('max-height', 'none');
-            tempHeight = getAccurateSize($tmp[0], 'height');
-
-            // Expanded image is same as small, remove scalability
-            if (tempHeight > getAccurateSize($img[0], 'height')) {
-              $imgWrap.addClass('h5p-question-image-scalable');
-              $imgOverlay.removeClass('show');
-            }
-          }
-        }
-
-        $tmp.remove();
-      };
-
       self.on('resize', determineSize);
-      self.on('resize', function () {
-        // Wait for ongoing resizing (etc full screen).
-        setTimeout(function () {
-          toggleImageScale();
-        }, 100);
-      });
 
       return self;
     };
