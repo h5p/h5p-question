@@ -262,37 +262,38 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Allows for scaling of the question image.
      *
      * @param {H5P.jQuery} $img
-     * @param {Number} max Relative measurement of max image width
+     * @param {Number} [naturalHeight] Natural height of image
      */
-    var scaleImage = function ($img, max) {
+    var scaleImage = function ($img, naturalHeight) {
+      naturalHeight = naturalHeight ? naturalHeight : 10;
 
       var transitionTimer;
       if (imageThumb) {
-
-        // Find image translateX
-        var diffX = 2 * ($img.get(0).getBoundingClientRect().left -
-          sections.image.$element.get(0).getBoundingClientRect().left);
-
         var sectionWidth = sections.image.$element.get(0).getBoundingClientRect().width;
-        var sectionWidthWithMargins = sections.image.$element.get(0).getBoundingClientRect().width - diffX;
-        var relativeSectionWidth = sectionWidthWithMargins / parseFloat(sections.image.$element.css('font-size'));
+        var imgRatio = $img.get(0).naturalHeight / $img.get(0).naturalWidth;
+        var relativeHeight = (sectionWidth * imgRatio) / parseFloat(sections.image.$element.css('font-size'));
+
+        // Hardcoded height cap at 30 em
+        if (relativeHeight > 30) {
+          relativeHeight = 30;
+        }
 
         transitionTimer = 0;
         clearTimeout(imageTransitionTimer);
 
-        // Cap img to section width
-        if (max >= relativeSectionWidth) {
-          var imgRatio = $img.get(0).naturalHeight / $img.get(0).naturalWidth;
-          max = (sectionWidth * imgRatio) / parseFloat(sections.image.$element.css('font-size'));
-
+        // Expand img to section width
+        if (!sections.image.$element.hasClass('h5p-question-image-fill-width')) {
           transitionTimer = 300;
           sections.image.$element.addClass('h5p-question-image-fill-width');
         }
+
         sections.image.$element.addClass('h5p-question-image-large');
 
         // Animate to full size after animating it into place
         imageTransitionTimer = setTimeout(function () {
-          $img.css('maxHeight', max + 'em');
+          // Force image stretch
+          $img.css('height', relativeHeight + 'em');
+          $img.css('maxHeight', relativeHeight + 'em');
 
           // Trigger resize on Question after transition to adapt to new height if embeded.
           setTimeout(function () {
@@ -305,7 +306,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       else {
         clearTimeout(imageTransitionTimer);
         transitionTimer = 0;
-        $img.css('maxHeight', '');
+        // Necessary to force image stretch
+        $img.css('maxHeight', naturalHeight + 'em');
 
         // Let image scale down before repositioning it
         if (sections.image.$element.hasClass('h5p-question-image-large')) {
@@ -319,6 +321,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
           // Trigger resize on Question after transition to adapt to new height if embeded.
           setTimeout(function () {
+            // Restore image to natural height
+            $img.css('height', naturalHeight + 'em');
             self.trigger('resize');
           }, 300);
 
@@ -638,34 +642,35 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           return; // Try again next time.
         }
 
-        // Determine max size
+        // Determine max size, keep relative measurements.
         var maxHeight = $img[0].naturalHeight;
+        var fontSize = parseFloat($img.css('font-size'));
+        var naturalHeight = ((maxHeight / fontSize) > 10) ? 10 : (maxHeight / fontSize);
+        var imgRatio = $img.get(0).naturalWidth / maxHeight;
+        var initialWidth = imgRatio * naturalHeight * fontSize;
 
-        // Keep relative dimensions for consistent resizing.
-        var relativeWidth = $img.get(0).naturalWidth / parseFloat($img.css('font-size'));
-        var relativeHeight = maxHeight / parseFloat($img.css('font-size'));
-
-        // Determine thumb size
-        if (maxHeight > sections.image.$element.get(0).getBoundingClientRect().height) {
-          // We can do better. Add resize capability
+        // Add resize capability, unless image is too wide.
+        if (initialWidth <= sections.image.$element.get(0).getBoundingClientRect().width) {
           $img.attr('role', 'button').attr('tabIndex', '0');
           $imgWrap.addClass('h5p-question-image-scalable')
             .on('click', function (event) {
               if (event.which === 1) {
-                scaleImage($img, relativeWidth); // Left mouse button click
+                scaleImage($img, naturalHeight); // Left mouse button click
               }
             }).on('keypress', function (event) {
               if (event.which === 32) {
-                scaleImage($img, relativeWidth); // Space bar pressed
+                scaleImage($img, naturalHeight); // Space bar pressed
               }
             });
           sections.image.$element.removeClass('h5p-question-image-fill-width');
+
+          sizeDetermined  = true; // Prevent any futher events
+        }
+        else {
+          naturalHeight = sections.image.$element.get(0).getBoundingClientRect().width / imgRatio / fontSize;
         }
 
-        // Set natural height
-        $img.css('height', relativeHeight + 'em');
-
-        sizeDetermined  = true; // Prevent any futher events
+        $img.css('height', naturalHeight + 'em');
       };
 
       self.on('resize', determineSize);
