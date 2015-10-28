@@ -602,13 +602,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Remove margins if natural image width is bigger than section width
           var imageSectionWidth = sections.image.$element.get(0).getBoundingClientRect().width;
 
-          var $clone = $imgWrap.clone().css({
+          // Do not transition, for instant measurements
+          $imgWrap.css({
             '-webkit-transition': 'none',
             'transition': 'none'
-          }).appendTo($imgWrap.parent());
+          });
 
           // Margin as translateX on both sides of image.
-          var diffX = 2 * ($clone.get(0).getBoundingClientRect().left -
+          var diffX = 2 * ($imgWrap.get(0).getBoundingClientRect().left -
             sections.image.$element.get(0).getBoundingClientRect().left);
 
           if ($img.get(0).naturalWidth >= imageSectionWidth - diffX) {
@@ -618,7 +619,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             sections.image.$element.removeClass('h5p-question-image-fill-width');
           }
 
-          $clone.remove();
+          // Reset transition rules
+          $imgWrap.css({
+            '-webkit-transition': '',
+            'transition': ''
+          })
         };
 
         // Determine image width
