@@ -2,7 +2,9 @@
   background: rgba(255, 255, 255, 0.9);
   position: relative;
 }
-
+.h5p-question-video {
+  line-height: 0;
+}
 .h5p-question-image {
   text-align: left;
   margin: 0 0 1em;
