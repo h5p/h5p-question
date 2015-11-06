@@ -578,6 +578,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Will stop any playback going on in the task.
+     */
+    self.pause = function () {
+      if (sections.video && sections.video.isVisible) {
+        sections.video.instance.pause();
+      }
+    };
+
+    /**
      * Add task image.
      *
      * @param {string} path Relative
