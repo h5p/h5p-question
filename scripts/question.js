@@ -15,7 +15,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(this);
 
     // Register default section order
-    self.order = ['image', 'introduction', 'content', 'feedback', 'buttons'];
+    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons'];
 
     // Keep track of registered sections
     var sections = {};
@@ -558,6 +558,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * A video to display above the task.
+     *
+     * @param {object} params
+     */
+    self.setVideo = function (params) {
+      sections.video = {
+        $element: $('<div/>', {
+          'class': 'h5p-question-video'
+        })
+      };
+
+      sections.video.instance = H5P.newRunnable(params, self.contentId, sections.video.$element, true);
+      self.on('resize', function () {
+        sections.video.instance.trigger('resize');
+      });
+
+      return self;
+    };
+
+    /**
      * Add task image.
      *
      * @param {string} path Relative
@@ -623,7 +643,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           $imgWrap.css({
             '-webkit-transition': '',
             'transition': ''
-          })
+          });
         };
 
         // Determine image width
