@@ -569,6 +569,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         })
       };
 
+      // Never fit to wrapper
+      params.params.fit = false;
       sections.video.instance = H5P.newRunnable(params, self.contentId, sections.video.$element, true);
       self.on('resize', function () {
         sections.video.instance.trigger('resize');
