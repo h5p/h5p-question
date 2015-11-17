@@ -30,12 +30,13 @@
   margin-bottom: 1em;
   -webkit-transform: translate(1em, 1em);
   transform: translate(1em, 1em);
+  max-width: calc(100% - 2em);
+}
+.h5p-question-image-wrap.animatable {
   -webkit-transition: -webkit-transform 0.3s, margin 0.3s;
   -moz-transition: transform 0.3s, margin 0.3s;
   transition: transform 0.3s, margin 0.3s;
-  max-width: calc(100% - 2em);
 }
-
 .h5p-question-image-overlay {
   display: none;
   position: absolute;

@@ -267,6 +267,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var scaleImage = function ($img, naturalHeight) {
       naturalHeight = naturalHeight ? naturalHeight : 10;
 
+      // Add this here to avoid initial transition of the image making
+      // content overflow. Alternatively we need to trigger a resize.
+      $img.parent().addClass('animatable');
+
       var transitionTimer;
       if (imageThumb) {
         var sectionWidth = sections.image.$element.get(0).getBoundingClientRect().width;
