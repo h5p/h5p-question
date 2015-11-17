@@ -273,11 +273,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         var imgRatio = $img.get(0).naturalHeight / $img.get(0).naturalWidth;
         var relativeHeight = (sectionWidth * imgRatio) / parseFloat(sections.image.$element.css('font-size'));
 
-        // Hardcoded height cap at 30 em
-        if (relativeHeight > 30) {
-          relativeHeight = 30;
-        }
-
         transitionTimer = 0;
         clearTimeout(imageTransitionTimer);
 
