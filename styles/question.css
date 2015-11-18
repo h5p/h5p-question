@@ -15,15 +15,12 @@
 }
 .h5p-question-image img {
   display: block;
-  max-width: 100%;
+  width: 100%;
   height: auto;
-  max-height: 10em;
   border: 0;
   outline: none;
-  -webkit-transition: max-height 0.3s;
-  -moz-transition: max-height 0.3s;
-  transition: max-height 0.3s;
 }
+
 .h5p-question-image-wrap {
   display: inline-block;
   position: relative;
@@ -32,11 +29,17 @@
   transform: translate(1em, 1em);
   max-width: calc(100% - 2em);
 }
-.h5p-question-image-wrap.animatable {
-  -webkit-transition: -webkit-transform 0.3s, margin 0.3s;
-  -moz-transition: transform 0.3s, margin 0.3s;
-  transition: transform 0.3s, margin 0.3s;
+
+.h5p-question-image.animatable .h5p-question-image-wrap.h5p-question-image-scalable {
+  -webkit-transition: -webkit-transform 0.3s 0.3s, width 0.3s 0s;
+  transition: transform 0.3s 0.3s, width 0.3s 0s;
 }
+
+.h5p-question-image.animatable.h5p-question-image-fill-width .h5p-question-image-wrap {
+  -webkit-transition: -webkit-transform 0.3s 0s, width 0.3s 0.3s;
+  transition: transform 0.3s 0s, width 0.3s 0.3s;
+}
+
 .h5p-question-image-overlay {
   display: none;
   position: absolute;
@@ -61,7 +64,13 @@
 
 .h5p-question-image-scalable {
   cursor: pointer;
+  width: 35%;
 }
+
+.h5p-question-image.h5p-question-image-fill-width .h5p-question-image-scalable{
+  width: 100%;
+}
+
 .h5p-question-image-scalable:before {
   position: absolute;
   font-family: 'H5PFontAwesome4';
@@ -80,7 +89,7 @@
   text-align: center;
 }
 
-.h5p-question-image-large .h5p-question-image-scalable:before {
+.h5p-question-image-fill-width .h5p-question-image-scalable:before {
   content: "\f068";
 }
 

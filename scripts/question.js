@@ -260,75 +260,33 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     /**
      * Allows for scaling of the question image.
-     *
-     * @param {H5P.jQuery} $img
-     * @param {Number} [naturalHeight] Natural height of image
      */
-    var scaleImage = function ($img, naturalHeight) {
-      naturalHeight = naturalHeight ? naturalHeight : 10;
+    var scaleImage = function () {
+      var $imgSection = sections.image.$element;
 
       // Add this here to avoid initial transition of the image making
       // content overflow. Alternatively we need to trigger a resize.
-      $img.parent().addClass('animatable');
+      $imgSection.addClass('animatable');
 
-      var transitionTimer;
       if (imageThumb) {
-        var sectionWidth = sections.image.$element.get(0).getBoundingClientRect().width;
-        var imgRatio = $img.get(0).naturalHeight / $img.get(0).naturalWidth;
-        var relativeHeight = (sectionWidth * imgRatio) / parseFloat(sections.image.$element.css('font-size'));
 
-        transitionTimer = 0;
-        clearTimeout(imageTransitionTimer);
-
-        // Expand img to section width
-        if (!sections.image.$element.hasClass('h5p-question-image-fill-width')) {
-          transitionTimer = 300;
-          sections.image.$element.addClass('h5p-question-image-fill-width');
-        }
-
-        sections.image.$element.addClass('h5p-question-image-large');
-
-        // Animate to full size after animating it into place
-        imageTransitionTimer = setTimeout(function () {
-          // Force image stretch
-          $img.css('height', relativeHeight + 'em');
-          $img.css('maxHeight', relativeHeight + 'em');
-
-          // Trigger resize on Question after transition to adapt to new height if embeded.
-          setTimeout(function () {
-            self.trigger('resize');
-          }, 300);
-        }, transitionTimer);
+        // Expand image
+        $imgSection.addClass('h5p-question-image-fill-width');
         imageThumb = false;
 
+        setTimeout(function () {
+          self.trigger('resize');
+        }, 300);
       }
       else {
-        clearTimeout(imageTransitionTimer);
-        transitionTimer = 0;
-        // Necessary to force image stretch
-        $img.css('maxHeight', naturalHeight + 'em');
 
-        // Let image scale down before repositioning it
-        if (sections.image.$element.hasClass('h5p-question-image-large')) {
-          transitionTimer = 300;
-        }
-        sections.image.$element.removeClass('h5p-question-image-large');
-
-        // Reposition image after scaling it
-        imageTransitionTimer = setTimeout(function () {
-          sections.image.$element.removeClass('h5p-question-image-fill-width');
-
-          // Trigger resize on Question after transition to adapt to new height if embeded.
-          setTimeout(function () {
-            // Restore image to natural height
-            $img.css('height', naturalHeight + 'em');
-            self.trigger('resize');
-          }, 300);
-
-        }, transitionTimer);
-
-
+        // Scale down image
+        $imgSection.removeClass('h5p-question-image-fill-width');
         imageThumb = true;
+
+        setTimeout(function () {
+          self.trigger('resize');
+        }, 300);
       }
     };
 
@@ -685,35 +643,20 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           return; // Try again next time.
         }
 
-        // Determine max size, keep relative measurements.
-        var maxHeight = $img[0].naturalHeight;
-        var fontSize = parseFloat($img.css('font-size'));
-        var naturalHeight = ((maxHeight / fontSize) > 10) ? 10 : (maxHeight / fontSize);
-        var imgRatio = $img.get(0).naturalWidth / maxHeight;
-        var initialWidth = imgRatio * naturalHeight * fontSize;
+        $img.attr('role', 'button').attr('tabIndex', '0');
+        $imgWrap.addClass('h5p-question-image-scalable')
+          .on('click', function (event) {
+            if (event.which === 1) {
+              scaleImage(); // Left mouse button click
+            }
+          }).on('keypress', function (event) {
+          if (event.which === 32) {
+            scaleImage(); // Space bar pressed
+          }
+        });
+        sections.image.$element.removeClass('h5p-question-image-fill-width');
 
-        // Add resize capability, unless image is too wide.
-        if (initialWidth <= sections.image.$element.get(0).getBoundingClientRect().width) {
-          $img.attr('role', 'button').attr('tabIndex', '0');
-          $imgWrap.addClass('h5p-question-image-scalable')
-            .on('click', function (event) {
-              if (event.which === 1) {
-                scaleImage($img, naturalHeight); // Left mouse button click
-              }
-            }).on('keypress', function (event) {
-              if (event.which === 32) {
-                scaleImage($img, naturalHeight); // Space bar pressed
-              }
-            });
-          sections.image.$element.removeClass('h5p-question-image-fill-width');
-
-          sizeDetermined  = true; // Prevent any futher events
-        }
-        else {
-          naturalHeight = sections.image.$element.get(0).getBoundingClientRect().width / imgRatio / fontSize;
-        }
-
-        $img.css('height', naturalHeight + 'em');
+        sizeDetermined  = true; // Prevent any futher events
       };
 
       self.on('resize', determineSize);
