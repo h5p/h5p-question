@@ -277,7 +277,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         imageTransitionTimer = setTimeout(function () {
           self.trigger('resize');
-        }, 300);
+        }, 600);
       }
       else {
 
@@ -287,7 +287,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         imageTransitionTimer = setTimeout(function () {
           self.trigger('resize');
-        }, 300);
+        }, 600);
       }
     };
 
