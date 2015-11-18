@@ -263,6 +263,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     var scaleImage = function () {
       var $imgSection = sections.image.$element;
+      clearTimeout(imageTransitionTimer);
 
       // Add this here to avoid initial transition of the image making
       // content overflow. Alternatively we need to trigger a resize.
@@ -274,7 +275,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         $imgSection.addClass('h5p-question-image-fill-width');
         imageThumb = false;
 
-        setTimeout(function () {
+        imageTransitionTimer = setTimeout(function () {
           self.trigger('resize');
         }, 300);
       }
@@ -284,7 +285,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         $imgSection.removeClass('h5p-question-image-fill-width');
         imageThumb = true;
 
-        setTimeout(function () {
+        imageTransitionTimer = setTimeout(function () {
           self.trigger('resize');
         }, 300);
       }
