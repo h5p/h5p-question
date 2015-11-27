@@ -1007,7 +1007,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $container
      */
     self.attach = function ($container) {
-      this.setActivityStarted();
+      if (self.isRoot()) {
+        this.setActivityStarted();
+      }
 
       // The first time we attach we also create our DOM elements.
       if ($wrapper === undefined) {
