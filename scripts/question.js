@@ -14,8 +14,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Inheritance
     EventDispatcher.call(this);
 
-    // Register default order
-    self.order = ['image', 'introduction', 'content', 'feedback', 'buttons'];
+    // Register default section order
+    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons'];
 
     // Keep track of registered sections
     var sections = {};
@@ -178,11 +178,20 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     var hideButtons = function () {
       for (var i = 0; i < buttonsToHide.length; i++) {
-        // Using detach() vs hide() makes it harder to cheat.
-        buttons[buttonsToHide[i].id].$element.detach();
-        buttons[buttonsToHide[i].id].isVisible = false;
+        hideButton(buttonsToHide[i].id);
       }
       buttonsToHide = [];
+    };
+
+    /**
+     * Does the actual hiding.
+     * @private
+     * @param {string} buttonId
+     */
+    var hideButton = function (buttonId) {
+      // Using detach() vs hide() makes it harder to cheat.
+      buttons[buttonId].$element.detach();
+      buttons[buttonId].isVisible = false;
     };
 
     /**
@@ -199,19 +208,24 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Show buttons
       for (var i = 0; i < buttonsToShow.length; i++) {
         insert(buttonOrder, buttonsToShow[i].id, buttons, sections.buttons.$element);
-        buttonsToShow[i].isVisible = true;
+        buttons[buttonsToShow[i].id].isVisible = true;
       }
       buttonsToShow = [];
 
       // Hide buttons
+      var numToHide = 0;
       for (var j = 0; j < buttonsToHide.length; j++) {
-        if (buttons[buttonsToHide[j].id].$element.is(':focus')) {
+        var button = buttons[buttonsToHide[j].id];
+        if (button.isVisible) {
+          numToHide += 1;
+        }
+        if (button.$element.is(':focus')) {
           // Move focus to the first visible button.
           self.focusButton();
         }
       }
 
-      if (sections.buttons && buttonsToHide.length === sections.buttons.$element.children().length) {
+      if (sections.buttons && numToHide === sections.buttons.$element.children().length) {
         // All buttons are going to be hidden. Hide container using transition.
         sections.buttons.$element.removeClass('h5p-question-visible');
         sections.buttons.$element.css('max-height', '');
@@ -245,90 +259,36 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Get size of element, including decimals.
-     *
-     * @private
-     * @param {Element} element
-     * @param {string} size
-     * @returns {number}
-     */
-    var getAccurateSize = function (element, size) {
-      return parseFloat(window.getComputedStyle(element)[size]);
-    };
-
-    /**
      * Allows for scaling of the question image.
-     *
-     * @param {H5P.jQuery} $img
      */
-    var scaleImage = function ($img) {
-      var transitionTimer;
+    var scaleImage = function () {
+      var $imgSection = sections.image.$element;
+      clearTimeout(imageTransitionTimer);
+
+      // Add this here to avoid initial transition of the image making
+      // content overflow. Alternatively we need to trigger a resize.
+      $imgSection.addClass('animatable');
+
       if (imageThumb) {
-        // Find our target height
-        var $tmp = $img.clone()
-          .css('max-height', 'none').appendTo($img.parent());
-        var targetHeight = getAccurateSize($tmp[0], 'height');
-        var targetWidth = getAccurateSize($tmp[0], 'width');
-        var elementWidth = getAccurateSize(sections.image.$element[0], 'width');
-        var canUseTotalWidth = (targetWidth >= elementWidth);
-        if (canUseTotalWidth) {
-          $tmp.css('width', elementWidth + 'px');
-          targetHeight = getAccurateSize($tmp[0], 'height');
-        }
-        canUseTotalWidth = (canUseTotalWidth &&
-          !$wrapper.hasClass('h5p-transparent') &&
-          !$wrapper.parent().hasClass('h5p-no-frame'));
 
-        transitionTimer = 0;
-        $tmp.remove();
-
-        clearTimeout(imageTransitionTimer);
-        sections.image.$element.addClass('h5p-question-image-large');
-
-        // Only remove margins of section if image can use it.
-        if (canUseTotalWidth && !sections.image.$element.hasClass('h5p-question-image-fill-width')) {
-          transitionTimer = 300;
-          sections.image.$element.addClass('h5p-question-image-fill-width');
-        }
-
-        // Animate to full size after animating it into place
-        imageTransitionTimer = setTimeout(function () {
-          $img.css('maxHeight', targetHeight);
-
-          // Trigger resize on Question after transition to adapt to new height if embeded.
-          setTimeout(function () {
-            self.trigger('resize');
-          }, 300);
-        }, transitionTimer);
+        // Expand image
+        $imgSection.addClass('h5p-question-image-fill-width');
         imageThumb = false;
+
+        imageTransitionTimer = setTimeout(function () {
+          self.trigger('resize');
+        }, 600);
       }
       else {
-        clearTimeout(imageTransitionTimer);
-        transitionTimer = 0;
-        $img.css('maxHeight', '');
 
-        // Let image scale down before repositioning it
-        if (sections.image.$element.hasClass('h5p-question-image-large')) {
-          transitionTimer = 300;
-        }
-        sections.image.$element.removeClass('h5p-question-image-large');
-
-        // Reposition image after scaling it
-        imageTransitionTimer = setTimeout(function () {
-          sections.image.$element.removeClass('h5p-question-image-fill-width');
-
-          // Trigger resize on Question after transition to adapt to new height if embeded.
-          setTimeout(function () {
-            self.trigger('resize');
-          }, 300);
-
-        }, transitionTimer);
-
-
+        // Scale down image
+        $imgSection.removeClass('h5p-question-image-fill-width');
         imageThumb = true;
+
+        imageTransitionTimer = setTimeout(function () {
+          self.trigger('resize');
+        }, 600);
       }
-
-
     };
 
     /**
@@ -556,16 +516,58 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * A video to display above the task.
+     *
+     * @param {object} params
+     */
+    self.setVideo = function (params) {
+      sections.video = {
+        $element: $('<div/>', {
+          'class': 'h5p-question-video'
+        })
+      };
+
+      // Never fit to wrapper
+      params.params.fit = false;
+      sections.video.instance = H5P.newRunnable(params, self.contentId, sections.video.$element, true);
+      var fromVideo = false; // Hack to avoid never ending loop
+      sections.video.instance.on('resize', function () {
+        fromVideo = true;
+        self.trigger('resize');
+        fromVideo = false;
+      });
+      self.on('resize', function () {
+        if (!fromVideo) {
+          sections.video.instance.trigger('resize');
+        }
+      });
+
+      return self;
+    };
+
+    /**
+     * Will stop any playback going on in the task.
+     */
+    self.pause = function () {
+      if (sections.video && sections.video.isVisible) {
+        sections.video.instance.pause();
+      }
+    };
+
+    /**
      * Add task image.
      *
      * @param {string} path Relative
-     * @param {string} [alt] Text representation
+     * @param {Object} [options] Options object
+     * @param {string} [options.alt] Text representation
+     * @param {Boolean} [options.disableImageZooming] Set as true to disable image zooming
      */
-    self.setImage = function (path, alt) {
+    self.setImage = function (path, options) {
+      options = options ? options : {};
       sections.image = {};
       // Image container
       sections.image.$element = $('<div/>', {
-        'class': 'h5p-question-image',
+        'class': 'h5p-question-image h5p-question-image-fill-width'
       });
 
       // Inner wrap
@@ -577,7 +579,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Image element
       var $img = $('<img/>', {
         src: H5P.getPath(path, this.contentId),
-        alt: (alt === undefined ? '' : alt),
+        alt: (options.alt === undefined ? '' : options.alt),
         on: {
           load: function () {
             self.trigger('imageLoaded', this);
@@ -587,35 +589,77 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         appendTo: $imgWrap
       });
 
+      // Disable image zooming
+      if (options.disableImageZooming) {
+        $img.css('maxHeight', 'none');
+
+        // Make sure we are using the correct amount of width at all times
+        var determineImgWidth = function () {
+
+          // Remove margins if natural image width is bigger than section width
+          var imageSectionWidth = sections.image.$element.get(0).getBoundingClientRect().width;
+
+          // Do not transition, for instant measurements
+          $imgWrap.css({
+            '-webkit-transition': 'none',
+            'transition': 'none'
+          });
+
+          // Margin as translateX on both sides of image.
+          var diffX = 2 * ($imgWrap.get(0).getBoundingClientRect().left -
+            sections.image.$element.get(0).getBoundingClientRect().left);
+
+          if ($img.get(0).naturalWidth >= imageSectionWidth - diffX) {
+            sections.image.$element.addClass('h5p-question-image-fill-width');
+          }
+          else { // Use margin for small res images
+            sections.image.$element.removeClass('h5p-question-image-fill-width');
+          }
+
+          // Reset transition rules
+          $imgWrap.css({
+            '-webkit-transition': '',
+            'transition': ''
+          });
+        };
+
+        // Determine image width
+        if ($img.is(':visible')) {
+          determineImgWidth();
+        }
+        else {
+          $img.load(function () {
+            determineImgWidth();
+          });
+        }
+
+        // Skip adding zoom functionality
+        return;
+      }
+
       var sizeDetermined = false;
       var determineSize = function () {
+
         if (sizeDetermined || !$img.is(':visible')) {
           return; // Try again next time.
         }
 
-        // Determine max size
-        $img.css('maxHeight', 'none');
-        var maxHeight = $img[0].height;
-
-        // Determine thumb size
-        $img.css('maxHeight', '');
-        if (maxHeight > $img[0].height) {
-          // We can do better. Add resize capability
-          $img.attr('role', 'button').attr('tabIndex', '0');
-          $imgWrap.addClass('h5p-question-image-scalable')
-            .on('click', function (event) {
-              if (event.which === 1) {
-                scaleImage($img); // Left mouse button click
-              }
-            }).on('keypress', function (event) {
-              if (event.which === 32) {
-                scaleImage($img); // Space bar pressed
-              }
-            });
-        }
+        $img.attr('role', 'button').attr('tabIndex', '0');
+        $imgWrap.addClass('h5p-question-image-scalable')
+          .on('click', function (event) {
+            if (event.which === 1) {
+              scaleImage(); // Left mouse button click
+            }
+          }).on('keypress', function (event) {
+          if (event.which === 32) {
+            scaleImage(); // Space bar pressed
+          }
+        });
+        sections.image.$element.removeClass('h5p-question-image-fill-width');
 
         sizeDetermined  = true; // Prevent any futher events
       };
+
       self.on('resize', determineSize);
 
       return self;
@@ -897,7 +941,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       else if (!buttons[id].$element.is(':visible')) {
 
         // Make sure it is detached in case the container is hidden.
-        buttons[id].$element.detach();
+        hideButton(id);
       }
       else {
 
@@ -963,7 +1007,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $container
      */
     self.attach = function ($container) {
-      this.setActivityStarted();
+      if (self.isRoot()) {
+        this.setActivityStarted();
+      }
 
       // The first time we attach we also create our DOM elements.
       if ($wrapper === undefined) {
