@@ -555,6 +555,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Start playback of video
+     */
+    self.play = function () {
+      if (sections.video && sections.video.isVisible) {
+        sections.video.instance.play();
+      }
+    };
+
+    /**
      * Add task image.
      *
      * @param {string} path Relative
