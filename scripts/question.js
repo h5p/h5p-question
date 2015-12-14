@@ -64,6 +64,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Keep track of whether sections is transitioning.
     var sectionsIsTransitioning = false;
 
+    // Keep track of auto play state
+    var disableAutoPlay = false;
+
     /**
      * Register section with given content.
      *
@@ -527,6 +530,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         })
       };
 
+      if (disableAutoPlay) {
+        params.params.autoplay = false;
+      }
+
       // Never fit to wrapper
       params.params.fit = false;
       sections.video.instance = H5P.newRunnable(params, self.contentId, sections.video.$element, true);
@@ -561,6 +568,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (sections.video && sections.video.isVisible) {
         sections.video.instance.play();
       }
+    };
+
+    /**
+     * Disable auto play, useful in editors.
+     */
+    self.disableAutoPlay = function () {
+      disableAutoPlay = true;
     };
 
     /**
