@@ -67,6 +67,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Keep track of auto play state
     var disableAutoPlay = false;
 
+    // Feedback transition timer
+    var feedbackTransitionTimer;
+
     /**
      * Register section with given content.
      *
@@ -730,6 +733,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (behaviour.disableFeedback) {
         return self;
       }
+      clearTimeout(feedbackTransitionTimer);
 
       if (content) {
         var $feedback = $('<div>', {
@@ -759,7 +763,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
         }
         // Show feedback section
-        setTimeout(function () {
+        feedbackTransitionTimer = setTimeout(function () {
           sections.feedback.$element.addClass('h5p-question-visible');
           setElementHeight(sections.feedback.$element);
           sectionsIsTransitioning = true;
@@ -768,7 +772,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           scrollToBottom();
 
           // Trigger resize after animation
-          setTimeout(function () {
+          feedbackTransitionTimer = setTimeout(function () {
             sectionsIsTransitioning = false;
             self.trigger('resize');
           }, 150);
@@ -784,7 +788,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         sectionsIsTransitioning = true;
 
         // Detach after transition
-        setTimeout(function () {
+        feedbackTransitionTimer = setTimeout(function () {
           // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
           if (!showFeedback) {
             sections.feedback.$element.children().detach();
