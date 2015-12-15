@@ -12,7 +12,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var self = this;
 
     // Inheritance
-    EventDispatcher.call(this);
+    EventDispatcher.call(self);
 
     // Register default section order
     self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons'];
@@ -588,7 +588,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Image element
       var $img = $('<img/>', {
-        src: H5P.getPath(path, this.contentId),
+        src: H5P.getPath(path, self.contentId),
         alt: (options.alt === undefined ? '' : options.alt),
         on: {
           load: function () {
@@ -1019,7 +1019,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.attach = function ($container) {
       if (self.isRoot()) {
-        this.setActivityStarted();
+        self.setActivityStarted();
       }
 
       // The first time we attach we also create our DOM elements.
@@ -1058,10 +1058,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $container.append($sections);
 
       // Let others react to dom changes
-      this.trigger('domChanged', {
+      self.trigger('domChanged', {
         '$target': $container,
-        'library': this.libraryInfo.machineName,
-        'contentId': this.contentId,
+        'library': self.libraryInfo.machineName,
+        'contentId': self.contentId,
         'key': 'newLibrary'
       }, {'bubbles': true, 'external': true});
 
