@@ -157,7 +157,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         .css({
           'position': 'absolute',
           'max-height': 'none'
-        }).appendTo($element.parent());
+        }).appendTo(H5P.$body);
 
       // Apply height to element
       var h = Math.round($tmp.get(0).getBoundingClientRect().height);
