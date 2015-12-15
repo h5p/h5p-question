@@ -347,22 +347,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Resize sections, used for resizing sections when question is resized.
-     *
-     * @private
-     */
-    var resizeSections = function () {
-      // Necessary when content changes, for example when entering full screen
-      if (sections.feedback && showFeedback) {
-        setElementHeight(sections.feedback.$element);
-      }
-
-      if (sections.buttons) {
-        setElementHeight(sections.buttons.$element);
-      }
-    };
-
-    /**
      * Resize buttons to fit container width
      *
      * @private
@@ -1103,10 +1087,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     // Listen for resize
-    this.on('resize', function () {
+    self.on('resize', function () {
       // Allow elements to attach and set their height before resizing
-      if (!sectionsIsTransitioning) {
-        resizeSections();
+      if (!sectionsIsTransitioning && sections.feedback && showFeedback) {
+        // Resize feedback to fit
+        setElementHeight(sections.feedback.$element);
       }
 
       resizeButtons();
