@@ -161,7 +161,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Apply height to element
       var h = Math.round($tmp.get(0).getBoundingClientRect().height);
-      $element.css('max-height', h + 'px');
+      var fontSize = parseFloat($element.css('fontSize'));
+      var relativeH = h / fontSize;
+      $element.css('max-height', relativeH + 'em');
       $tmp.remove();
 
       if (h > 0 && sections.buttons && sections.buttons.$element === $element) {
