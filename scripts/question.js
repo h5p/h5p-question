@@ -12,7 +12,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var self = this;
 
     // Inheritance
-    EventDispatcher.call(this);
+    EventDispatcher.call(self);
 
     // Register default section order
     self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons'];
@@ -63,6 +63,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Keep track of whether sections is transitioning.
     var sectionsIsTransitioning = false;
+
+    // Keep track of auto play state
+    var disableAutoPlay = false;
+
+    // Feedback transition timer
+    var feedbackTransitionTimer;
 
     /**
      * Register section with given content.
@@ -155,7 +161,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Apply height to element
       var h = Math.round($tmp.get(0).getBoundingClientRect().height);
-      $element.css('max-height', h + 'px');
+      var fontSize = parseFloat($element.css('fontSize'));
+      var relativeH = h / fontSize;
+      $element.css('max-height', relativeH + 'em');
       $tmp.remove();
 
       if (h > 0 && sections.buttons && sections.buttons.$element === $element) {
@@ -341,22 +349,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Resize sections, used for resizing sections when question is resized.
-     *
-     * @private
-     */
-    var resizeSections = function () {
-      // Necessary when content changes, for example when entering full screen
-      if (sections.feedback && showFeedback) {
-        setElementHeight(sections.feedback.$element);
-      }
-
-      if (sections.buttons) {
-        setElementHeight(sections.buttons.$element);
-      }
-    };
-
-    /**
      * Resize buttons to fit container width
      *
      * @private
@@ -527,6 +519,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         })
       };
 
+      if (disableAutoPlay) {
+        params.params.autoplay = false;
+      }
+
       // Never fit to wrapper
       params.params.fit = false;
       sections.video.instance = H5P.newRunnable(params, self.contentId, sections.video.$element, true);
@@ -555,6 +551,22 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Start playback of video
+     */
+    self.play = function () {
+      if (sections.video && sections.video.isVisible) {
+        sections.video.instance.play();
+      }
+    };
+
+    /**
+     * Disable auto play, useful in editors.
+     */
+    self.disableAutoPlay = function () {
+      disableAutoPlay = true;
+    };
+
+    /**
      * Add task image.
      *
      * @param {string} path Relative
@@ -578,7 +590,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Image element
       var $img = $('<img/>', {
-        src: H5P.getPath(path, this.contentId),
+        src: H5P.getPath(path, self.contentId),
         alt: (options.alt === undefined ? '' : options.alt),
         on: {
           load: function () {
@@ -707,6 +719,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (behaviour.disableFeedback) {
         return self;
       }
+      clearTimeout(feedbackTransitionTimer);
 
       if (content) {
         var $feedback = $('<div>', {
@@ -736,7 +749,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
         }
         // Show feedback section
-        setTimeout(function () {
+        feedbackTransitionTimer = setTimeout(function () {
           sections.feedback.$element.addClass('h5p-question-visible');
           setElementHeight(sections.feedback.$element);
           sectionsIsTransitioning = true;
@@ -745,7 +758,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           scrollToBottom();
 
           // Trigger resize after animation
-          setTimeout(function () {
+          feedbackTransitionTimer = setTimeout(function () {
             sectionsIsTransitioning = false;
             self.trigger('resize');
           }, 150);
@@ -761,7 +774,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         sectionsIsTransitioning = true;
 
         // Detach after transition
-        setTimeout(function () {
+        feedbackTransitionTimer = setTimeout(function () {
           // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
           if (!showFeedback) {
             sections.feedback.$element.children().detach();
@@ -1008,7 +1021,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.attach = function ($container) {
       if (self.isRoot()) {
-        this.setActivityStarted();
+        self.setActivityStarted();
       }
 
       // The first time we attach we also create our DOM elements.
@@ -1047,10 +1060,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $container.append($sections);
 
       // Let others react to dom changes
-      this.trigger('domChanged', {
+      self.trigger('domChanged', {
         '$target': $container,
-        'library': this.libraryInfo.machineName,
-        'contentId': this.contentId,
+        'library': self.libraryInfo.machineName,
+        'contentId': self.contentId,
         'key': 'newLibrary'
       }, {'bubbles': true, 'external': true});
 
@@ -1076,10 +1089,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     // Listen for resize
-    this.on('resize', function () {
+    self.on('resize', function () {
       // Allow elements to attach and set their height before resizing
-      if (!sectionsIsTransitioning) {
-        resizeSections();
+      if (!sectionsIsTransitioning && sections.feedback && showFeedback) {
+        // Resize feedback to fit
+        setElementHeight(sections.feedback.$element);
       }
 
       resizeButtons();
