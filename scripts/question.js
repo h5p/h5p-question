@@ -12,10 +12,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     var self = this;
 
     // Inheritance
-    EventDispatcher.call(this);
+    EventDispatcher.call(self);
 
-    // Register default order
-    self.order = ['image', 'introduction', 'content', 'feedback', 'buttons'];
+    // Register default section order
+    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons'];
 
     // Keep track of registered sections
     var sections = {};
@@ -63,6 +63,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Keep track of whether sections is transitioning.
     var sectionsIsTransitioning = false;
+
+    // Keep track of auto play state
+    var disableAutoPlay = false;
+
+    // Feedback transition timer
+    var feedbackTransitionTimer;
 
     /**
      * Register section with given content.
@@ -155,7 +161,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Apply height to element
       var h = Math.round($tmp.get(0).getBoundingClientRect().height);
-      $element.css('max-height', h + 'px');
+      var fontSize = parseFloat($element.css('fontSize'));
+      var relativeH = h / fontSize;
+      $element.css('max-height', relativeH + 'em');
       $tmp.remove();
 
       if (h > 0 && sections.buttons && sections.buttons.$element === $element) {
@@ -188,7 +196,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @private
      * @param {string} buttonId
      */
-    var hideButton = function (buttonId) {
+    var hideButton = function (buttonId) {
       // Using detach() vs hide() makes it harder to cheat.
       buttons[buttonId].$element.detach();
       buttons[buttonId].isVisible = false;
@@ -259,90 +267,36 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Get size of element, including decimals.
-     *
-     * @private
-     * @param {Element} element
-     * @param {string} size
-     * @returns {number}
-     */
-    var getAccurateSize = function (element, size) {
-      return parseFloat(window.getComputedStyle(element)[size]);
-    };
-
-    /**
      * Allows for scaling of the question image.
-     *
-     * @param {H5P.jQuery} $img
      */
-    var scaleImage = function ($img) {
-      var transitionTimer;
+    var scaleImage = function () {
+      var $imgSection = sections.image.$element;
+      clearTimeout(imageTransitionTimer);
+
+      // Add this here to avoid initial transition of the image making
+      // content overflow. Alternatively we need to trigger a resize.
+      $imgSection.addClass('animatable');
+
       if (imageThumb) {
-        // Find our target height
-        var $tmp = $img.clone()
-          .css('max-height', 'none').appendTo($img.parent());
-        var targetHeight = getAccurateSize($tmp[0], 'height');
-        var targetWidth = getAccurateSize($tmp[0], 'width');
-        var elementWidth = getAccurateSize(sections.image.$element[0], 'width');
-        var canUseTotalWidth = (targetWidth >= elementWidth);
-        if (canUseTotalWidth) {
-          $tmp.css('width', elementWidth + 'px');
-          targetHeight = getAccurateSize($tmp[0], 'height');
-        }
-        canUseTotalWidth = (canUseTotalWidth &&
-          !$wrapper.hasClass('h5p-transparent') &&
-          !$wrapper.parent().hasClass('h5p-no-frame'));
 
-        transitionTimer = 0;
-        $tmp.remove();
-
-        clearTimeout(imageTransitionTimer);
-        sections.image.$element.addClass('h5p-question-image-large');
-
-        // Only remove margins of section if image can use it.
-        if (canUseTotalWidth && !sections.image.$element.hasClass('h5p-question-image-fill-width')) {
-          transitionTimer = 300;
-          sections.image.$element.addClass('h5p-question-image-fill-width');
-        }
-
-        // Animate to full size after animating it into place
-        imageTransitionTimer = setTimeout(function () {
-          $img.css('maxHeight', targetHeight);
-
-          // Trigger resize on Question after transition to adapt to new height if embeded.
-          setTimeout(function () {
-            self.trigger('resize');
-          }, 300);
-        }, transitionTimer);
+        // Expand image
+        $imgSection.addClass('h5p-question-image-fill-width');
         imageThumb = false;
+
+        imageTransitionTimer = setTimeout(function () {
+          self.trigger('resize');
+        }, 600);
       }
       else {
-        clearTimeout(imageTransitionTimer);
-        transitionTimer = 0;
-        $img.css('maxHeight', '');
 
-        // Let image scale down before repositioning it
-        if (sections.image.$element.hasClass('h5p-question-image-large')) {
-          transitionTimer = 300;
-        }
-        sections.image.$element.removeClass('h5p-question-image-large');
-
-        // Reposition image after scaling it
-        imageTransitionTimer = setTimeout(function () {
-          sections.image.$element.removeClass('h5p-question-image-fill-width');
-
-          // Trigger resize on Question after transition to adapt to new height if embeded.
-          setTimeout(function () {
-            self.trigger('resize');
-          }, 300);
-
-        }, transitionTimer);
-
-
+        // Scale down image
+        $imgSection.removeClass('h5p-question-image-fill-width');
         imageThumb = true;
+
+        imageTransitionTimer = setTimeout(function () {
+          self.trigger('resize');
+        }, 600);
       }
-
-
     };
 
     /**
@@ -391,22 +345,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         scrollableAncestor.animate({
           scrollTop: $wrapper.css('height')
         }, "slow");
-      }
-    };
-
-    /**
-     * Resize sections, used for resizing sections when question is resized.
-     *
-     * @private
-     */
-    var resizeSections = function () {
-      // Necessary when content changes, for example when entering full screen
-      if (sections.feedback && showFeedback) {
-        setElementHeight(sections.feedback.$element);
-      }
-
-      if (sections.buttons) {
-        setElementHeight(sections.buttons.$element);
       }
     };
 
@@ -570,16 +508,78 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * A video to display above the task.
+     *
+     * @param {object} params
+     */
+    self.setVideo = function (params) {
+      sections.video = {
+        $element: $('<div/>', {
+          'class': 'h5p-question-video'
+        })
+      };
+
+      if (disableAutoPlay) {
+        params.params.autoplay = false;
+      }
+
+      // Never fit to wrapper
+      params.params.fit = false;
+      sections.video.instance = H5P.newRunnable(params, self.contentId, sections.video.$element, true);
+      var fromVideo = false; // Hack to avoid never ending loop
+      sections.video.instance.on('resize', function () {
+        fromVideo = true;
+        self.trigger('resize');
+        fromVideo = false;
+      });
+      self.on('resize', function () {
+        if (!fromVideo) {
+          sections.video.instance.trigger('resize');
+        }
+      });
+
+      return self;
+    };
+
+    /**
+     * Will stop any playback going on in the task.
+     */
+    self.pause = function () {
+      if (sections.video && sections.video.isVisible) {
+        sections.video.instance.pause();
+      }
+    };
+
+    /**
+     * Start playback of video
+     */
+    self.play = function () {
+      if (sections.video && sections.video.isVisible) {
+        sections.video.instance.play();
+      }
+    };
+
+    /**
+     * Disable auto play, useful in editors.
+     */
+    self.disableAutoPlay = function () {
+      disableAutoPlay = true;
+    };
+
+    /**
      * Add task image.
      *
      * @param {string} path Relative
-     * @param {string} [alt] Text representation
+     * @param {Object} [options] Options object
+     * @param {string} [options.alt] Text representation
+     * @param {Boolean} [options.disableImageZooming] Set as true to disable image zooming
      */
-    self.setImage = function (path, alt) {
+    self.setImage = function (path, options) {
+      options = options ? options : {};
       sections.image = {};
       // Image container
       sections.image.$element = $('<div/>', {
-        'class': 'h5p-question-image',
+        'class': 'h5p-question-image h5p-question-image-fill-width'
       });
 
       // Inner wrap
@@ -590,8 +590,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Image element
       var $img = $('<img/>', {
-        src: H5P.getPath(path, this.contentId),
-        alt: (alt === undefined ? '' : alt),
+        src: H5P.getPath(path, self.contentId),
+        alt: (options.alt === undefined ? '' : options.alt),
         on: {
           load: function () {
             self.trigger('imageLoaded', this);
@@ -601,35 +601,77 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         appendTo: $imgWrap
       });
 
+      // Disable image zooming
+      if (options.disableImageZooming) {
+        $img.css('maxHeight', 'none');
+
+        // Make sure we are using the correct amount of width at all times
+        var determineImgWidth = function () {
+
+          // Remove margins if natural image width is bigger than section width
+          var imageSectionWidth = sections.image.$element.get(0).getBoundingClientRect().width;
+
+          // Do not transition, for instant measurements
+          $imgWrap.css({
+            '-webkit-transition': 'none',
+            'transition': 'none'
+          });
+
+          // Margin as translateX on both sides of image.
+          var diffX = 2 * ($imgWrap.get(0).getBoundingClientRect().left -
+            sections.image.$element.get(0).getBoundingClientRect().left);
+
+          if ($img.get(0).naturalWidth >= imageSectionWidth - diffX) {
+            sections.image.$element.addClass('h5p-question-image-fill-width');
+          }
+          else { // Use margin for small res images
+            sections.image.$element.removeClass('h5p-question-image-fill-width');
+          }
+
+          // Reset transition rules
+          $imgWrap.css({
+            '-webkit-transition': '',
+            'transition': ''
+          });
+        };
+
+        // Determine image width
+        if ($img.is(':visible')) {
+          determineImgWidth();
+        }
+        else {
+          $img.load(function () {
+            determineImgWidth();
+          });
+        }
+
+        // Skip adding zoom functionality
+        return;
+      }
+
       var sizeDetermined = false;
       var determineSize = function () {
+
         if (sizeDetermined || !$img.is(':visible')) {
           return; // Try again next time.
         }
 
-        // Determine max size
-        $img.css('maxHeight', 'none');
-        var maxHeight = $img[0].height;
-
-        // Determine thumb size
-        $img.css('maxHeight', '');
-        if (maxHeight > $img[0].height) {
-          // We can do better. Add resize capability
-          $img.attr('role', 'button').attr('tabIndex', '0');
-          $imgWrap.addClass('h5p-question-image-scalable')
-            .on('click', function (event) {
-              if (event.which === 1) {
-                scaleImage($img); // Left mouse button click
-              }
-            }).on('keypress', function (event) {
-              if (event.which === 32) {
-                scaleImage($img); // Space bar pressed
-              }
-            });
-        }
+        $img.attr('role', 'button').attr('tabIndex', '0');
+        $imgWrap.addClass('h5p-question-image-scalable')
+          .on('click', function (event) {
+            if (event.which === 1) {
+              scaleImage(); // Left mouse button click
+            }
+          }).on('keypress', function (event) {
+          if (event.which === 32) {
+            scaleImage(); // Space bar pressed
+          }
+        });
+        sections.image.$element.removeClass('h5p-question-image-fill-width');
 
         sizeDetermined  = true; // Prevent any futher events
       };
+
       self.on('resize', determineSize);
 
       return self;
@@ -677,6 +719,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (behaviour.disableFeedback) {
         return self;
       }
+      clearTimeout(feedbackTransitionTimer);
 
       if (content) {
         var $feedback = $('<div>', {
@@ -706,7 +749,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
         }
         // Show feedback section
-        setTimeout(function () {
+        feedbackTransitionTimer = setTimeout(function () {
           sections.feedback.$element.addClass('h5p-question-visible');
           setElementHeight(sections.feedback.$element);
           sectionsIsTransitioning = true;
@@ -715,7 +758,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           scrollToBottom();
 
           // Trigger resize after animation
-          setTimeout(function () {
+          feedbackTransitionTimer = setTimeout(function () {
             sectionsIsTransitioning = false;
             self.trigger('resize');
           }, 150);
@@ -731,7 +774,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         sectionsIsTransitioning = true;
 
         // Detach after transition
-        setTimeout(function () {
+        feedbackTransitionTimer = setTimeout(function () {
           // Avoiding Transition.onTransitionEnd since it will register multiple events, and there's no way to cancel it if the transition changes back to "show" while the animation is happening.
           if (!showFeedback) {
             sections.feedback.$element.children().detach();
@@ -977,7 +1020,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $container
      */
     self.attach = function ($container) {
-      this.setActivityStarted();
+      if (self.isRoot()) {
+        self.setActivityStarted();
+      }
 
       // The first time we attach we also create our DOM elements.
       if ($wrapper === undefined) {
@@ -1015,10 +1060,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $container.append($sections);
 
       // Let others react to dom changes
-      this.trigger('domChanged', {
+      self.trigger('domChanged', {
         '$target': $container,
-        'library': this.libraryInfo.machineName,
-        'contentId': this.contentId,
+        'library': self.libraryInfo.machineName,
+        'contentId': self.contentId,
         'key': 'newLibrary'
       }, {'bubbles': true, 'external': true});
 
@@ -1044,10 +1089,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     // Listen for resize
-    this.on('resize', function () {
+    self.on('resize', function () {
       // Allow elements to attach and set their height before resizing
-      if (!sectionsIsTransitioning) {
-        resizeSections();
+      if (!sectionsIsTransitioning && sections.feedback && showFeedback) {
+        // Resize feedback to fit
+        setElementHeight(sections.feedback.$element);
       }
 
       resizeButtons();
