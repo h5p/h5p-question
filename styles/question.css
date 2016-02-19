@@ -97,9 +97,14 @@
   margin: 1em;
 }
 
-.h5p-question-introduction > p {
+.h5p-question-introduction {
   font-size: 1.125em;
-  line-height: 1.25em;
+  line-height: 1.125em;
+}
+
+.h5p-question-introduction > p {
+  font-size: inherit;
+  line-height: inherit;
   margin: 0;
 }
 
