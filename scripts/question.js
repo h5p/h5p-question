@@ -732,7 +732,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         scoreBar.appendTo($feedback);
         scoreBar.setScore(score);
         $feedback.append($('<div>', {
-          'aria-live': 'assertive',
           'class': 'h5p-question-feedback-content',
           'html': content
         }));
@@ -749,6 +748,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             insert(self.order, 'feedback', sections, $wrapper);
           }
         }
+
         // Show feedback section
         feedbackTransitionTimer = setTimeout(function () {
           sections.feedback.$element.addClass('h5p-question-visible');
