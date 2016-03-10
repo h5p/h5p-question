@@ -727,8 +727,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} content
      * @param {number} score The score
      * @param {number} maxScore The maximum score for this question
+     * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
      */
-    self.setFeedback = function (content, score, maxScore) {
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel) {
 
       // Feedback is disabled
       if (behaviour.disableFeedback) {
@@ -742,7 +743,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         });
 
         if (scoreBar === undefined) {
-          scoreBar = JoubelUI.createScoreBar(maxScore);
+          scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel);
         }
         scoreBar.appendTo($feedback);
         scoreBar.setScore(score);
