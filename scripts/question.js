@@ -706,6 +706,21 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Force readspeaker to read text. Useful when you have to use
+     * setTimeout for animations.
+     */
+    self.read = function (content) {
+      // Read text from content
+      var $el = $('<div/>', {
+        'aria-live': 'assertive',
+        'class': 'h5p-hidden-read',
+        'html': content,
+        appendTo: $wrapper
+      });
+      setTimeout(function () { $el.remove(); }, 1);
+    };
+
+    /**
      * Set feedback message.
      * Setting the message to blank or undefined will hide it again.
      *
@@ -735,6 +750,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'class': 'h5p-question-feedback-content',
           'html': content
         }));
+
+        // Feedback for readspeakers
+        self.read(content);
 
         showFeedback = true;
         if (sections.feedback) {
