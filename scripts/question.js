@@ -847,8 +847,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} text label
      * @param {function} clicked
      * @param {boolean} [visible=true]
+     * @param {Object} [options] Options for button
      */
-    self.addButton = function (id, text, clicked, visible) {
+    self.addButton = function (id, text, clicked, visible, options) {
       if (buttons[id]) {
         return self; // Already registered
       }
@@ -861,11 +862,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
+      options = options || {};
+
       buttons[id] = {
         isTruncated: false,
         text: text
       };
-      var $e = buttons[id].$element = JoubelUI.createButton({
+      var $e = buttons[id].$element = JoubelUI.createButton($.extend({
         'class': 'h5p-question-' + id,
         html: text,
         title: text,
@@ -874,7 +877,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             clicked();
           }
         }
-      });
+      }, options));
       buttonOrder.push(id);
 
       if (visible === undefined || visible) {
