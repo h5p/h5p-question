@@ -183,12 +183,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Does the actual job of hiding the buttons scheduled for hiding.
      *
      * @private
+     * @param {boolean} [relocateFocus] Find a new button to focus
      */
-    var hideButtons = function () {
+    var hideButtons = function (relocateFocus) {
       for (var i = 0; i < buttonsToHide.length; i++) {
         hideButton(buttonsToHide[i].id);
       }
       buttonsToHide = [];
+
+      if (relocateFocus) {
+        self.focusButton();
+      }
     };
 
     /**
@@ -222,6 +227,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Hide buttons
       var numToHide = 0;
+      var relocateFocus = false;
       for (var j = 0; j < buttonsToHide.length; j++) {
         var button = buttons[buttonsToHide[j].id];
         if (button.isVisible) {
@@ -229,7 +235,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
         if (button.$element.is(':focus')) {
           // Move focus to the first visible button.
-          self.focusButton();
+          relocateFocus = true;
         }
       }
 
@@ -241,12 +247,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Wait for animations before detaching buttons
         toggleButtonsTransitionTimer = setTimeout(function () {
-          hideButtons();
+          hideButtons(relocateFocus);
           sectionsIsTransitioning = false;
         }, 150);
       }
       else {
-        hideButtons();
+        hideButtons(relocateFocus);
 
         // Show button section
         if (!sections.buttons.$element.is(':empty')) {
