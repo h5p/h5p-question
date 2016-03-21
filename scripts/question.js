@@ -183,12 +183,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Does the actual job of hiding the buttons scheduled for hiding.
      *
      * @private
+     * @param {boolean} [relocateFocus] Find a new button to focus
      */
-    var hideButtons = function () {
+    var hideButtons = function (relocateFocus) {
       for (var i = 0; i < buttonsToHide.length; i++) {
         hideButton(buttonsToHide[i].id);
       }
       buttonsToHide = [];
+
+      if (relocateFocus) {
+        self.focusButton();
+      }
     };
 
     /**
@@ -222,6 +227,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Hide buttons
       var numToHide = 0;
+      var relocateFocus = false;
       for (var j = 0; j < buttonsToHide.length; j++) {
         var button = buttons[buttonsToHide[j].id];
         if (button.isVisible) {
@@ -229,7 +235,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
         if (button.$element.is(':focus')) {
           // Move focus to the first visible button.
-          self.focusButton();
+          relocateFocus = true;
         }
       }
 
@@ -241,12 +247,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Wait for animations before detaching buttons
         toggleButtonsTransitionTimer = setTimeout(function () {
-          hideButtons();
+          hideButtons(relocateFocus);
           sectionsIsTransitioning = false;
         }, 150);
       }
       else {
-        hideButtons();
+        hideButtons(relocateFocus);
 
         // Show button section
         if (!sections.buttons.$element.is(':empty')) {
@@ -706,14 +712,30 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Force readspeaker to read text. Useful when you have to use
+     * setTimeout for animations.
+     */
+    self.read = function (content) {
+      // Read text from content
+      var $el = $('<div/>', {
+        'aria-live': 'assertive',
+        'class': 'h5p-hidden-read',
+        'html': content,
+        appendTo: $wrapper
+      });
+      setTimeout(function () { $el.remove(); }, 1);
+    };
+
+    /**
      * Set feedback message.
      * Setting the message to blank or undefined will hide it again.
      *
      * @param {string} content
      * @param {number} score The score
      * @param {number} maxScore The maximum score for this question
+     * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
      */
-    self.setFeedback = function (content, score, maxScore) {
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel) {
 
       // Feedback is disabled
       if (behaviour.disableFeedback) {
@@ -727,7 +749,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         });
 
         if (scoreBar === undefined) {
-          scoreBar = JoubelUI.createScoreBar(maxScore);
+          scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel);
         }
         scoreBar.appendTo($feedback);
         scoreBar.setScore(score);
@@ -735,6 +757,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'class': 'h5p-question-feedback-content',
           'html': content
         }));
+
+        // Feedback for readspeakers
+        self.read(content);
 
         showFeedback = true;
         if (sections.feedback) {
@@ -748,6 +773,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             insert(self.order, 'feedback', sections, $wrapper);
           }
         }
+
         // Show feedback section
         feedbackTransitionTimer = setTimeout(function () {
           sections.feedback.$element.addClass('h5p-question-visible');
@@ -827,8 +853,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} text label
      * @param {function} clicked
      * @param {boolean} [visible=true]
+     * @param {Object} [options] Options for button
      */
-    self.addButton = function (id, text, clicked, visible) {
+    self.addButton = function (id, text, clicked, visible, options) {
       if (buttons[id]) {
         return self; // Already registered
       }
@@ -841,11 +868,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
+      options = options || {};
+
       buttons[id] = {
         isTruncated: false,
         text: text
       };
-      var $e = buttons[id].$element = JoubelUI.createButton({
+      var $e = buttons[id].$element = JoubelUI.createButton($.extend({
         'class': 'h5p-question-' + id,
         html: text,
         title: text,
@@ -854,7 +883,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             clicked();
           }
         }
-      });
+      }, options));
       buttonOrder.push(id);
 
       if (visible === undefined || visible) {
@@ -1038,7 +1067,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Prepare container
       $wrapper = $container;
-      $container.html('').addClass('h5p-question h5p-' + type);
+      $container.html('')
+        .attr('role', 'application')
+        .addClass('h5p-question h5p-' + type);
 
       // Add sections in given order
       var $sections = [];
