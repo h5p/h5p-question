@@ -75,7 +75,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      *
      * @private
      * @param {string} section ID of the section
-     * @param {(string|H5P.jQuery)} content
+     * @param {(string|H5P.jQuery)} [content]
      */
     var register = function (section, content) {
       sections[section] = {};
@@ -107,7 +107,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Insert element with given ID into the DOM.
      *
      * @private
-     * @param {array} order
+     * @param {array|Array|string[]} order
      * List with ordered element IDs
      * @param {string} id
      * ID of the element to be inserted
@@ -847,6 +847,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * @typedef {Object} ConfirmationDialog
+     * @property {boolean} [enable] Must be true to show confirmation dialog
+     * @property {Object} [l10n] Translatable fields
+     * @property {string} [l10n.header] Header text
+     * @property {string} [l10n.body] Body text
+     * @property {string} [l10n.cancelLabel]
+     * @property {string} [l10n.confirmLabel]
+     */
+
+    /**
      * Register buttons for the task.
      *
      * @param {string} id
@@ -854,8 +864,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {function} clicked
      * @param {boolean} [visible=true]
      * @param {Object} [options] Options for button
+     * @param {Object} [extras] Extra options
+     * @param {ConfirmationDialog} [extras.confirmationDialog] Confirmation dialog
      */
-    self.addButton = function (id, text, clicked, visible, options) {
+    self.addButton = function (id, text, clicked, visible, options, extras) {
       if (buttons[id]) {
         return self; // Already registered
       }
@@ -866,6 +878,45 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         if (initialized) {
           insert(self.order, 'buttons', sections, $wrapper);
         }
+      }
+
+      var confirmationDialog;
+      extras = extras || {};
+      extras.confirmationDialog = extras.confirmationDialog || {};
+
+      // Confirmation dialog
+      if  (extras.confirmationDialog.enable) {
+        confirmationDialog = new H5P.ConfirmationDialog({
+          headerText: extras.confirmationDialog.l10n.header,
+          dialogText: extras.confirmationDialog.l10n.body,
+          cancelText: extras.confirmationDialog.l10n.cancelLabel,
+          confirmText: extras.confirmationDialog.l10n.confirmLabel
+        });
+
+        if (sections.popups === undefined) {
+          register('popups');
+          if (initialized) {
+            insert(self.order, 'popups', sections, $wrapper);
+          }
+          sections.popups.$element.addClass('hidden');
+          self.order.push('popups');
+        }
+        confirmationDialog.appendTo(sections.popups.$element.get(0));
+
+        confirmationDialog.on('confirmed', function () {
+          sections.popups.$element.addClass('hidden');
+          clicked();
+
+          // Trigger to content type
+          self.trigger('confirmed');
+        });
+
+        confirmationDialog.on('canceled', function () {
+          sections.popups.$element.addClass('hidden');
+
+          // Trigger to content type
+          self.trigger('canceled');
+        });
       }
 
       options = options || {};
@@ -880,7 +931,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         title: text,
         on: {
           click: function () {
-            clicked();
+            if (extras.confirmationDialog.enable && confirmationDialog) {
+              sections.popups.$element.removeClass('hidden');
+              confirmationDialog.show($e.position().top);
+            }
+            else {
+              clicked();
+            }
           }
         }
       }, options));
