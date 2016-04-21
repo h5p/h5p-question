@@ -849,6 +849,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     /**
      * @typedef {Object} ConfirmationDialog
      * @property {boolean} [enable] Must be true to show confirmation dialog
+     * @property {jQuery} [$parentElement] Append to this element.
      * @property {Object} [l10n] Translatable fields
      * @property {string} [l10n.header] Header text
      * @property {string} [l10n.body] Body text
@@ -880,46 +881,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
-      var confirmationDialog;
       extras = extras || {};
       extras.confirmationDialog = extras.confirmationDialog || {};
-
-      // Confirmation dialog
-      if  (extras.confirmationDialog.enable) {
-        confirmationDialog = new H5P.ConfirmationDialog({
-          headerText: extras.confirmationDialog.l10n.header,
-          dialogText: extras.confirmationDialog.l10n.body,
-          cancelText: extras.confirmationDialog.l10n.cancelLabel,
-          confirmText: extras.confirmationDialog.l10n.confirmLabel
-        });
-
-        if (sections.popups === undefined) {
-          register('popups');
-          if (initialized) {
-            insert(self.order, 'popups', sections, $wrapper);
-          }
-          sections.popups.$element.addClass('hidden');
-          self.order.push('popups');
-        }
-        confirmationDialog.appendTo(sections.popups.$element.get(0));
-
-        confirmationDialog.on('confirmed', function () {
-          sections.popups.$element.addClass('hidden');
-          clicked();
-
-          // Trigger to content type
-          self.trigger('confirmed');
-        });
-
-        confirmationDialog.on('canceled', function () {
-          sections.popups.$element.addClass('hidden');
-
-          // Trigger to content type
-          self.trigger('canceled');
-        });
-      }
-
       options = options || {};
+
+      var confirmationDialog =
+        self.addConfirmationDialogToButton(extras.confirmationDialog, clicked);
 
       buttons[id] = {
         isTruncated: false,
@@ -932,7 +899,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         on: {
           click: function () {
             if (extras.confirmationDialog.enable && confirmationDialog) {
-              sections.popups.$element.removeClass('hidden');
+              // Show popups section if used
+              if (!extras.confirmationDialog.$parentElement) {
+                sections.popups.$element.removeClass('hidden');
+              }
               confirmationDialog.show($e.position().top);
             }
             else {
@@ -951,6 +921,71 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       return self;
+    };
+
+    /**
+     * Add confirmation dialog to button
+     * @param {ConfirmationDialog} options
+     *  A confirmation dialog that will be shown before click handler of button
+     *  is triggered
+     * @param {function} clicked
+     *  Click handler of button
+     * @return {H5P.ConfirmationDialog|undefined}
+     *  Confirmation dialog if enabled
+     */
+    self.addConfirmationDialogToButton = function (options, clicked) {
+      options = options || {};
+
+      if (!options.enable) {
+        return;
+      }
+
+      // Confirmation dialog
+      var confirmationDialog = new H5P.ConfirmationDialog({
+        headerText: options.l10n.header,
+        dialogText: options.l10n.body,
+        cancelText: options.l10n.cancelLabel,
+        confirmText: options.l10n.confirmLabel
+      });
+
+      // Determine parent element
+      if (options.$parentElement) {
+        confirmationDialog.appendTo(options.$parentElement.get(0));
+      }
+      else {
+
+        // Create popup section and append to that
+        if (sections.popups === undefined) {
+          register('popups');
+          if (initialized) {
+            insert(self.order, 'popups', sections, $wrapper);
+          }
+          sections.popups.$element.addClass('hidden');
+          self.order.push('popups');
+        }
+        confirmationDialog.appendTo(sections.popups.$element.get(0));
+      }
+
+      // Add event listeners
+      confirmationDialog.on('confirmed', function () {
+        if (!options.$parentElement) {
+          sections.popups.$element.addClass('hidden');
+        }
+        clicked();
+
+        // Trigger to content type
+        self.trigger('confirmed');
+      });
+
+      confirmationDialog.on('canceled', function () {
+        if (!options.$parentElement) {
+          sections.popups.$element.addClass('hidden');
+        }
+        // Trigger to content type
+        self.trigger('canceled');
+      });
+
+      return confirmationDialog;
     };
 
     /**
