@@ -849,6 +849,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     /**
      * @typedef {Object} ConfirmationDialog
      * @property {boolean} [enable] Must be true to show confirmation dialog
+     * @property {Object} [instance] Instance that uses confirmation dialog
      * @property {jQuery} [$parentElement] Append to this element.
      * @property {Object} [l10n] Translatable fields
      * @property {string} [l10n.header] Header text
@@ -942,6 +943,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Confirmation dialog
       var confirmationDialog = new H5P.ConfirmationDialog({
+        instance: options.instance,
         headerText: options.l10n.header,
         dialogText: options.l10n.body,
         cancelText: options.l10n.cancelLabel,
