@@ -877,10 +877,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $e = buttons[id].$element = JoubelUI.createButton($.extend({
         'class': 'h5p-question-' + id,
         html: text,
-        title: text,
         on: {
-          click: function () {
+          click: function (event) {
             clicked();
+            if (options.href !== undefined) {
+              event.preventDefault();
+            }
           }
         }
       }, options));
