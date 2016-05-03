@@ -735,7 +735,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {number} maxScore The maximum score for this question
      * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
      */
-    self.setFeedback = function (content, score, maxScore, scoreBarLabel) {
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText) {
 
       // Feedback is disabled
       if (behaviour.disableFeedback) {
@@ -757,6 +757,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'class': 'h5p-question-feedback-content',
           'html': content
         }));
+
+        if (helpText !== false) {
+          $feedback.append(JoubelUI.createTip(helpText, {helpIcon: true}));
+        }
 
         // Feedback for readspeakers
         self.read(content);
