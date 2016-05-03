@@ -75,7 +75,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      *
      * @private
      * @param {string} section ID of the section
-     * @param {(string|H5P.jQuery)} content
+     * @param {(string|H5P.jQuery)} [content]
      */
     var register = function (section, content) {
       sections[section] = {};
@@ -107,7 +107,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Insert element with given ID into the DOM.
      *
      * @private
-     * @param {array} order
+     * @param {array|Array|string[]} order
      * List with ordered element IDs
      * @param {string} id
      * ID of the element to be inserted
@@ -847,6 +847,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * @typedef {Object} ConfirmationDialog
+     * @property {boolean} [enable] Must be true to show confirmation dialog
+     * @property {Object} [instance] Instance that uses confirmation dialog
+     * @property {jQuery} [$parentElement] Append to this element.
+     * @property {Object} [l10n] Translatable fields
+     * @property {string} [l10n.header] Header text
+     * @property {string} [l10n.body] Body text
+     * @property {string} [l10n.cancelLabel]
+     * @property {string} [l10n.confirmLabel]
+     */
+
+    /**
      * Register buttons for the task.
      *
      * @param {string} id
@@ -854,8 +866,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {function} clicked
      * @param {boolean} [visible=true]
      * @param {Object} [options] Options for button
+     * @param {Object} [extras] Extra options
+     * @param {ConfirmationDialog} [extras.confirmationDialog] Confirmation dialog
      */
-    self.addButton = function (id, text, clicked, visible, options) {
+    self.addButton = function (id, text, clicked, visible, options, extras) {
       if (buttons[id]) {
         return self; // Already registered
       }
@@ -868,7 +882,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
+      extras = extras || {};
+      extras.confirmationDialog = extras.confirmationDialog || {};
       options = options || {};
+
+      var confirmationDialog =
+        self.addConfirmationDialogToButton(extras.confirmationDialog, clicked);
 
       buttons[id] = {
         isTruncated: false,
@@ -878,8 +897,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         'class': 'h5p-question-' + id,
         html: text,
         on: {
-          click: function (event) {
-            clicked();
+          click: function () {
+            if (extras.confirmationDialog.enable && confirmationDialog) {
+              // Show popups section if used
+              if (!extras.confirmationDialog.$parentElement) {
+                sections.popups.$element.removeClass('hidden');
+              }
+              confirmationDialog.show($e.position().top);
+            }
+            else {
+              clicked();
+            }
+            
             if (options.href !== undefined) {
               event.preventDefault();
             }
@@ -896,6 +925,72 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       return self;
+    };
+
+    /**
+     * Add confirmation dialog to button
+     * @param {ConfirmationDialog} options
+     *  A confirmation dialog that will be shown before click handler of button
+     *  is triggered
+     * @param {function} clicked
+     *  Click handler of button
+     * @return {H5P.ConfirmationDialog|undefined}
+     *  Confirmation dialog if enabled
+     */
+    self.addConfirmationDialogToButton = function (options, clicked) {
+      options = options || {};
+
+      if (!options.enable) {
+        return;
+      }
+
+      // Confirmation dialog
+      var confirmationDialog = new H5P.ConfirmationDialog({
+        instance: options.instance,
+        headerText: options.l10n.header,
+        dialogText: options.l10n.body,
+        cancelText: options.l10n.cancelLabel,
+        confirmText: options.l10n.confirmLabel
+      });
+
+      // Determine parent element
+      if (options.$parentElement) {
+        confirmationDialog.appendTo(options.$parentElement.get(0));
+      }
+      else {
+
+        // Create popup section and append to that
+        if (sections.popups === undefined) {
+          register('popups');
+          if (initialized) {
+            insert(self.order, 'popups', sections, $wrapper);
+          }
+          sections.popups.$element.addClass('hidden');
+          self.order.push('popups');
+        }
+        confirmationDialog.appendTo(sections.popups.$element.get(0));
+      }
+
+      // Add event listeners
+      confirmationDialog.on('confirmed', function () {
+        if (!options.$parentElement) {
+          sections.popups.$element.addClass('hidden');
+        }
+        clicked();
+
+        // Trigger to content type
+        self.trigger('confirmed');
+      });
+
+      confirmationDialog.on('canceled', function () {
+        if (!options.$parentElement) {
+          sections.popups.$element.addClass('hidden');
+        }
+        // Trigger to content type
+        self.trigger('canceled');
+      });
+
+      return confirmationDialog;
     };
 
     /**
