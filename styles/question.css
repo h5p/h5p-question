@@ -186,3 +186,15 @@
   text-indent: 1px;
   overflow: hidden;
 }
+
+.h5p-question-popups {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.h5p-question-popups.hidden {
+  display: none;
+}
