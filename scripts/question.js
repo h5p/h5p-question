@@ -286,6 +286,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (imageThumb) {
 
         // Expand image
+        $(this).attr('aria-expanded', true);
         $imgSection.addClass('h5p-question-image-fill-width');
         imageThumb = false;
 
@@ -296,6 +297,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       else {
 
         // Scale down image
+        $(this).attr('aria-expanded', false);
         $imgSection.removeClass('h5p-question-image-fill-width');
         imageThumb = true;
 
@@ -662,15 +664,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           return; // Try again next time.
         }
 
-        $img.attr('role', 'button').attr('tabIndex', '0');
         $imgWrap.addClass('h5p-question-image-scalable')
+          .attr('aria-expanded', false)
+          .attr('role', 'button')
+          .attr('tabIndex', '0')
           .on('click', function (event) {
             if (event.which === 1) {
-              scaleImage(); // Left mouse button click
+              scaleImage.apply(this); // Left mouse button click
             }
           }).on('keypress', function (event) {
           if (event.which === 32) {
-            scaleImage(); // Space bar pressed
+            scaleImage.apply(this); // Space bar pressed
           }
         });
         sections.image.$element.removeClass('h5p-question-image-fill-width');
