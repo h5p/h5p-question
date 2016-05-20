@@ -897,7 +897,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         'class': 'h5p-question-' + id,
         html: text,
         on: {
-          click: function () {
+          click: function (event) {
             if (extras.confirmationDialog.enable && confirmationDialog) {
               // Show popups section if used
               if (!extras.confirmationDialog.$parentElement) {
@@ -908,7 +908,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             else {
               clicked();
             }
-            
+
             if (options.href !== undefined) {
               event.preventDefault();
             }
