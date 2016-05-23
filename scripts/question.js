@@ -15,7 +15,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons'];
+    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -69,6 +69,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Feedback transition timer
     var feedbackTransitionTimer;
+
+    // Used when reading messages to the user
+    var $read, readText;
 
     /**
      * Register section with given content.
@@ -720,14 +723,21 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * setTimeout for animations.
      */
     self.read = function (content) {
-      // Read text from content
-      var $el = $('<div/>', {
-        'aria-live': 'assertive',
-        'class': 'h5p-hidden-read',
-        'html': content,
-        appendTo: $wrapper
-      });
-      setTimeout(function () { $el.remove(); }, 1);
+      if (readText) {
+        // Combine texts if called multiple times
+        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content
+      }
+      else {
+        readText = content;
+      }
+
+      // Set text
+      $read.html(readText);
+
+      setTimeout(function () {
+        // Stop combining when done reading
+        readText = null;
+      }, 100);
     };
 
     /**
@@ -1163,6 +1173,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
            // Give the question type a chance to register before attaching
           self.registerDomElements();
         }
+
+        // Create section for reading messages
+        $read = $('<div/>', {
+          'aria-live': 'polite',
+          'class': 'h5p-hidden-read'
+        });
+        register('read', $read);
+        
         self.trigger('registerDomElements');
       }
 
