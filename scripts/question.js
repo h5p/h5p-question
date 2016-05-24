@@ -723,6 +723,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * setTimeout for animations.
      */
     self.read = function (content) {
+      if (!$read) {
+        return; // Not ready yet
+      }
+
       if (readText) {
         // Combine texts if called multiple times
         readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content
@@ -1180,7 +1184,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'class': 'h5p-hidden-read'
         });
         register('read', $read);
-        
         self.trigger('registerDomElements');
       }
 
