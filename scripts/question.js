@@ -741,6 +741,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       setTimeout(function () {
         // Stop combining when done reading
         readText = null;
+        $read.html('');
       }, 100);
     };
 
