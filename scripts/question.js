@@ -1191,7 +1191,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Prepare container
       $wrapper = $container;
       $container.html('')
-        .attr('role', 'application')
         .addClass('h5p-question h5p-' + type);
 
       // Add sections in given order
