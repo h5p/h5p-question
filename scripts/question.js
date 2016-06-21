@@ -15,7 +15,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons'];
+    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -70,12 +70,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Feedback transition timer
     var feedbackTransitionTimer;
 
+    // Used when reading messages to the user
+    var $read, readText;
+
     /**
      * Register section with given content.
      *
      * @private
      * @param {string} section ID of the section
-     * @param {(string|H5P.jQuery)} content
+     * @param {(string|H5P.jQuery)} [content]
      */
     var register = function (section, content) {
       sections[section] = {};
@@ -107,7 +110,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Insert element with given ID into the DOM.
      *
      * @private
-     * @param {array} order
+     * @param {array|Array|string[]} order
      * List with ordered element IDs
      * @param {string} id
      * ID of the element to be inserted
@@ -286,6 +289,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (imageThumb) {
 
         // Expand image
+        $(this).attr('aria-expanded', true);
         $imgSection.addClass('h5p-question-image-fill-width');
         imageThumb = false;
 
@@ -296,6 +300,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       else {
 
         // Scale down image
+        $(this).attr('aria-expanded', false);
         $imgSection.removeClass('h5p-question-image-fill-width');
         imageThumb = true;
 
@@ -662,15 +667,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           return; // Try again next time.
         }
 
-        $img.attr('role', 'button').attr('tabIndex', '0');
         $imgWrap.addClass('h5p-question-image-scalable')
+          .attr('aria-expanded', false)
+          .attr('role', 'button')
+          .attr('tabIndex', '0')
           .on('click', function (event) {
             if (event.which === 1) {
-              scaleImage(); // Left mouse button click
+              scaleImage.apply(this); // Left mouse button click
             }
           }).on('keypress', function (event) {
           if (event.which === 32) {
-            scaleImage(); // Space bar pressed
+            scaleImage.apply(this); // Space bar pressed
           }
         });
         sections.image.$element.removeClass('h5p-question-image-fill-width');
@@ -716,14 +723,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * setTimeout for animations.
      */
     self.read = function (content) {
-      // Read text from content
-      var $el = $('<div/>', {
-        'aria-live': 'assertive',
-        'class': 'h5p-hidden-read',
-        'html': content,
-        appendTo: $wrapper
-      });
-      setTimeout(function () { $el.remove(); }, 1);
+      if (!$read) {
+        return; // Not ready yet
+      }
+
+      if (readText) {
+        // Combine texts if called multiple times
+        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content
+      }
+      else {
+        readText = content;
+      }
+
+      // Set text
+      $read.html(readText);
+
+      setTimeout(function () {
+        // Stop combining when done reading
+        readText = null;
+        $read.html('');
+      }, 100);
     };
 
     /**
@@ -847,6 +866,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * @typedef {Object} ConfirmationDialog
+     * @property {boolean} [enable] Must be true to show confirmation dialog
+     * @property {Object} [instance] Instance that uses confirmation dialog
+     * @property {jQuery} [$parentElement] Append to this element.
+     * @property {Object} [l10n] Translatable fields
+     * @property {string} [l10n.header] Header text
+     * @property {string} [l10n.body] Body text
+     * @property {string} [l10n.cancelLabel]
+     * @property {string} [l10n.confirmLabel]
+     */
+
+    /**
      * Register buttons for the task.
      *
      * @param {string} id
@@ -854,8 +885,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {function} clicked
      * @param {boolean} [visible=true]
      * @param {Object} [options] Options for button
+     * @param {Object} [extras] Extra options
+     * @param {ConfirmationDialog} [extras.confirmationDialog] Confirmation dialog
      */
-    self.addButton = function (id, text, clicked, visible, options) {
+    self.addButton = function (id, text, clicked, visible, options, extras) {
       if (buttons[id]) {
         return self; // Already registered
       }
@@ -868,7 +901,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
+      extras = extras || {};
+      extras.confirmationDialog = extras.confirmationDialog || {};
       options = options || {};
+
+      var confirmationDialog =
+        self.addConfirmationDialogToButton(extras.confirmationDialog, clicked);
 
       buttons[id] = {
         isTruncated: false,
@@ -877,10 +915,22 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $e = buttons[id].$element = JoubelUI.createButton($.extend({
         'class': 'h5p-question-' + id,
         html: text,
-        title: text,
         on: {
-          click: function () {
-            clicked();
+          click: function (event) {
+            if (extras.confirmationDialog.enable && confirmationDialog) {
+              // Show popups section if used
+              if (!extras.confirmationDialog.$parentElement) {
+                sections.popups.$element.removeClass('hidden');
+              }
+              confirmationDialog.show($e.position().top);
+            }
+            else {
+              clicked();
+            }
+
+            if (options.href !== undefined) {
+              event.preventDefault();
+            }
           }
         }
       }, options));
@@ -894,6 +944,72 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       return self;
+    };
+
+    /**
+     * Add confirmation dialog to button
+     * @param {ConfirmationDialog} options
+     *  A confirmation dialog that will be shown before click handler of button
+     *  is triggered
+     * @param {function} clicked
+     *  Click handler of button
+     * @return {H5P.ConfirmationDialog|undefined}
+     *  Confirmation dialog if enabled
+     */
+    self.addConfirmationDialogToButton = function (options, clicked) {
+      options = options || {};
+
+      if (!options.enable) {
+        return;
+      }
+
+      // Confirmation dialog
+      var confirmationDialog = new H5P.ConfirmationDialog({
+        instance: options.instance,
+        headerText: options.l10n.header,
+        dialogText: options.l10n.body,
+        cancelText: options.l10n.cancelLabel,
+        confirmText: options.l10n.confirmLabel
+      });
+
+      // Determine parent element
+      if (options.$parentElement) {
+        confirmationDialog.appendTo(options.$parentElement.get(0));
+      }
+      else {
+
+        // Create popup section and append to that
+        if (sections.popups === undefined) {
+          register('popups');
+          if (initialized) {
+            insert(self.order, 'popups', sections, $wrapper);
+          }
+          sections.popups.$element.addClass('hidden');
+          self.order.push('popups');
+        }
+        confirmationDialog.appendTo(sections.popups.$element.get(0));
+      }
+
+      // Add event listeners
+      confirmationDialog.on('confirmed', function () {
+        if (!options.$parentElement) {
+          sections.popups.$element.addClass('hidden');
+        }
+        clicked();
+
+        // Trigger to content type
+        self.trigger('confirmed');
+      });
+
+      confirmationDialog.on('canceled', function () {
+        if (!options.$parentElement) {
+          sections.popups.$element.addClass('hidden');
+        }
+        // Trigger to content type
+        self.trigger('canceled');
+      });
+
+      return confirmationDialog;
     };
 
     /**
@@ -1062,13 +1178,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
            // Give the question type a chance to register before attaching
           self.registerDomElements();
         }
+
+        // Create section for reading messages
+        $read = $('<div/>', {
+          'aria-live': 'polite',
+          'class': 'h5p-hidden-read'
+        });
+        register('read', $read);
         self.trigger('registerDomElements');
       }
 
       // Prepare container
       $wrapper = $container;
       $container.html('')
-        .attr('role', 'application')
         .addClass('h5p-question h5p-' + type);
 
       // Add sections in given order
