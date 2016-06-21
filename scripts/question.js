@@ -15,7 +15,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons'];
+    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -69,6 +69,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Feedback transition timer
     var feedbackTransitionTimer;
+
+    // Used when reading messages to the user
+    var $read, readText;
 
     /**
      * Register section with given content.
@@ -286,6 +289,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (imageThumb) {
 
         // Expand image
+        $(this).attr('aria-expanded', true);
         $imgSection.addClass('h5p-question-image-fill-width');
         imageThumb = false;
 
@@ -296,6 +300,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       else {
 
         // Scale down image
+        $(this).attr('aria-expanded', false);
         $imgSection.removeClass('h5p-question-image-fill-width');
         imageThumb = true;
 
@@ -662,15 +667,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           return; // Try again next time.
         }
 
-        $img.attr('role', 'button').attr('tabIndex', '0');
         $imgWrap.addClass('h5p-question-image-scalable')
+          .attr('aria-expanded', false)
+          .attr('role', 'button')
+          .attr('tabIndex', '0')
           .on('click', function (event) {
             if (event.which === 1) {
-              scaleImage(); // Left mouse button click
+              scaleImage.apply(this); // Left mouse button click
             }
           }).on('keypress', function (event) {
           if (event.which === 32) {
-            scaleImage(); // Space bar pressed
+            scaleImage.apply(this); // Space bar pressed
           }
         });
         sections.image.$element.removeClass('h5p-question-image-fill-width');
@@ -716,14 +723,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * setTimeout for animations.
      */
     self.read = function (content) {
-      // Read text from content
-      var $el = $('<div/>', {
-        'aria-live': 'assertive',
-        'class': 'h5p-hidden-read',
-        'html': content,
-        appendTo: $wrapper
-      });
-      setTimeout(function () { $el.remove(); }, 1);
+      if (!$read) {
+        return; // Not ready yet
+      }
+
+      if (readText) {
+        // Combine texts if called multiple times
+        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content
+      }
+      else {
+        readText = content;
+      }
+
+      // Set text
+      $read.html(readText);
+
+      setTimeout(function () {
+        // Stop combining when done reading
+        readText = null;
+        $read.html('');
+      }, 100);
     };
 
     /**
@@ -897,7 +916,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         'class': 'h5p-question-' + id,
         html: text,
         on: {
-          click: function () {
+          click: function (event) {
             if (extras.confirmationDialog.enable && confirmationDialog) {
               // Show popups section if used
               if (!extras.confirmationDialog.$parentElement) {
@@ -908,7 +927,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             else {
               clicked();
             }
-            
+
             if (options.href !== undefined) {
               event.preventDefault();
             }
@@ -1159,13 +1178,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
            // Give the question type a chance to register before attaching
           self.registerDomElements();
         }
+
+        // Create section for reading messages
+        $read = $('<div/>', {
+          'aria-live': 'polite',
+          'class': 'h5p-hidden-read'
+        });
+        register('read', $read);
         self.trigger('registerDomElements');
       }
 
       // Prepare container
       $wrapper = $container;
       $container.html('')
-        .attr('role', 'application')
         .addClass('h5p-question h5p-' + type);
 
       // Add sections in given order
