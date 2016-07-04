@@ -931,6 +931,23 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var confirmationDialog =
         self.addConfirmationDialogToButton(extras.confirmationDialog, clicked);
 
+      /**
+       * Handle button clicks through both mouse and keyboard
+       * @private
+       */
+      var handleButtonClick = function () {
+        if (extras.confirmationDialog.enable && confirmationDialog) {
+          // Show popups section if used
+          if (!extras.confirmationDialog.$parentElement) {
+            sections.popups.$element.removeClass('hidden');
+          }
+          confirmationDialog.show($e.position().top);
+        }
+        else {
+          clicked();
+        }
+      };
+
       buttons[id] = {
         isTruncated: false,
         text: text
@@ -940,19 +957,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         html: text,
         on: {
           click: function (event) {
-            if (extras.confirmationDialog.enable && confirmationDialog) {
-              // Show popups section if used
-              if (!extras.confirmationDialog.$parentElement) {
-                sections.popups.$element.removeClass('hidden');
-              }
-              confirmationDialog.show($e.position().top);
-            }
-            else {
-              clicked();
-            }
-
+            handleButtonClick();
             if (options.href !== undefined) {
               event.preventDefault();
+            }
+          },
+          keydown: function (event) {
+            switch (event.which) {
+              case 13: // Enter
+              case 32: // Space
+                handleButtonClick();
+                event.preventDefault();
             }
           }
         }
