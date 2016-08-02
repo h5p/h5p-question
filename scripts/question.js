@@ -52,7 +52,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @property {Boolean} behaviour.disableFeedback Set to true to disable feedback section
      */
     var behaviour = {
-      disableFeedback: false
+      disableFeedback: false,
+      disableReadSpeaker: false
     };
 
     // Keeps track of thumb state
@@ -746,6 +747,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Read feedback
+     */
+    self.readFeedback = function () {
+      var invalidFeedback =
+        behaviour.disableReadSpeaker ||
+        !showFeedback ||
+        !sections.feedback ||
+        !sections.feedback.$element;
+
+      if (invalidFeedback) {
+        return;
+      }
+
+      var $feedback = $('.h5p-question-feedback-content', sections.feedback.$element);
+      if ($feedback && $feedback.html() && $feedback.html().length) {
+        self.read($feedback.html());
+      }
+    };
+
+    /**
      * Set feedback message.
      * Setting the message to blank or undefined will hide it again.
      *
@@ -778,7 +799,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }));
 
         // Feedback for readspeakers
-        self.read(content);
+        if (!behaviour.disableReadSpeaker) {
+          self.read(content);
+        }
 
         showFeedback = true;
         if (sections.feedback) {
@@ -908,6 +931,23 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var confirmationDialog =
         self.addConfirmationDialogToButton(extras.confirmationDialog, clicked);
 
+      /**
+       * Handle button clicks through both mouse and keyboard
+       * @private
+       */
+      var handleButtonClick = function () {
+        if (extras.confirmationDialog.enable && confirmationDialog) {
+          // Show popups section if used
+          if (!extras.confirmationDialog.$parentElement) {
+            sections.popups.$element.removeClass('hidden');
+          }
+          confirmationDialog.show($e.position().top);
+        }
+        else {
+          clicked();
+        }
+      };
+
       buttons[id] = {
         isTruncated: false,
         text: text
@@ -917,19 +957,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         html: text,
         on: {
           click: function (event) {
-            if (extras.confirmationDialog.enable && confirmationDialog) {
-              // Show popups section if used
-              if (!extras.confirmationDialog.$parentElement) {
-                sections.popups.$element.removeClass('hidden');
-              }
-              confirmationDialog.show($e.position().top);
-            }
-            else {
-              clicked();
-            }
-
+            handleButtonClick();
             if (options.href !== undefined) {
               event.preventDefault();
+            }
+          },
+          keydown: function (event) {
+            switch (event.which) {
+              case 13: // Enter
+              case 32: // Space
+                handleButtonClick();
+                event.preventDefault();
             }
           }
         }
@@ -1137,6 +1175,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       return self;
+    };
+
+    /**
+     * Toggle readspeaker functionality
+     * @param {boolean} [disable] True to disable, false to enable.
+     */
+    self.toggleReadSpeaker = function (disable) {
+      behaviour.disableReadSpeaker = disable || !behaviour.disableReadSpeaker;
     };
 
     /**
