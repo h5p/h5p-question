@@ -760,9 +760,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return;
       }
 
-      var $feedback = $('.h5p-question-feedback-content', sections.feedback.$element);
-      if ($feedback && $feedback.html() && $feedback.html().length) {
-        self.read($feedback.html());
+      var $feedbackText = $('.h5p-question-feedback-content-text', sections.feedback.$element);
+      if ($feedbackText && $feedbackText.html() && $feedbackText.html().length) {
+        self.read($feedbackText.html());
       }
     };
 
@@ -774,6 +774,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {number} score The score
      * @param {number} maxScore The maximum score for this question
      * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
+     * @param {string} [helpText] Help text that describes the score inside a tip icon
      */
     self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText) {
 
@@ -793,13 +794,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
         scoreBar.appendTo($feedback);
         scoreBar.setScore(score);
-        $feedback.append($('<div>', {
-          'class': 'h5p-question-feedback-content',
+        var $feedbackContent = $('<div>', {
+          'class': 'h5p-question-feedback-content'
+        }).appendTo($feedback);
+
+        // Feedback text
+        $('<div>', {
+          'class': 'h5p-question-feedback-content-text',
           'html': content
-        }));
+        }).appendTo($feedbackContent);
 
         if (helpText !== false) {
-          $feedback.append(JoubelUI.createTip(helpText, {helpIcon: true}));
+          JoubelUI.createTip(helpText, {helpIcon: true})
+            .appendTo($feedbackContent);
         }
 
         // Feedback for readspeakers
