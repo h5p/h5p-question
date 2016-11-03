@@ -138,7 +138,6 @@
 }
 
 .h5p-question-buttons {
-  overflow: hidden;
   margin: 0 1em;
   max-height: 0;
   opacity: 0;
@@ -185,4 +184,16 @@
   position: absolute;
   text-indent: 1px;
   overflow: hidden;
+}
+
+.h5p-question-popups {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.h5p-question-popups.hidden {
+  display: none;
 }
