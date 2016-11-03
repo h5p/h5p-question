@@ -804,7 +804,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'html': content
         }).appendTo($feedbackContent);
 
-        if (helpText !== false) {
+        if (helpText) {
           JoubelUI.createTip(helpText, {helpIcon: true})
             .appendTo($feedbackContent);
         }
