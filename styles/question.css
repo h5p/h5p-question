@@ -137,6 +137,10 @@
   backface-visibility: hidden;
 }
 
+.h5p-question-feedback-content-text {
+  display: inline-block;
+}
+
 .h5p-question-buttons {
   margin: 0 1em;
   max-height: 0;
