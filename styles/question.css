@@ -201,3 +201,32 @@
 .h5p-question-popups.hidden {
   display: none;
 }
+
+.h5p-question-feedback.h5p-question-popup {
+  position: absolute;
+  width: 17em;
+  margin: 0;
+  background-color: white;
+  box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.59);
+  border-radius: 1em;
+  padding: 1.5em;
+  transition: none;
+}
+
+.h5p-question-feedback.h5p-question-popup .h5p-question-feedback-content {
+  display: block;
+  word-break: break-all;
+}
+
+.h5p-question-feedback.h5p-question-popup .h5p-question-retry-button {
+  margin: 0;
+}
+
+.h5p-question-feedback-tail {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  background-color: white;
+  box-shadow: -2px -2px 0px 0px rgba(0, 0, 0, 0.18);
+  transform: rotate(225deg);
+}
