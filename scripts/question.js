@@ -202,6 +202,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             tailRotation = 315;
             tailLeft = left - $tail.width() / 2;
             tailTop = top + popupHeight / 2 - $tail.width() / 2;
+
+            if (!$click.hasClass('correct')) {
+              $element.css({'margin-top': '-1.75em'});
+            }
           }
         }
       }
@@ -231,6 +235,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             tailRotation = 135;
             tailLeft = left + popupWidth - $tail.width() / 2;
             tailTop = top + popupHeight / 2 - $tail.height() / 2;
+
+            if (!$click.hasClass('correct')) {
+              $element.css({'margin-top': '-1.75em'});
+            }
           }
         }
         else {
@@ -246,6 +254,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           tailRotation = 225;
           tailLeft = $click.position().left + $click.width() / 2 - $tail.width() / 2;
           tailTop = top + popupHeight - $tail.height() / 2;
+
+          if (!$click.hasClass('correct')) {
+            $element.css({'margin-top': '-3em'});
+          }
         }
         else {
           // Popup has to little space to be at top, goes to bottom
@@ -257,6 +269,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       $element.css({top: top, left: left});
+
+      if (!$click.hasClass('correct')) {
+        sections.buttons.$element
+        .css({'margin': '1em 0 0 0'})
+        .appendTo(sections.feedback.$element);
+      }
+      else {
+        $element.css({'margin-top': '0'});
+      }
 
       if (!disableTail) {
         $tail.css({
@@ -906,7 +927,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return self;
       }
       clearTimeout(feedbackTransitionTimer);
-
       if (content) {
         var $feedback = $('<div>', {
           'class': 'h5p-question-feedback-container'
@@ -992,6 +1012,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           sectionsIsTransitioning = false;
           scoreBar.setScore(0);
         }, 150);
+
+        $wrapper.find('.h5p-question-feedback-tail').remove();
       }
 
       return self;
