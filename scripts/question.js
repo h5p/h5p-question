@@ -144,10 +144,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
     };
 
+    /**
+     * Make feedback into a popup and position relative to click.
+     *
+     * @private
+     * @param {Object} $element Feedback div
+     * @param {Object} $click Visual click div
+     */
     var makeFeedbackPopup = function ($element, $click) {
       var extraHeight = $wrapper.find('.h5p-question-introduction').height() + ($click.height() / 2);
       var disableTail = false;
-      var offset = 15;
+      var offset = 10;
       var top = 0;
       var left = 0;
       var tailTop;
@@ -155,18 +162,20 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var tailRotation;
 
       $element.addClass('h5p-question-popup');
-      var elementHeight = setElementHeight($element);
+
+      var popupHeight = setElementHeight($element);
+      var popupWidth = $element.outerWidth();
 
       if (!disableTail) {
         // Draw the tail
         var $tail = $('<div/>', {
           'class': 'h5p-question-feedback-tail',
         });
-        $tail.appendTo($element.parent()).hide();
+        $tail.appendTo($element.parent());
       }
 
       // Position the popup and its tail. Covers a lot of cases, so it might be difficult to understand the math.
-      if (($element.outerWidth() / 2) > $click.position().left) {
+      if ((popupWidth / 2) > $click.position().left) {
         // Popup has too little space to the left
         if ($click.position().left - offset > $click.width() / 2) {
           // Click is close to left edge but not outside
@@ -183,67 +192,67 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           else if ($click.position().top + ($click.height() / 2) > $wrapper.outerHeight() - extraHeight - $click.height() - offset) {
             // Click is in bottom left corner
             left = $click.position().left + $click.width();
-            top = $click.position().top + extraHeight - elementHeight;
+            top = $click.position().top + extraHeight - popupHeight;
             disableTail = true;
           }
           else {
             // Click is outside the left area but not in a corner
-            left = $click.position().left + $click.width() + offset;
-            top = $click.position().top + extraHeight - (elementHeight / 2) + ($click.height() / 2);
+            left = $click.position().left + $click.width() + offset + $tail.width() / 2;
+            top = $click.position().top + extraHeight - (popupHeight / 2) + ($click.height() / 2);
             tailRotation = 315;
-            tailLeft = $click.position().left + $click.width() + ($tail.width() / 2);
-            tailTop = $click.position().top + extraHeight + ($tail.height() / 2);
+            tailLeft = left - $tail.width() / 2;
+            tailTop = top + popupHeight / 2 - $tail.width() / 2;
           }
         }
       }
-      else if (($element.outerWidth() / 2) < $wrapper.outerWidth() - $click.position().left - ($click.width() / 2) - offset) {
+      else if ((popupWidth / 2) < $wrapper.outerWidth() - $click.position().left - ($click.width() / 2) - offset) {
         // Popup has enough space both left and right
-        left = $click.position().left - ($element.outerWidth() / 2) + $click.width() / 2;
+        left = $click.position().left - (popupWidth / 2) + $click.width() / 2;
       }
       else {
         // Popup has too little space to the right
         if ($click.position().left > $wrapper.outerWidth() - $click.width() - ($click.width() / 2) - offset) {
           if ($click.position().top + ($click.height() / 2) < $click.height()) {
             // Click is in top right corner
-            left = $click.position().left - $element.outerWidth();
+            left = $click.position().left - popupWidth;
             top = $click.position().top + extraHeight + $click.height();
             disableTail = true;
           }
           else if ($click.position().top + ($click.height() / 2) > $wrapper.outerHeight() - extraHeight - $click.height() - offset) {
             // Click is in bottom right corner
-            left = $click.position().left - $element.outerWidth();
-            top = $click.position().top + extraHeight - elementHeight;
+            left = $click.position().left - popupWidth;
+            top = $click.position().top + extraHeight - popupHeight;
             disableTail = true;
           }
           else {
             // Click is outside the right area but not in a corner
-            left = $click.position().left - $element.outerWidth() - offset;
-            top = $click.position().top + extraHeight - (elementHeight / 2) + ($click.height() / 2);
+            left = $click.position().left - popupWidth - offset - $tail.width() / 2;
+            top = $click.position().top + extraHeight - (popupHeight / 2) + ($click.height() / 2);
             tailRotation = 135;
-            tailLeft = $click.position().left - ($tail.width() / 2) - offset;
-            tailTop = $click.position().top + extraHeight + ($tail.height() / 2);
+            tailLeft = left + popupWidth - $tail.width() / 2;
+            tailTop = top + popupHeight / 2 - $tail.height() / 2;
           }
         }
         else {
-          left = $wrapper.outerWidth() - $element.outerWidth() - offset;
+          left = $wrapper.outerWidth() - popupWidth - offset;
         }
       }
 
       if (top === 0) {
         // If no special cases already sat the popups height, set it over or under click
-        if (elementHeight < $click.position().top) {
+        if (popupHeight < $click.position().top) {
           // Popup has enough space to be at top
-          top = $click.position().top + extraHeight - elementHeight - offset;
+          top = $click.position().top + extraHeight - popupHeight - $tail.height() - offset;
           tailRotation = 225;
-          tailLeft = $click.position().left + $tail.width() / 2;
-          tailTop = $click.position().top + extraHeight - ($tail.height() / 2) - $tail.height();
+          tailLeft = $click.position().left + $click.width() / 2 - $tail.width() / 2;
+          tailTop = top + popupHeight - $tail.height() / 2;
         }
         else {
           // Popup has to little space to be at top, goes to bottom
-          top = $click.position().top + extraHeight + $click.height() + offset;
+          top = $click.position().top + extraHeight + $click.height() + offset + $tail.height() / 2;
           tailRotation = 45;
-          tailLeft = $click.position().left + $tail.width() / 2;
-          tailTop = $click.position().top + extraHeight + ($tail.width() / 2) + $click.height();
+          tailLeft = $click.position().left + $click.width() / 2 - $tail.width() / 2;
+          tailTop = top - $tail.height() / 2;
         }
       }
 
@@ -251,13 +260,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       if (!disableTail) {
         $tail.css({
-          'left': Math.round(tailLeft),
-          'top': Math.round(tailTop),
+          'left': tailLeft,
+          'top': tailTop,
           'transform': 'rotate(' + tailRotation + 'deg)'
         });
-        setTimeout(function() {
-          $tail.show();
-        }, 30);
       }
     };
 
@@ -944,24 +950,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
         }
 
-        // Show feedback section
-        feedbackTransitionTimer = setTimeout(function () {
-          sections.feedback.$element.addClass('h5p-question-visible');
-          setElementHeight(sections.feedback.$element);
-          sectionsIsTransitioning = true;
-
-          // Scroll to bottom after showing feedback
-          scrollToBottom();
-
-          // Trigger resize after animation
-          feedbackTransitionTimer = setTimeout(function () {
-            sectionsIsTransitioning = false;
-            self.trigger('resize');
-          }, 150);
-        }, 0);
+        sections.feedback.$element.addClass('h5p-question-visible');
 
         if (asPopup) {
           makeFeedbackPopup(sections.feedback.$element, that.hotspotFeedback.$element);
+        }
+        else {
+          // Show feedback section
+          feedbackTransitionTimer = setTimeout(function () {
+            setElementHeight(sections.feedback.$element);
+            sectionsIsTransitioning = true;
+
+            // Scroll to bottom after showing feedback
+            scrollToBottom();
+
+            // Trigger resize after animation
+            feedbackTransitionTimer = setTimeout(function () {
+              sectionsIsTransitioning = false;
+              self.trigger('resize');
+            }, 150);
+          }, 0);
         }
       }
       else if (sections.feedback && showFeedback) {
