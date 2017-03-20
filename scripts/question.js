@@ -195,6 +195,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             left = $click.position().left + $click.width();
             top = $click.position().top + extraHeight - popupHeight;
             disableTail = true;
+
+            // Add extra space because of retry button
+            $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-3em') });
           }
           else {
             // Click is outside the left area but not in a corner
@@ -204,6 +207,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             tailLeft = left - $tail.width() / 2;
             tailTop = top + popupHeight / 2 - $tail.width() / 2;
 
+            // Add extra space because of retry button
             $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-1.75em') });
           }
         }
@@ -226,6 +230,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             left = $click.position().left - popupWidth;
             top = $click.position().top + extraHeight - popupHeight;
             disableTail = true;
+
+            // Add extra space because of retry button
+            $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-3em') });
           }
           else {
             // Click is outside the right area but not in a corner
@@ -235,6 +242,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             tailLeft = left + popupWidth - $tail.width() / 2;
             tailTop = top + popupHeight / 2 - $tail.height() / 2;
 
+            // Add extra space because of retry button
             $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-1.75em') });
           }
         }
@@ -252,9 +260,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           tailLeft = $click.position().left + $click.width() / 2 - $tail.width() / 2;
           tailTop = top + popupHeight - $tail.height() / 2;
 
-          if (!$click.hasClass('correct')) {
-            $element.css({'margin-top': '-3em'});
-          }
+          // Add extra space because of retry button
+          $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-3em') });
         }
         else {
           // Popup has to little space to be at top, goes to bottom
