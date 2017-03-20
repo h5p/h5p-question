@@ -166,13 +166,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var popupHeight = setElementHeight($element);
       var popupWidth = $element.outerWidth();
 
-      if (!disableTail) {
-        // Draw the tail
-        var $tail = $('<div/>', {
-          'class': 'h5p-question-feedback-tail',
-        });
-        $tail.appendTo($element.parent());
-      }
+      // Draw the tail
+      var $tail = $('<div/>', {
+        'class': 'h5p-question-feedback-tail',
+      }).hide();
+      $tail.appendTo($element.parent());
+
+      // Reset margin of popup
+      $element.css({'margin-top': '0'});
 
       // Position the popup and its tail. Covers a lot of cases, so it might be difficult to understand the math.
       if ((popupWidth / 2) > $click.position().left) {
@@ -203,9 +204,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             tailLeft = left - $tail.width() / 2;
             tailTop = top + popupHeight / 2 - $tail.width() / 2;
 
-            if (!$click.hasClass('correct')) {
-              $element.css({'margin-top': '-1.75em'});
-            }
+            $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-1.75em') });
           }
         }
       }
@@ -236,9 +235,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             tailLeft = left + popupWidth - $tail.width() / 2;
             tailTop = top + popupHeight / 2 - $tail.height() / 2;
 
-            if (!$click.hasClass('correct')) {
-              $element.css({'margin-top': '-1.75em'});
-            }
+            $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-1.75em') });
           }
         }
         else {
@@ -284,7 +281,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'left': tailLeft,
           'top': tailTop,
           'transform': 'rotate(' + tailRotation + 'deg)'
-        });
+        }).show();
       }
     };
 
