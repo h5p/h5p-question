@@ -272,6 +272,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
+      // Fix that click is not in center of visual click
+      if (!$wrapper.find('.h5p-question-introduction').length > 0) {
+        top -= ($click.height() / 2) - 2;
+        tailTop -= ($click.height() / 2) - 2;
+      }
+
       $element.css({top: top, left: left});
 
       if (!$click.hasClass('correct')) {
