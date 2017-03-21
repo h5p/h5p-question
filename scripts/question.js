@@ -168,9 +168,35 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Draw the tail
       var $tail = $('<div/>', {
-        'class': 'h5p-question-feedback-tail',
-      }).hide();
-      $tail.appendTo($element.parent());
+        'class': 'h5p-question-feedback-tail'
+      })
+      .hide()
+      .appendTo($element.parent());
+
+      // Draw the close button
+      var $close = $('<div/>', {
+        'class': 'h5p-question-feedback-close',
+        'tabindex': 0,
+        'title': 'close',
+        on: {
+          click: function (event) {
+            $element.remove();
+            $tail.remove();
+            event.preventDefault();
+          },
+          keydown: function (event) {
+            switch (event.which) {
+              case 13: // Enter
+              case 32: // Space
+                $element.remove();
+                $tail.remove();
+                event.preventDefault();
+            }
+          }
+        }
+      })
+      .hide()
+      .appendTo($element);
 
       // Reset margin of popup
       $element.css({'margin-top': '0'});
@@ -282,11 +308,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       if (!$click.hasClass('correct')) {
         sections.buttons.$element
-        .css({'margin': '1em 0 0 0'})
+        .css({'margin': '0.82em 0 0 0'})
         .appendTo(sections.feedback.$element);
       }
       else {
         $element.css({'margin-top': '0'});
+        $close.show();
       }
 
       if (!disableTail) {
