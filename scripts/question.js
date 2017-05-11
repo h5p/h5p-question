@@ -194,7 +194,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $retryButton = $('<button/>', {
         'class': 'h5p-question-retry-button h5p-joubelui-button',
         'type': 'button',
-        'text': 'test',
+        'text': 'retry',
         on: {
           click: function (event) {
             sections.buttons.$element.find('.h5p-question-retry-button').trigger('click');
@@ -311,6 +311,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           tailY = positionY + popupHeight / 2 - $tail.height() / 2;
           tailRotation = 135;
         }
+      }
+
+      // Contain popup from overflowing bottom edge
+      if (positionY + popupHeight > $container.height()) {
+        positionY = $container.height() - popupHeight;
       }
 
       // Contain popup from ovreflowing top edge
