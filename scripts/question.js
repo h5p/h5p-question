@@ -27,6 +27,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Wrapper when attached
     var $wrapper;
 
+    // Click element
+    var clickElement;
+
     // ScoreBar
     var scoreBar;
 
@@ -148,10 +151,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Make feedback into a popup and position relative to click.
      *
      * @private
-     * @param {Object} $element Feedback div
-     * @param {Object} $click Visual click div
      */
-    var makeFeedbackPopup = function ($element, $click) {
+    var makeFeedbackPopup = function () {
+      var $element = sections.feedback.$element;
+      var $click = clickElement.$element;
+
       $element
         .appendTo(sections.content.$element)
         .addClass('h5p-question-popup');
@@ -191,10 +195,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       .hide()
       .appendTo($element);
 
-      $retryButton = $('<button/>', {
+      var $retryButton = $('<button/>', {
         'class': 'h5p-question-retry-button h5p-joubelui-button',
         'type': 'button',
-        'text': 'retry',
+        'text': 'Retry',
         on: {
           click: function (event) {
             sections.buttons.$element.find('.h5p-question-retry-button').trigger('click');
@@ -221,8 +225,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {Object} $click Visual click div
      * @param {Object} $tail Feedback popup tail
      */
-    var positionFeedbackPopup = function ($element, $click, $tail) {
+    var positionFeedbackPopup = function ($element, $click) {
       var $container = $element.parent();
+      var $tail = $element.siblings('.h5p-question-feedback-tail');
       var popupWidth = $element.outerWidth();
       var popupHeight = setElementHeight($element);
       var space = 15;
@@ -854,7 +859,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       var sizeDetermined = false;
       var determineSize = function () {
-
         if (sizeDetermined || !$img.is(':visible')) {
           return; // Try again next time.
         }
@@ -969,6 +973,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, asPopup) {
       var that = this;
+
+      clickElement = this.hotspotFeedback;
+
       // Feedback is disabled
       if (behaviour.disableFeedback) {
         return self;
@@ -1021,7 +1028,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         .addClass('h5p-question-visible');
 
         if (asPopup) {
-          makeFeedbackPopup(sections.feedback.$element, that.hotspotFeedback.$element);
+          makeFeedbackPopup();
         }
         else {
           // Show feedback section
@@ -1502,6 +1509,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (!sectionsIsTransitioning && sections.feedback && showFeedback) {
         // Resize feedback to fit
         setElementHeight(sections.feedback.$element);
+      }
+
+      // Re-position feedback popup if in use
+      var $element = sections.feedback;
+      var $click = clickElement;
+
+      if ($element != null && $click !== null) {
+        setTimeout(function() {
+          positionFeedbackPopup($element.$element, $click.$element);
+        }, 100);
       }
 
       resizeButtons();
