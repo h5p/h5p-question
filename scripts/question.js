@@ -258,6 +258,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         positionX = 0;
       }
 
+      // If popuo is outside right edge, position right
       if (positionX + popupWidth > $container.width()) {
         positionX = $container.width() - popupWidth;
       }
@@ -310,6 +311,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           tailY = positionY + popupHeight / 2 - $tail.height() / 2;
           tailRotation = 135;
         }
+      }
+
+      // Contain popup from ovreflowing top edge
+      if (positionY < 0) {
+        positionY = 0;
       }
 
       $element.css({top: positionY, left: positionX});
