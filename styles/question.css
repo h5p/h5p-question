@@ -111,6 +111,11 @@
 .h5p-question-content {
   margin: 1em;
 }
+
+.h5p-question-content.h5p-has-question-popup {
+  position: relative;
+}
+
 .h5p-question-feedback {
   font-weight: bold;
   color: #1a73d9;
@@ -119,6 +124,7 @@
   opacity: 0;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
+
 .h5p-question-feedback.h5p-question-visible {
   margin: 1em;
   opacity: 1;
@@ -227,13 +233,8 @@
   top: 0;
 }
 
-.h5p-question-feedback.h5p-question-popup .h5p-question-buttons {
-  margin: -1em 0;
-  transition: none;
-}
-
-.h5p-question-feedback.h5p-question-popup .h5p-question-buttons .h5p-question-retry-button {
-  margin: 0;
+.h5p-question-feedback.h5p-question-popup .h5p-question-retry-button {
+  margin: 1em 0 0 0;
 }
 
 .h5p-question-feedback.h5p-question-popup .h5p-question-feedback-close {

@@ -152,19 +152,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {Object} $click Visual click div
      */
     var makeFeedbackPopup = function ($element, $click) {
-      var extraHeight = $wrapper.find('.h5p-question-introduction').height() + ($click.height() / 2);
-      var disableTail = false;
-      var offset = 10;
-      var top = 0;
-      var left = 0;
-      var tailTop;
-      var tailLeft;
-      var tailRotation;
+      $element
+        .appendTo(sections.content.$element)
+        .addClass('h5p-question-popup');
 
-      $element.addClass('h5p-question-popup');
-
-      var popupHeight = setElementHeight($element);
-      var popupWidth = $element.outerWidth();
+      $element.parent()
+        .addClass('h5p-has-question-popup');
 
       // Draw the tail
       var $tail = $('<div/>', {
@@ -198,128 +191,134 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       .hide()
       .appendTo($element);
 
-      // Reset margin of popup
-      $element.css({'margin-top': '0'});
-
-      // Position the popup and its tail. Covers a lot of cases, so it might be difficult to understand the math.
-      if ((popupWidth / 2) > $click.position().left) {
-        // Popup has too little space to the left
-        if ($click.position().left - offset > $click.width() / 2) {
-          // Click is close to left edge but not outside
-          left = offset;
-        }
-        else {
-          // Click is outside left area, center popup to the right
-          if ($click.position().top + ($click.height() / 2) < $click.height()) {
-            // Click is in top left corner
-            left = $click.position().left + $click.width();
-            top = $click.position().top + extraHeight + $click.height();
-            disableTail = true;
-          }
-          else if ($click.position().top + ($click.height() / 2) > $wrapper.outerHeight() - extraHeight - $click.height() - offset) {
-            // Click is in bottom left corner
-            left = $click.position().left + $click.width();
-            top = $click.position().top + extraHeight - popupHeight;
-            disableTail = true;
-
-            // Add extra space because of retry button
-            $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-3em') });
-          }
-          else {
-            // Click is outside the left area but not in a corner
-            left = $click.position().left + $click.width() + offset + $tail.width() / 2;
-            top = $click.position().top + extraHeight - (popupHeight / 2) + ($click.height() / 2);
-            tailRotation = 315;
-            tailLeft = left - $tail.width() / 2;
-            tailTop = top + popupHeight / 2 - $tail.width() / 2;
-
-            // Add extra space because of retry button
-            $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-1.75em') });
+      $retryButton = $('<button/>', {
+        'class': 'h5p-question-retry-button h5p-joubelui-button',
+        'type': 'button',
+        'text': 'test',
+        on: {
+          click: function (event) {
+            sections.buttons.$element.find('.h5p-question-retry-button').trigger('click');
           }
         }
-      }
-      else if ((popupWidth / 2) < $wrapper.outerWidth() - $click.position().left - ($click.width() / 2) - offset) {
-        // Popup has enough space both left and right
-        left = $click.position().left - (popupWidth / 2) + $click.width() / 2;
-      }
-      else {
-        // Popup has too little space to the right
-        if ($click.position().left > $wrapper.outerWidth() - $click.width() - ($click.width() / 2) - offset) {
-          if ($click.position().top + ($click.height() / 2) < $click.height()) {
-            // Click is in top right corner
-            left = $click.position().left - popupWidth;
-            top = $click.position().top + extraHeight + $click.height();
-            disableTail = true;
-          }
-          else if ($click.position().top + ($click.height() / 2) > $wrapper.outerHeight() - extraHeight - $click.height() - offset) {
-            // Click is in bottom right corner
-            left = $click.position().left - popupWidth;
-            top = $click.position().top + extraHeight - popupHeight;
-            disableTail = true;
-
-            // Add extra space because of retry button
-            $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-3em') });
-          }
-          else {
-            // Click is outside the right area but not in a corner
-            left = $click.position().left - popupWidth - offset - $tail.width() / 2;
-            top = $click.position().top + extraHeight - (popupHeight / 2) + ($click.height() / 2);
-            tailRotation = 135;
-            tailLeft = left + popupWidth - $tail.width() / 2;
-            tailTop = top + popupHeight / 2 - $tail.height() / 2;
-
-            // Add extra space because of retry button
-            $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-1.75em') });
-          }
-        }
-        else {
-          left = $wrapper.outerWidth() - popupWidth - offset;
-        }
-      }
-
-      if (top === 0) {
-        // If no special cases already sat the popups height, set it over or under click
-        if (popupHeight < $click.position().top) {
-          // Popup has enough space to be at top
-          top = $click.position().top + extraHeight - popupHeight - $tail.height() - offset;
-          tailRotation = 225;
-          tailLeft = $click.position().left + $click.width() / 2 - $tail.width() / 2;
-          tailTop = top + popupHeight - $tail.height() / 2;
-
-          // Add extra space because of retry button
-          $element.css({'margin-top': ($click.hasClass('correct') === 'true' ? '0em' : '-3em') });
-        }
-        else {
-          // Popup has to little space to be at top, goes to bottom
-          top = $click.position().top + extraHeight + $click.height() + offset + $tail.height() / 2;
-          tailRotation = 45;
-          tailLeft = $click.position().left + $click.width() / 2 - $tail.width() / 2;
-          tailTop = top - $tail.height() / 2;
-        }
-      }
-
-      // Fix that click is not in center of visual click
-      if (!$wrapper.find('.h5p-question-introduction').length > 0) {
-        top -= ($click.height() / 2) - 2;
-        tailTop -= ($click.height() / 2) - 2;
-      }
-
-      $element.css({top: top, left: left});
+      });
 
       if (!$click.hasClass('correct')) {
-        sections.buttons.$element
-        .css({'margin': '0.82em 0 0 0'})
-        .appendTo(sections.feedback.$element);
+        sections.buttons.$element.hide();
+        $retryButton.appendTo(sections.feedback.$element);
       }
       else {
-        $element.css({'margin-top': '0'});
         $close.show();
       }
 
+      positionFeedbackPopup($element, $click, $tail);
+    };
+
+    /**
+     * Position the feedback popup.
+     *
+     * @private
+     * @param {Object} $element Feedback div
+     * @param {Object} $click Visual click div
+     * @param {Object} $tail Feedback popup tail
+     */
+    var positionFeedbackPopup = function ($element, $click, $tail) {
+      var $container = $element.parent();
+      var popupWidth = $element.outerWidth();
+      var popupHeight = setElementHeight($element);
+      var space = 15;
+      var positionX;
+      var positionY;
+      var tailX;
+      var tailY;
+      var tailRotation;
+      var disableTail = false;
+
+      // Edge detection for click, takes space into account
+      var clickNearTop = ($click[0].offsetTop < space);
+      var clickNearBottom = ($click[0].offsetTop + $click.height() > $container.height() - space);
+      var clickNearLeft = ($click[0].offsetLeft < space);
+      var clickNearRight = ($click[0].offsetLeft + $click.width() > $container.width() - space);
+
+      // Click is not in a corner or close to edge, calculate position normally
+      positionX = $click[0].offsetLeft - popupWidth / 2  + $click.width() / 2;
+      positionY = $click[0].offsetTop - popupHeight - space;
+      tailX = positionX + popupWidth / 2 - $tail.width() / 2;
+      tailY = positionY + popupHeight - $tail.height() / 2;
+      tailRotation = 225;
+
+      // If popup is outside top edge, position under click instead
+      if (popupHeight + space > $click[0].offsetTop) {
+        positionY = $click[0].offsetTop + $click.height() + space;
+        tailY = positionY - $tail.height() / 2 ;
+        tailRotation = 45;
+      }
+
+      // If popup is outside left edge, position left
+      if (positionX < 0) {
+        positionX = 0;
+      }
+
+      if (positionX + popupWidth > $container.width()) {
+        positionX = $container.width() - popupWidth;
+      }
+
+      // Special cases such as corner clicks, or close to an edge, they override X and Y positions if met
+      if (clickNearTop) {
+        // Click is close to top edge
+        if (clickNearLeft) {
+          // Click is in top left corner
+          positionX = $click[0].offsetLeft + $click.width();
+          positionY = $click[0].offsetTop + $click.height();
+          disableTail = true;
+        }
+        else if (clickNearRight) {
+          // Click is in top right corner
+          positionX = $click[0].offsetLeft - popupWidth;
+          positionY = $click[0].offsetTop + $click.height();
+          disableTail = true;
+        }
+      }
+      else if (clickNearBottom) {
+        // Click is close to bottom edge
+        if (clickNearLeft) {
+          // Click is in bottom left corner
+          positionX = $click[0].offsetLeft + $click.width();
+          positionY = $click[0].offsetTop - popupHeight;
+          disableTail = true;
+        }
+        else if (clickNearRight) {
+          // Click is in bottom right corner
+          positionX = $click[0].offsetLeft - popupWidth;
+          positionY = $click[0].offsetTop - popupHeight;
+          disableTail = true;
+        }
+      } else {
+        // Click is not close to top or bottom edge
+        if (clickNearLeft) {
+          // Click is close to left edge, but no corner
+          positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
+          positionX = $click[0].offsetLeft + $click.width() + space;
+          tailX = positionX - $tail.width() / 2;
+          tailY = positionY + popupHeight / 2 - $tail.height() / 2;
+          tailRotation = 315;
+        }
+        else if (clickNearRight) {
+          // Click is close to right edge, but no corner
+          positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
+          positionX = $click[0].offsetLeft - popupWidth - space;
+          tailX = positionX + popupWidth - $tail.width() / 2;
+          tailY = positionY + popupHeight / 2 - $tail.height() / 2;
+          tailRotation = 135;
+        }
+      }
+
+      $element.css({top: positionY, left: positionX});
+      $tail.css({top: tailY, left: tailX});
+
       if (!disableTail) {
         $tail.css({
-          'left': tailLeft,
-          'top': tailTop,
+          'left': tailX,
+          'top': tailY,
           'transform': 'rotate(' + tailRotation + 'deg)'
         }).show();
       }
@@ -1007,7 +1006,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
         }
 
-        sections.feedback.$element.addClass('h5p-question-visible');
+        sections.feedback.$element
+        .addClass('h5p-question-visible');
 
         if (asPopup) {
           makeFeedbackPopup(sections.feedback.$element, that.hotspotFeedback.$element);
