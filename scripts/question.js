@@ -151,8 +151,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Make feedback into a popup and position relative to click.
      *
      * @private
+     * @param {string} [closeText] Text for the close button
      */
-    var makeFeedbackPopup = function () {
+    var makeFeedbackPopup = function (closeText) {
       var $element = sections.feedback.$element;
       var $click = clickElement.$element;
 
@@ -174,7 +175,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $close = $('<div/>', {
         'class': 'h5p-question-feedback-close',
         'tabindex': 0,
-        'title': 'close',
+        'title': closeText,
         on: {
           click: function (event) {
             $element.remove();
@@ -195,35 +196,23 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       .hide()
       .appendTo($element);
 
-      var $retryButton = $('<button/>', {
-        'class': 'h5p-question-retry-button h5p-joubelui-button',
-        'type': 'button',
-        'text': 'Retry',
-        on: {
-          click: function (event) {
-            sections.buttons.$element.find('.h5p-question-retry-button').trigger('click');
-          }
-        }
-      });
-
-      if (!$click.hasClass('correct')) {
-        sections.buttons.$element.hide();
-        $retryButton.appendTo(sections.feedback.$element);
-      }
-      else {
+      if ($click.hasClass('correct')) {
         $close.show();
+        sections.buttons.$element.hide();
+      } else {
+        sections.buttons.$element.appendTo(sections.feedback.$element);
       }
 
-      positionFeedbackPopup($element, $click, $tail);
+      positionFeedbackPopup($element, $click);
     };
 
     /**
      * Position the feedback popup.
      *
      * @private
-     * @param {Object} $element Feedback div
-     * @param {Object} $click Visual click div
-     * @param {Object} $tail Feedback popup tail
+     * @param {H5P.jQuery} $element Feedback div
+     * @param {H5P.jQuery} $click Visual click div
+     * @param {H5P.jQuery} $tail Feedback popup tail
      */
     var positionFeedbackPopup = function ($element, $click) {
       var $container = $element.parent();
@@ -231,11 +220,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var popupWidth = $element.outerWidth();
       var popupHeight = setElementHeight($element);
       var space = 15;
-      var positionX;
-      var positionY;
-      var tailX;
-      var tailY;
-      var tailRotation;
       var disableTail = false;
 
       // Edge detection for click, takes space into account
@@ -321,6 +305,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Contain popup from overflowing bottom edge
       if (positionY + popupHeight > $container.height()) {
         positionY = $container.height() - popupHeight;
+
+        if (popupHeight > $container.height() - ($click[0].offsetTop + $click.height() + space)) {
+          disableTail = true;
+        }
       }
 
       // Contain popup from ovreflowing top edge
@@ -337,6 +325,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'top': tailY,
           'transform': 'rotate(' + tailRotation + 'deg)'
         }).show();
+      }
+      else {
+        $tail.hide();
       }
     };
 
@@ -439,6 +430,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
+      var animationTimer = 150;
+      if (sections.feedback.$element.hasClass('h5p-question-popup')) {
+        animationTimer = 0;
+      }
+
       if (sections.buttons && numToHide === sections.buttons.$element.children().length) {
         // All buttons are going to be hidden. Hide container using transition.
         sections.buttons.$element.removeClass('h5p-question-visible');
@@ -449,7 +445,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         toggleButtonsTransitionTimer = setTimeout(function () {
           hideButtons(relocateFocus);
           sectionsIsTransitioning = false;
-        }, 150);
+        }, animationTimer);
       }
       else {
         hideButtons(relocateFocus);
@@ -462,7 +458,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Trigger resize after animation
           toggleButtonsTransitionTimer = setTimeout(function () {
             self.trigger('resize');
-          }, 150);
+          }, animationTimer);
         }
       }
 
@@ -970,10 +966,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {number} maxScore The maximum score for this question
      * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
      * @param {string} [helpText] Help text that describes the score inside a tip icon
+     * @param {boolean} asPopup Decides if feedback should be made into a popup
+     * @param {string} [closeText] Text for the close button
      */
-    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, asPopup) {
-      var that = this;
-
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, asPopup, closeText = 'close') {
       clickElement = this.hotspotFeedback;
 
       // Feedback is disabled
@@ -1028,7 +1024,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         .addClass('h5p-question-visible');
 
         if (asPopup) {
-          makeFeedbackPopup();
+          makeFeedbackPopup(closeText);
         }
         else {
           // Show feedback section
@@ -1515,10 +1511,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $element = sections.feedback;
       var $click = clickElement;
 
-      if ($element != null && $click !== null) {
+      if ($element != null && $element.$element != null && $click != null && $click.$element != null) {
         setTimeout(function() {
           positionFeedbackPopup($element.$element, $click.$element);
-        }, 100);
+        }, 10);
       }
 
       resizeButtons();
