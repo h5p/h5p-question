@@ -980,7 +980,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {boolean} asPopup Decides if feedback should be made into a popup
      * @param {string} [closeText] Text for the close button
      */
-    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, asPopup, closeText = 'close', click = null) {
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, asPopup, closeText = '', click = null) {
       // Feedback is disabled
       if (behaviour.disableFeedback) {
         return self;
