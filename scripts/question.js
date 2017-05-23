@@ -155,7 +155,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     var makeFeedbackPopup = function (closeText) {
       var $element = sections.feedback.$element;
-      var $click = clickElement.$element;
+      var $click = (clickElement != null ? clickElement.$element : null);
 
       $element
         .appendTo(sections.content.$element)
@@ -196,11 +196,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       .hide()
       .appendTo($element);
 
-      if ($click.hasClass('correct')) {
-        $close.show();
-        sections.buttons.$element.hide();
-      } else {
-        sections.buttons.$element.appendTo(sections.feedback.$element);
+      if ($click != null) {
+        if ($click.hasClass('correct')) {
+          $close.show();
+          sections.buttons.$element.hide();
+        } else {
+          sections.buttons.$element.appendTo(sections.feedback.$element);
+        }
       }
 
       positionFeedbackPopup($element, $click);
@@ -222,93 +224,102 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var space = 15;
       var disableTail = false;
 
-      // Edge detection for click, takes space into account
-      var clickNearTop = ($click[0].offsetTop < space);
-      var clickNearBottom = ($click[0].offsetTop + $click.height() > $container.height() - space);
-      var clickNearLeft = ($click[0].offsetLeft < space);
-      var clickNearRight = ($click[0].offsetLeft + $click.width() > $container.width() - space);
+      if ($click != null) {
+        // Edge detection for click, takes space into account
+        var clickNearTop = ($click[0].offsetTop < space);
+        var clickNearBottom = ($click[0].offsetTop + $click.height() > $container.height() - space);
+        var clickNearLeft = ($click[0].offsetLeft < space);
+        var clickNearRight = ($click[0].offsetLeft + $click.width() > $container.width() - space);
 
-      // Click is not in a corner or close to edge, calculate position normally
-      positionX = $click[0].offsetLeft - popupWidth / 2  + $click.width() / 2;
-      positionY = $click[0].offsetTop - popupHeight - space;
-      tailX = positionX + popupWidth / 2 - $tail.width() / 2;
-      tailY = positionY + popupHeight - $tail.height() / 2;
-      tailRotation = 225;
+        // Click is not in a corner or close to edge, calculate position normally
+        positionX = $click[0].offsetLeft - popupWidth / 2  + $click.width() / 2;
+        positionY = $click[0].offsetTop - popupHeight - space;
+        tailX = positionX + popupWidth / 2 - $tail.width() / 2;
+        tailY = positionY + popupHeight - $tail.height() / 2;
+        tailRotation = 225;
 
-      // If popup is outside top edge, position under click instead
-      if (popupHeight + space > $click[0].offsetTop) {
-        positionY = $click[0].offsetTop + $click.height() + space;
-        tailY = positionY - $tail.height() / 2 ;
-        tailRotation = 45;
+        // If popup is outside top edge, position under click instead
+        if (popupHeight + space > $click[0].offsetTop) {
+          positionY = $click[0].offsetTop + $click.height() + space;
+          tailY = positionY - $tail.height() / 2 ;
+          tailRotation = 45;
+        }
+
+        // If popup is outside left edge, position left
+        if (positionX < 0) {
+          positionX = 0;
+        }
+
+        // If popuo is outside right edge, position right
+        if (positionX + popupWidth > $container.width()) {
+          positionX = $container.width() - popupWidth;
+        }
+
+        // Special cases such as corner clicks, or close to an edge, they override X and Y positions if met
+        if (clickNearTop) {
+          // Click is close to top edge
+          if (clickNearLeft) {
+            // Click is in top left corner
+            positionX = $click[0].offsetLeft + $click.width();
+            positionY = $click[0].offsetTop + $click.height();
+            disableTail = true;
+          }
+          else if (clickNearRight) {
+            // Click is in top right corner
+            positionX = $click[0].offsetLeft - popupWidth;
+            positionY = $click[0].offsetTop + $click.height();
+            disableTail = true;
+          }
+        }
+        else if (clickNearBottom) {
+          // Click is close to bottom edge
+          if (clickNearLeft) {
+            // Click is in bottom left corner
+            positionX = $click[0].offsetLeft + $click.width();
+            positionY = $click[0].offsetTop - popupHeight;
+            disableTail = true;
+          }
+          else if (clickNearRight) {
+            // Click is in bottom right corner
+            positionX = $click[0].offsetLeft - popupWidth;
+            positionY = $click[0].offsetTop - popupHeight;
+            disableTail = true;
+          }
+        } else {
+          // Click is not close to top or bottom edge
+          if (clickNearLeft) {
+            // Click is close to left edge, but no corner
+            positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
+            positionX = $click[0].offsetLeft + $click.width() + space;
+            tailX = positionX - $tail.width() / 2;
+            tailY = positionY + popupHeight / 2 - $tail.height() / 2;
+            tailRotation = 315;
+          }
+          else if (clickNearRight) {
+            // Click is close to right edge, but no corner
+            positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
+            positionX = $click[0].offsetLeft - popupWidth - space;
+            tailX = positionX + popupWidth - $tail.width() / 2;
+            tailY = positionY + popupHeight / 2 - $tail.height() / 2;
+            tailRotation = 135;
+          }
+        }
+
+        // Contain popup from overflowing bottom edge
+        if (positionY + popupHeight > $container.height()) {
+          positionY = $container.height() - popupHeight;
+
+          if (popupHeight > $container.height() - ($click[0].offsetTop + $click.height() + space)) {
+            disableTail = true;
+          }
+        }
       }
-
-      // If popup is outside left edge, position left
-      if (positionX < 0) {
-        positionX = 0;
-      }
-
-      // If popuo is outside right edge, position right
-      if (positionX + popupWidth > $container.width()) {
-        positionX = $container.width() - popupWidth;
-      }
-
-      // Special cases such as corner clicks, or close to an edge, they override X and Y positions if met
-      if (clickNearTop) {
-        // Click is close to top edge
-        if (clickNearLeft) {
-          // Click is in top left corner
-          positionX = $click[0].offsetLeft + $click.width();
-          positionY = $click[0].offsetTop + $click.height();
-          disableTail = true;
-        }
-        else if (clickNearRight) {
-          // Click is in top right corner
-          positionX = $click[0].offsetLeft - popupWidth;
-          positionY = $click[0].offsetTop + $click.height();
-          disableTail = true;
-        }
-      }
-      else if (clickNearBottom) {
-        // Click is close to bottom edge
-        if (clickNearLeft) {
-          // Click is in bottom left corner
-          positionX = $click[0].offsetLeft + $click.width();
-          positionY = $click[0].offsetTop - popupHeight;
-          disableTail = true;
-        }
-        else if (clickNearRight) {
-          // Click is in bottom right corner
-          positionX = $click[0].offsetLeft - popupWidth;
-          positionY = $click[0].offsetTop - popupHeight;
-          disableTail = true;
-        }
-      } else {
-        // Click is not close to top or bottom edge
-        if (clickNearLeft) {
-          // Click is close to left edge, but no corner
-          positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
-          positionX = $click[0].offsetLeft + $click.width() + space;
-          tailX = positionX - $tail.width() / 2;
-          tailY = positionY + popupHeight / 2 - $tail.height() / 2;
-          tailRotation = 315;
-        }
-        else if (clickNearRight) {
-          // Click is close to right edge, but no corner
-          positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
-          positionX = $click[0].offsetLeft - popupWidth - space;
-          tailX = positionX + popupWidth - $tail.width() / 2;
-          tailY = positionY + popupHeight / 2 - $tail.height() / 2;
-          tailRotation = 135;
-        }
-      }
-
-      // Contain popup from overflowing bottom edge
-      if (positionY + popupHeight > $container.height()) {
-        positionY = $container.height() - popupHeight;
-
-        if (popupHeight > $container.height() - ($click[0].offsetTop + $click.height() + space)) {
-          disableTail = true;
-        }
+      else {
+        positionY = $container.height() / 2 - popupHeight / 2;
+        positionX = $container.width() / 2 - popupWidth / 2;
+        tailX = 0;
+        tailY = 0;
+        disableTail = true;
       }
 
       // Contain popup from ovreflowing top edge
@@ -969,13 +980,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {boolean} asPopup Decides if feedback should be made into a popup
      * @param {string} [closeText] Text for the close button
      */
-    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, asPopup, closeText = 'close') {
-      clickElement = this.hotspotFeedback;
-
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, asPopup, closeText = 'close', click = null) {
       // Feedback is disabled
       if (behaviour.disableFeedback) {
         return self;
       }
+
+      clickElement = click;
+
       clearTimeout(feedbackTransitionTimer);
       if (content) {
         var $feedback = $('<div>', {
