@@ -214,7 +214,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @private
      * @param {H5P.jQuery} $element Feedback div
      * @param {H5P.jQuery} $click Visual click div
-     * @param {H5P.jQuery} $tail Feedback popup tail
      */
     var positionFeedbackPopup = function ($element, $click) {
       var $container = $element.parent();
@@ -223,6 +222,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var popupHeight = setElementHeight($element);
       var space = 15;
       var disableTail = false;
+      var positionY = $container.height() / 2 - popupHeight / 2;
+      var positionX = $container.width() / 2 - popupWidth / 2;
+      var tailX = 0;
+      var tailY = 0;
+      var tailRotation = 0;
 
       if ($click != null) {
         // Edge detection for click, takes space into account
@@ -315,10 +319,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
       else {
-        positionY = $container.height() / 2 - popupHeight / 2;
-        positionX = $container.width() / 2 - popupWidth / 2;
-        tailX = 0;
-        tailY = 0;
         disableTail = true;
       }
 
@@ -977,16 +977,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {number} maxScore The maximum score for this question
      * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
      * @param {string} [helpText] Help text that describes the score inside a tip icon
-     * @param {boolean} asPopup Decides if feedback should be made into a popup
-     * @param {string} [closeText] Text for the close button
+     * @param {object} [popupSettings] Extra settings for popup feedback
      */
-    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, asPopup, closeText = '', click = null) {
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, popupSettings) {
       // Feedback is disabled
       if (behaviour.disableFeedback) {
         return self;
       }
 
-      clickElement = click;
+      clickElement = (popupSettings != null && popupSettings.click != null ? popupSettings.click : null);
 
       clearTimeout(feedbackTransitionTimer);
       if (content) {
@@ -1034,9 +1033,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         sections.feedback.$element
         .addClass('h5p-question-visible');
-
-        if (asPopup) {
-          makeFeedbackPopup(closeText);
+        if (popupSettings != null && popupSettings.showAsPopup == true) {
+          makeFeedbackPopup(popupSettings.closeText);
         }
         else {
           // Show feedback section

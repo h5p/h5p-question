@@ -260,6 +260,7 @@
   position: absolute;
   width: 1em;
   height: 1em;
+  z-index: 3;
   background-color: white;
   box-shadow: -2px -2px 0px 0px rgba(0, 0, 0, 0.18);
   transform: rotate(225deg);
