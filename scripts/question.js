@@ -15,7 +15,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons', 'read'];
+    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons', 'explanation', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -886,6 +886,21 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         $('.h5p-question-feedback-content', sections.feedback.$element).html(content);
       }
 
+      return self;
+    };
+
+    self.setExplanation = function (content) {
+      if (content) {
+        var $explanation = $('<div>', {
+          'class': 'h5p-question-explanation-container',
+          'html': content
+        });
+
+        register('explanation', $explanation);
+        if (initialized && $wrapper) {
+          insert(self.order, 'explanation', sections, $wrapper);
+        }
+      }
       return self;
     };
 
