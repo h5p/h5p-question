@@ -889,18 +889,106 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       return self;
     };
 
-    self.setExplanation = function (content) {
-      if (content) {
-        var $explanation = $('<div>', {
-          'class': 'h5p-question-explanation-container',
-          'html': content
-        });
+    self.generateExplanationContainer = function (data) {
 
-        register('explanation', $explanation);
-        if (initialized && $wrapper) {
-          insert(self.order, 'explanation', sections, $wrapper);
+      var $explanationContainer = $('<div/>', {
+        'class': 'h5p-question-explanation-container',
+        html: '<p>Feedback</p>' // TODO Add translations
+      });
+
+      var $explanationListContainer = $('<div/>', {
+        'class': 'h5p-question-explanation-list-container'
+      }).appendTo($explanationContainer);
+
+      var $explanationList = $('<ul>').appendTo($explanationListContainer);
+
+      var correctResponses = data.correctResponses;
+      var userResponses = data.userResponses;
+      var correctFeedback = data.userResponses;
+      var incorrectFeedback = data.correctFeedback;
+
+      for (var i = 0; i < userResponses.length; i++) {
+        // Only generate feedback if a user has responded
+        if (userResponses[i] !== '') {
+          console.log(userResponses[i]);
+          var $content = $('<span />', {
+            'class': 'correct',
+            html: correctResponses[i]
+          });
+
+          // User has answered incorrectly
+          if (userResponses[i] === correctResponses[i]) {
+            // Add feedback if it exists
+            if (correctFeedback[i]) {
+              $correctFeedback = $('<span />', {
+                'class': 'h5p-question-explanation-text',
+                html: correctFeedback[i]
+              });
+              $content = $content.add($correctFeedback);
+            }
+          }
+          else {
+            // Only add user response if incorrectly answered
+            $userResponse = $('<span />', {
+              'class': 'user-response',
+              html: userResponses[i]
+            });
+            $content = $content.add($userResponse);
+
+            // Add incorrect feedback if it exists
+            if (incorrectFeedback[i]) {
+              $incorrectFeedback = $('<span />', {
+                'class': 'h5p-question-explanation-text',
+                html: incorrectFeedback[i]
+              });
+              $content = $content.add($incorrectFeedback);
+            }
+          }
+
+          $('<li />', {
+            html: $content
+          }).appendTo($explanationList);
         }
       }
+
+      $explanationList.children().not(':last').addClass('h5p-question-explanation-not-last');
+
+      return $explanationContainer;
+    }
+
+    self.setExplanation = function (data) {
+      // Feedback is disabled
+      if (behaviour.disableFeedback) {
+        return self;
+      }
+
+      if (data) {
+        var $explanation = $('<div>', {
+          'class': 'h5p-question-explanation-container',
+          'html': self.generateExplanationContainer(data)
+        });
+
+        if (sections.explanation) {
+          // Update section
+          update('explanation', $explanation);
+        }
+        else {
+          register('explanation', $explanation);
+          if (initialized && $wrapper) {
+            insert(self.order, 'explanation', sections, $wrapper);
+          }
+        }
+
+        // Show the explanation
+        sections.explanation.$element.addClass('h5p-question-visible');
+      }
+
+      else if (sections.explanation) {
+        // Hide explanation section
+        sections.explanation.$element.removeClass('h5p-question-visible');
+        sections.explanation.$element.css('max-height', '');
+      }
+
       return self;
     };
 
