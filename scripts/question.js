@@ -730,7 +730,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       if (readText) {
         // Combine texts if called multiple times
-        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content
+        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content;
       }
       else {
         readText = content;
@@ -1313,6 +1313,47 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
   // Inheritance
   Question.prototype = Object.create(EventDispatcher.prototype);
   Question.prototype.constructor = Question;
+
+  /**
+   * Determine the overall feedback to display for the question.
+   * If no range fits the closest one will be picked.
+   *
+   * @param {Object[]} feedbacks
+   * @param {number} scoreRatio
+   * @return {string}
+   */
+  Question.determineOverallFeedback = function (feedbacks, scoreRatio) {
+    scoreRatio = Math.floor(scoreRatio * 100);
+
+    var i, feedback;
+    for (i = 0; i < feedbacks.length; i++) {
+      feedback = feedbacks[i];
+
+      if (feedback.from <= scoreRatio && feedback.to >= scoreRatio) {
+        return feedback.feedback || '';
+      }
+    }
+
+    // No feedback found, determine which is closest
+    var closest, distance;
+    for (i = 0; i < feedbacks.length; i++) {
+      feedback = feedbacks[i];
+
+      var fromDistance = Math.abs(feedback.from - scoreRatio);
+      if (!distance || fromDistance < distance) {
+        distance = fromDistance;
+        closest = feedback;
+      }
+
+      var toDistance = Math.abs(feedback.to - scoreRatio);
+      if (toDistance < distance) {
+        distance = fromDistance;
+        closest = feedback;
+      }
+    }
+
+    return closest.feedback || '';
+  };
 
   return Question;
 })(H5P.jQuery, H5P.EventDispatcher, H5P.JoubelUI);
