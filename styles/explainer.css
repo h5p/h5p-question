@@ -30,27 +30,36 @@
   padding: 0.5em 0.5em 0.5em 1em;
   margin: 0;
   line-height: 1;
+  display: flex;
 }
 
 .h5p-question-explanation-item:not(:last-child) {
   border-bottom: 1px solid #e0e0e0;
 }
 
+.h5p-question-explanation-status {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
 .h5p-question-explanation-correct {
   color: #265c42;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .h5p-question-explanation-wrong {
   color: #b61c1e;
   font-weight: bold;
   text-decoration: line-through;
+  margin-left: 0.5em;
 }
 
-.h5p-question-explanation-text:before {
-  content: '|';
-  color: #ccc;
-  padding: 0 0.5em;
+.h5p-question-explanation-text {
+  display: inline-flex;
+  padding-left: 0.5em;
+  margin-left: 0.5em;
+  border-left: 1px solid #ddd;
 }
 
 .h5p-question-explanation-list::-webkit-scrollbar {

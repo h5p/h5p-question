@@ -33,16 +33,19 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
 
       for (var i = 0; i < explanations.length; i++) {
         var feedback = explanations[i];
-        var content = '';
+        var content = '<div class="h5p-question-explanation-status">';
+
         if (feedback.correct) {
           content += '<span class="h5p-question-explanation-correct">' + feedback.correct + "</span>";
         }
         if (feedback.wrong) {
           content += '<span class="h5p-question-explanation-wrong">' + feedback.wrong + "</span>";
         }
+        content += '</div>';
         if (feedback.text) {
-          content += '<span class="h5p-question-explanation-text">' + feedback.text + "</span>";
+          content += '<div class="h5p-question-explanation-text">' + feedback.text + "</div>";
         }
+
 
         $('<li>', {
           'class': 'h5p-question-explanation-item',
