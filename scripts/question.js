@@ -889,91 +889,28 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       return self;
     };
 
-    self.generateExplanationContainer = function (data) {
-
-      var $explanationContainer = $('<div/>', {
-        'class': 'h5p-question-explanation-container',
-        html: '<p>Feedback</p>' // TODO Add translations
-      });
-
-      var $explanationListContainer = $('<div/>', {
-        'class': 'h5p-question-explanation-list-container'
-      }).appendTo($explanationContainer);
-
-      var $explanationList = $('<ul>').appendTo($explanationListContainer);
-
-      var correctResponses = data.correctResponses;
-      var userResponses = data.userResponses;
-      var correctFeedback = data.userResponses;
-      var incorrectFeedback = data.correctFeedback;
-
-      for (var i = 0; i < userResponses.length; i++) {
-        // Only generate feedback if a user has responded
-        if (userResponses[i] !== '') {
-          console.log(userResponses[i]);
-          var $content = $('<span />', {
-            'class': 'correct',
-            html: correctResponses[i]
-          });
-
-          // User has answered incorrectly
-          if (userResponses[i] === correctResponses[i]) {
-            // Add feedback if it exists
-            if (correctFeedback[i]) {
-              $correctFeedback = $('<span />', {
-                'class': 'h5p-question-explanation-text',
-                html: correctFeedback[i]
-              });
-              $content = $content.add($correctFeedback);
-            }
-          }
-          else {
-            // Only add user response if incorrectly answered
-            $userResponse = $('<span />', {
-              'class': 'user-response',
-              html: userResponses[i]
-            });
-            $content = $content.add($userResponse);
-
-            // Add incorrect feedback if it exists
-            if (incorrectFeedback[i]) {
-              $incorrectFeedback = $('<span />', {
-                'class': 'h5p-question-explanation-text',
-                html: incorrectFeedback[i]
-              });
-              $content = $content.add($incorrectFeedback);
-            }
-          }
-
-          $('<li />', {
-            html: $content
-          }).appendTo($explanationList);
-        }
-      }
-
-      $explanationList.children().not(':last').addClass('h5p-question-explanation-not-last');
-
-      return $explanationContainer;
-    }
-
-    self.setExplanation = function (data) {
-      // Feedback is disabled
-      if (behaviour.disableFeedback) {
-        return self;
-      }
-
+    /**
+     * Set the content of the explanation / feedback panel
+     *
+     * @param {Object} data
+     * @param {string} data.correct
+     * @param {string} data.wrong
+     * @param {string} data.text
+     * @param {string} title Title for explanation panel
+     *
+     * @return {H5P.Question}
+     */
+    self.setExplanation = function (data, title) {
       if (data) {
-        var $explanation = $('<div>', {
-          'class': 'h5p-question-explanation-container',
-          'html': self.generateExplanationContainer(data)
-        });
+        var explainer = new H5P.Question.Explainer(title, data);
 
         if (sections.explanation) {
           // Update section
-          update('explanation', $explanation);
+          update('explanation', explainer.getElement());
         }
         else {
-          register('explanation', $explanation);
+          register('explanation', explainer.getElement());
+
           if (initialized && $wrapper) {
             insert(self.order, 'explanation', sections, $wrapper);
           }
@@ -982,11 +919,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Show the explanation
         sections.explanation.$element.addClass('h5p-question-visible');
       }
-
       else if (sections.explanation) {
         // Hide explanation section
-        sections.explanation.$element.removeClass('h5p-question-visible');
-        sections.explanation.$element.css('max-height', '');
+        sections.explanation.$element.children().detach();
       }
 
       return self;

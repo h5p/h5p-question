@@ -14,11 +14,17 @@
   "preloadedCss": [
     {
       "path": "styles/question.css"
+    },
+    {
+      "path": "styles/explainer.css"
     }
   ],
   "preloadedJs": [
     {
       "path": "scripts/question.js"
+    },
+    {
+      "path": "scripts/explainer.js"
     }
   ],
   "preloadedDependencies": [
