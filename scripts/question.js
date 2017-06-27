@@ -915,9 +915,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             insert(self.order, 'explanation', sections, $wrapper);
           }
         }
-
-        // Show the explanation
-        sections.explanation.$element.addClass('h5p-question-visible');
       }
       else if (sections.explanation) {
         // Hide explanation section

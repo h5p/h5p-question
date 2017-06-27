@@ -1,3 +1,8 @@
+.h5p-question-explanation {
+  /* Needed this to make it display in IE 11 */
+  position: relative;
+}
+
 .h5p-question-explanation-container {
   margin: 0;
   padding: 1em;
