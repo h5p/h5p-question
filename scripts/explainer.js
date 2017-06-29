@@ -28,6 +28,7 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
 
       var $explanationList = $('<ul>', {
         'class': 'h5p-question-explanation-list',
+        tabIndex: 0,
         appendTo: self.$explanation
       });
 
