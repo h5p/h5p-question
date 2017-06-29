@@ -1316,43 +1316,25 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
   /**
    * Determine the overall feedback to display for the question.
-   * If no range fits the closest one will be picked.
+   * If no range, returns empty string.
    *
    * @param {Object[]} feedbacks
    * @param {number} scoreRatio
    * @return {string}
    */
   Question.determineOverallFeedback = function (feedbacks, scoreRatio) {
-    scoreRatio = Math.floor(scoreRatio * 100);
+    scoreRatio = Math.round(scoreRatio * 100);
 
-    var i, feedback;
-    for (i = 0; i < feedbacks.length; i++) {
-      feedback = feedbacks[i];
+    for (var i = 0; i < feedbacks.length; i++) {
+      var feedback = feedbacks[i];
+      var hasFeedback = (feedback.feedback !== undefined && feedback.feedback.trim().length !== 0);
 
-      if (feedback.from <= scoreRatio && feedback.to >= scoreRatio) {
-        return feedback.feedback || '';
+      if (feedback.from <= scoreRatio && feedback.to >= scoreRatio && hasFeedback) {
+        return feedback.feedback;
       }
     }
 
-    // No feedback found, determine which is closest
-    var closest, distance;
-    for (i = 0; i < feedbacks.length; i++) {
-      feedback = feedbacks[i];
-
-      var fromDistance = Math.abs(feedback.from - scoreRatio);
-      if (!distance || fromDistance < distance) {
-        distance = fromDistance;
-        closest = feedback;
-      }
-
-      var toDistance = Math.abs(feedback.to - scoreRatio);
-      if (toDistance < distance) {
-        distance = fromDistance;
-        closest = feedback;
-      }
-    }
-
-    return closest.feedback || '';
+    return '';
   };
 
   return Question;
