@@ -34,25 +34,38 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
 
       for (var i = 0; i < explanations.length; i++) {
         var feedback = explanations[i];
-        var content = '<div class="h5p-question-explanation-status">';
-
-        if (feedback.correct) {
-          content += '<span class="h5p-question-explanation-correct">' + feedback.correct + "</span>";
-        }
-        if (feedback.wrong) {
-          content += '<span class="h5p-question-explanation-wrong">' + feedback.wrong + "</span>";
-        }
-        content += '</div>';
-        if (feedback.text) {
-          content += '<div class="h5p-question-explanation-text">' + feedback.text + "</div>";
-        }
-
-
-        $('<li>', {
+        var $explanationItem = $('<li>', {
           'class': 'h5p-question-explanation-item',
-          html: content,
           appendTo: $explanationList
         });
+
+        var $content = $('<div>', {
+          'class': 'h5p-question-explanation-status'
+        });
+
+        if (feedback.correct) {
+          $('<span>', {
+            'class': 'h5p-question-explanation-correct',
+            text: feedback.correct,
+            appendTo: $content
+          });
+        }
+        if (feedback.wrong) {
+          $('<span>', {
+            'class': 'h5p-question-explanation-wrong',
+            text: feedback.wrong,
+            appendTo: $content
+          });
+        }
+        $content.appendTo($explanationItem);
+
+        if (feedback.text) {
+          $('<div>', {
+            'class': 'h5p-question-explanation-text',
+            text: feedback.text,
+            appendTo: $explanationItem
+          });
+        }
       }
     }
 

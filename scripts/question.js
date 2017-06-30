@@ -784,7 +784,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
       clearTimeout(feedbackTransitionTimer);
 
-      if (content) {
+      if (content !== undefined) {
         var $feedback = $('<div>', {
           'class': 'h5p-question-feedback-container'
         });
