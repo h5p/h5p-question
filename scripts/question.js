@@ -1323,7 +1323,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
    * @return {string}
    */
   Question.determineOverallFeedback = function (feedbacks, scoreRatio) {
-    scoreRatio = Math.round(scoreRatio * 100);
+    scoreRatio = Math.floor(scoreRatio * 100);
 
     for (var i = 0; i < feedbacks.length; i++) {
       var feedback = feedbacks[i];
