@@ -17,7 +17,6 @@
 .h5p-question-explanation-list {
   background: #FFFFFF;
   border: 1px solid #e0e0e0;
-  max-height: 6.1em;
   overflow: auto;
   overflow-x: hidden;
 
@@ -27,9 +26,9 @@
 }
 
 .h5p-question-explanation-item {
-  padding: 0.5em 0.5em 0.5em 1em;
+  padding: 0.5em;
   margin: 0;
-  line-height: 1;
+  line-height: 1.2;
   display: flex;
 }
 
@@ -38,26 +37,36 @@
 }
 
 .h5p-question-explanation-status {
-  display: inline-flex;
+  display: flex;
   flex-shrink: 0;
+  width: 8em;
+  flex-wrap: wrap;
+}
+
+.h5p-question-explanation-correct,
+.h5p-question-explanation-wrong {
+  display: inline-flex;
+  font-weight: bold;
+  margin-left: 0.5em;
+  font-size: 0.9em;
+
+  word-break: break-all;
+  /* Non standard for WebKit */
+  word-break: break-word;
 }
 
 .h5p-question-explanation-correct {
   color: #265c42;
-  font-weight: bold;
-  white-space: nowrap;
 }
 
 .h5p-question-explanation-wrong {
   color: #b61c1e;
-  font-weight: bold;
   text-decoration: line-through;
-  margin-left: 0.5em;
 }
 
 .h5p-question-explanation-text {
   display: inline-flex;
-  padding-left: 0.5em;
+  padding-left: 1em;
   margin-left: 0.5em;
   border-left: 1px solid #ddd;
 }
