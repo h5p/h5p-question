@@ -978,6 +978,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
      * @param {string} [helpText] Help text that describes the score inside a tip icon
      * @param {object} [popupSettings] Extra settings for popup feedback
+     * @param {boolean} [popupSettings.showAsPopup] Should the feedback display as popup?
+     * @param {string} [popupSettings.closeText] Translation for close button text
+     * @param {object} [popupSettings.click] Element representing where user clicked on screen
      */
     self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, popupSettings) {
       // Feedback is disabled
