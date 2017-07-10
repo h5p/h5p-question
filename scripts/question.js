@@ -254,58 +254,29 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           positionX = 0;
         }
 
-        // If popuo is outside right edge, position right
+        // If popup is outside right edge, position right
         if (positionX + popupWidth > $container.width()) {
           positionX = $container.width() - popupWidth;
         }
 
         // Special cases such as corner clicks, or close to an edge, they override X and Y positions if met
-        if (clickNearTop) {
-          // Click is close to top edge
-          if (clickNearLeft) {
-            // Click is in top left corner
-            positionX = $click[0].offsetLeft + $click.width();
-            positionY = $click[0].offsetTop + $click.height();
-            disableTail = true;
-          }
-          else if (clickNearRight) {
-            // Click is in top right corner
-            positionX = $click[0].offsetLeft - popupWidth;
-            positionY = $click[0].offsetTop + $click.height();
-            disableTail = true;
-          }
+        if (clickNearTop && (clickNearLeft || clickNearRight)) {
+          positionX = $click[0].offsetLeft + (clickNearLeft ? $click.width() : -popupWidth);
+          positionY = $click[0].offsetTop + $click.height();
+          disableTail = true;
         }
-        else if (clickNearBottom) {
-          // Click is close to bottom edge
-          if (clickNearLeft) {
-            // Click is in bottom left corner
-            positionX = $click[0].offsetLeft + $click.width();
-            positionY = $click[0].offsetTop - popupHeight;
-            disableTail = true;
-          }
-          else if (clickNearRight) {
-            // Click is in bottom right corner
-            positionX = $click[0].offsetLeft - popupWidth;
-            positionY = $click[0].offsetTop - popupHeight;
-            disableTail = true;
-          }
-        } else {
-          // Click is not close to top or bottom edge
-          if (clickNearLeft) {
-            // Click is close to left edge, but no corner
+        else if (clickNearBottom && (clickNearLeft || clickNearRight)) {
+          positionX = $click[0].offsetLeft + (clickNearLeft ? $click.width() : -popupWidth)
+          positionY = $click[0].offsetTop - popupHeight;
+          disableTail = true;
+        }
+        else if (!clickNearTop && !clickNearBottom) {
+          if (clickNearLeft || clickNearRight) {
             positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
-            positionX = $click[0].offsetLeft + $click.width() + space;
-            tailX = positionX - $tail.width() / 2;
+            positionX = $click[0].offsetLeft + (clickNearLeft ? $click.width() + space : -popupWidth + -space); // DOUBLE CHECK LAST +
+            tailX = positionX + (clickNearLeft ? -$tail.width() / 2 : popupWidth - $tail.width() / 2);
             tailY = positionY + popupHeight / 2 - $tail.height() / 2;
-            tailRotation = 315;
-          }
-          else if (clickNearRight) {
-            // Click is close to right edge, but no corner
-            positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
-            positionX = $click[0].offsetLeft - popupWidth - space;
-            tailX = positionX + popupWidth - $tail.width() / 2;
-            tailY = positionY + popupHeight / 2 - $tail.height() / 2;
-            tailRotation = 135;
+            tailRotation = (clickNearLeft ? 315 : 135);
           }
         }
 
