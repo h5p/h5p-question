@@ -15,7 +15,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'introduction', 'content', 'feedback', 'buttons', 'read'];
+    self.order = ['video', 'image', 'introduction', 'content', 'explanation', 'feedback', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -986,9 +986,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       clickElement = (popupSettings != null && popupSettings.click != null ? popupSettings.click : null);
-
       clearTimeout(feedbackTransitionTimer);
-      if (content) {
+
+      if (content !== undefined) {
         var $feedback = $('<div>', {
           'class': 'h5p-question-feedback-container'
         });
@@ -1095,6 +1095,41 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Update feedback content html
         $('.h5p-question-feedback-content', sections.feedback.$element).html(content);
+      }
+
+      return self;
+    };
+
+    /**
+     * Set the content of the explanation / feedback panel
+     *
+     * @param {Object} data
+     * @param {string} data.correct
+     * @param {string} data.wrong
+     * @param {string} data.text
+     * @param {string} title Title for explanation panel
+     *
+     * @return {H5P.Question}
+     */
+    self.setExplanation = function (data, title) {
+      if (data) {
+        var explainer = new H5P.Question.Explainer(title, data);
+
+        if (sections.explanation) {
+          // Update section
+          update('explanation', explainer.getElement());
+        }
+        else {
+          register('explanation', explainer.getElement());
+
+          if (initialized && $wrapper) {
+            insert(self.order, 'explanation', sections, $wrapper);
+          }
+        }
+      }
+      else if (sections.explanation) {
+        // Hide explanation section
+        sections.explanation.$element.children().detach();
       }
 
       return self;
