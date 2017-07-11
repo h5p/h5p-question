@@ -159,6 +159,12 @@
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }
 
+.h5p-question-feedback.h5p-question-popup .h5p-question-buttons {
+  height: 3.14286em;
+  max-height: 3.14286em;
+  transition: none;
+}
+
 /* Remove margins when no frame or transparent */
 .h5p-no-frame > .h5p-question > *,
 .h5p-transparent > div > .h5p-question > * {
