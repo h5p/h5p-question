@@ -730,7 +730,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       if (readText) {
         // Combine texts if called multiple times
-        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content
+        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content;
       }
       else {
         readText = content;
@@ -1348,6 +1348,29 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
   // Inheritance
   Question.prototype = Object.create(EventDispatcher.prototype);
   Question.prototype.constructor = Question;
+
+  /**
+   * Determine the overall feedback to display for the question.
+   * If no range, returns empty string.
+   *
+   * @param {Object[]} feedbacks
+   * @param {number} scoreRatio
+   * @return {string}
+   */
+  Question.determineOverallFeedback = function (feedbacks, scoreRatio) {
+    scoreRatio = Math.floor(scoreRatio * 100);
+
+    for (var i = 0; i < feedbacks.length; i++) {
+      var feedback = feedbacks[i];
+      var hasFeedback = (feedback.feedback !== undefined && feedback.feedback.trim().length !== 0);
+
+      if (feedback.from <= scoreRatio && feedback.to >= scoreRatio && hasFeedback) {
+        return feedback.feedback;
+      }
+    }
+
+    return '';
+  };
 
   return Question;
 })(H5P.jQuery, H5P.EventDispatcher, H5P.JoubelUI);
