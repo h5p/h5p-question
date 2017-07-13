@@ -1351,7 +1351,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
   /**
    * Determine the overall feedback to display for the question.
-   * If no range, returns empty string.
+   * Returns empty string if no matching range is found.
    *
    * @param {Object[]} feedbacks
    * @param {number} scoreRatio
