@@ -531,12 +531,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         })
       };
 
-      if (disableAutoPlay) {
-        params.params.autoplay = false;
+      if (disableAutoPlay && params.params.playback) {
+        params.params.playback.autoplay = false;
       }
 
       // Never fit to wrapper
-      params.params.fit = false;
+      if (!params.params.visuals) {
+        params.params.visuals = {};
+      }
+      params.params.visuals.fit = false;
       sections.video.instance = H5P.newRunnable(params, self.contentId, sections.video.$element, true);
       var fromVideo = false; // Hack to avoid never ending loop
       sections.video.instance.on('resize', function () {
