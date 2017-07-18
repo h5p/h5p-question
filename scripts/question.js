@@ -1375,5 +1375,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     return '';
   };
 
+  /**
+   * Determine the overall feedback to display for the question.
+   * Returns empty string if no matching range is found.
+   *
+   * @param {boolean} isCorrect
+   * @param {number} delay
+   * @return {DOMElement}
+   */
+  Question.createScorePointLabel = function (isCorrect, delay) {
+    var scorePoint = document.createElement('div');
+    scorePoint.classList.add(isCorrect ? 'h5p-question-plus-one' : 'h5p-question-minus-one');
+    scorePoint.classList.add('h5p-question-hidden-one');
+
+    // Use timer to trigger show
+    setTimeout(function () {
+      scorePoint.classList.remove('h5p-question-hidden-one');
+    }, delay);
+
+    return scorePoint;
+  };
+
   return Question;
 })(H5P.jQuery, H5P.EventDispatcher, H5P.JoubelUI);

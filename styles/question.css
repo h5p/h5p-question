@@ -201,3 +201,26 @@
 .h5p-question-popups.hidden {
   display: none;
 }
+
+.h5p-question-plus-one,
+.h5p-question-minus-one {
+  position: absolute;
+  width: 30px;
+  height: 19.14893617px;
+  background-size: 100% 100%;
+  right: -24px;
+  top: -13px;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 150ms linear, transform 150ms linear;
+}
+.h5p-question-plus-one {
+  background-image: url(../images/plus-one.svg);
+}
+.h5p-question-minus-one {
+  background-image: url(../images/minus-one.svg);
+}
+.h5p-question-hidden-one {
+  opacity: 0;
+  transform: translateY(100%);
+}
