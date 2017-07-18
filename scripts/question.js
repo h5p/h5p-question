@@ -1376,8 +1376,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
   };
 
   /**
-   * Determine the overall feedback to display for the question.
-   * Returns empty string if no matching range is found.
+   * TODO
    *
    * @param {boolean} isCorrect
    * @param {number} delay
@@ -1394,6 +1393,24 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     }, delay);
 
     return scorePoint;
+  };
+
+  /**
+   * Determine the delay between triggering each point popup animation.
+   *
+   * @param {number} num Number of elements to animate
+   * @return {number}
+   */
+  Question.getShowScoreDelayIncrement = function (num) {
+    var increment = 150; // Default
+    var maxTime = 1000;
+
+    if (num && num > Math.ceil(maxTime / increment)) {
+      // Animations will run for more than ~1 second, reduce it.
+      increment = maxTime / num;
+    }
+
+    return increment;
   };
 
   return Question;
