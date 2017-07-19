@@ -1376,41 +1376,44 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
   };
 
   /**
-   * TODO
+   * Makes it easy to add animated score points for your question type.
    *
-   * @param {boolean} isCorrect
-   * @param {number} delay
-   * @return {DOMElement}
+   * @class H5P.Question.ScorePoints
+   * @param {number} numElements Used to limit animation time
    */
-  Question.createScorePointLabel = function (isCorrect, delay) {
-    var scorePoint = document.createElement('div');
-    scorePoint.classList.add(isCorrect ? 'h5p-question-plus-one' : 'h5p-question-minus-one');
-    scorePoint.classList.add('h5p-question-hidden-one');
+  Question.ScorePoints = function (numElements) {
+    var self = this;
 
-    // Use timer to trigger show
-    setTimeout(function () {
-      scorePoint.classList.remove('h5p-question-hidden-one');
-    }, delay);
-
-    return scorePoint;
-  };
-
-  /**
-   * Determine the delay between triggering each point popup animation.
-   *
-   * @param {number} num Number of elements to animate
-   * @return {number}
-   */
-  Question.getShowScoreDelayIncrement = function (num) {
-    var increment = 150; // Default
+    // Determine delay between triggering animations
+    var delay = 0;
+    var increment = 150;
     var maxTime = 1000;
 
-    if (num && num > Math.ceil(maxTime / increment)) {
+    if (numElements && numElements > Math.ceil(maxTime / increment)) {
       // Animations will run for more than ~1 second, reduce it.
-      increment = maxTime / num;
+      increment = maxTime / numElements;
     }
 
-    return increment;
+    /**
+     * Create the element that displays the score point element for questions.
+     *
+     * @param {boolean} isCorrect
+     * @return {DOMElement}
+     */
+    self.getElement = function (isCorrect) {
+      var element = document.createElement('div');
+      element.classList.add(isCorrect ? 'h5p-question-plus-one' : 'h5p-question-minus-one');
+      element.classList.add('h5p-question-hidden-one');
+
+      // Use timer to trigger show
+      setTimeout(function () {
+        element.classList.remove('h5p-question-hidden-one');
+      }, delay);
+      delay += increment;
+
+      return element;
+    };
+
   };
 
   return Question;
