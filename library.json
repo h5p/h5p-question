@@ -25,6 +25,9 @@
     },
     {
       "path": "scripts/explainer.js"
+    },
+    {
+      "path": "scripts/score-points.js"
     }
   ],
   "preloadedDependencies": [

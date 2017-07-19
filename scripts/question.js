@@ -1375,46 +1375,5 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     return '';
   };
 
-  /**
-   * Makes it easy to add animated score points for your question type.
-   *
-   * @class H5P.Question.ScorePoints
-   * @param {number} numElements Used to limit animation time
-   */
-  Question.ScorePoints = function (numElements) {
-    var self = this;
-
-    // Determine delay between triggering animations
-    var delay = 0;
-    var increment = 150;
-    var maxTime = 1000;
-
-    if (numElements && numElements > Math.ceil(maxTime / increment)) {
-      // Animations will run for more than ~1 second, reduce it.
-      increment = maxTime / numElements;
-    }
-
-    /**
-     * Create the element that displays the score point element for questions.
-     *
-     * @param {boolean} isCorrect
-     * @return {DOMElement}
-     */
-    self.getElement = function (isCorrect) {
-      var element = document.createElement('div');
-      element.classList.add(isCorrect ? 'h5p-question-plus-one' : 'h5p-question-minus-one');
-      element.classList.add('h5p-question-hidden-one');
-
-      // Use timer to trigger show
-      setTimeout(function () {
-        element.classList.remove('h5p-question-hidden-one');
-      }, delay);
-      delay += increment;
-
-      return element;
-    };
-
-  };
-
   return Question;
 })(H5P.jQuery, H5P.EventDispatcher, H5P.JoubelUI);
