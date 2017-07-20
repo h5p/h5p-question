@@ -394,7 +394,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
 
         // Button section reduced by 1 pixel for cross-broswer consistency.
-        var buttonSectionWidth = Math.floor(sections.buttons.$element.get(0).offsetWidth) - 1;
+        var buttonSectionWidth = Math.floor($(sections.buttons.$element).width()) - 1;
 
         // Remove button labels if width of buttons are too wide
         if (buttonsWidth >= buttonSectionWidth) {
@@ -791,12 +791,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         var $feedback = $('<div>', {
           'class': 'h5p-question-feedback-container'
         });
-
-        if (scoreBar === undefined) {
-          scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel);
-        }
-        scoreBar.appendTo($feedback);
-        scoreBar.setScore(score);
         var $feedbackContent = $('<div>', {
           'class': 'h5p-question-feedback-content'
         }).appendTo($feedback);
@@ -811,6 +805,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           JoubelUI.createTip(helpText, {helpIcon: true})
             .appendTo($feedbackContent);
         }
+
+        if (scoreBar === undefined) {
+          scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel);
+        }
+        scoreBar.appendTo($feedback);
 
         // Feedback for readspeakers
         if (!behaviour.disableReadSpeaker) {
@@ -833,6 +832,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Show feedback section
         feedbackTransitionTimer = setTimeout(function () {
           sections.feedback.$element.addClass('h5p-question-visible');
+          sections.buttons.$element.addClass('feedback-shown');
           setElementHeight(sections.feedback.$element);
           sectionsIsTransitioning = true;
 
@@ -843,6 +843,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           feedbackTransitionTimer = setTimeout(function () {
             sectionsIsTransitioning = false;
             self.trigger('resize');
+            scoreBar.setScore(score);
           }, 150);
         }, 0);
 
@@ -853,6 +854,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Hide feedback section
         sections.feedback.$element.removeClass('h5p-question-visible');
         sections.feedback.$element.css('max-height', '');
+        sections.buttons.$element.removeClass('feedback-shown');
         sectionsIsTransitioning = true;
 
         // Detach after transition
