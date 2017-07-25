@@ -111,6 +111,11 @@
 .h5p-question-content {
   margin: 1em;
 }
+
+.h5p-question-content.h5p-has-question-popup {
+  position: relative;
+}
+
 .h5p-question-feedback {
   font-weight: bold;
   color: #1a73d9;
@@ -119,6 +124,7 @@
   opacity: 0;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
+
 .h5p-question-feedback.h5p-question-visible {
   margin: 1em;
   opacity: 1;
@@ -151,6 +157,12 @@
   max-height: none;
   opacity: 1;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
+}
+
+.h5p-question-feedback.h5p-question-popup .h5p-question-buttons {
+  height: 3.14286em;
+  max-height: 3.14286em;
+  transition: none;
 }
 
 /* Remove margins when no frame or transparent */
@@ -200,6 +212,64 @@
 
 .h5p-question-popups.hidden {
   display: none;
+}
+
+.h5p-question-feedback.h5p-question-popup {
+  position: absolute;
+  display: none;
+  width: 22em;
+  max-width: 100%;
+  margin: 0;
+  z-index: 3;
+  background-color: white;
+  box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.59);
+  border-radius: 1em;
+  padding: 1.5em;
+  transition: none;
+}
+
+.h5p-question-feedback.h5p-question-popup.h5p-question-visible {
+  display: block;
+}
+
+.h5p-question-feedback.h5p-question-popup .h5p-question-feedback-content {
+  display: block;
+  word-break: break-all;
+  top: 0;
+}
+
+.h5p-question-feedback.h5p-question-popup .h5p-question-retry-button {
+  margin: 1em 0 0 0;
+}
+
+.h5p-question-feedback.h5p-question-popup .h5p-question-buttons {
+  margin: 0;
+}
+
+.h5p-question-feedback.h5p-question-popup .h5p-question-feedback-close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 1em;
+  cursor: pointer;
+}
+
+.h5p-question-feedback.h5p-question-popup .h5p-question-feedback-close:before {
+  font-family: 'h5pFontIcons';
+  font-size: 2.5em;
+  line-height: 0.9em;
+  content: '\e600';
+  color: rgb(205, 205, 205);
+}
+
+.h5p-question-feedback-tail {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  z-index: 3;
+  background-color: white;
+  box-shadow: -2px -2px 0px 0px rgba(0, 0, 0, 0.18);
+  transform: rotate(225deg);
 }
 
 .h5p-question-plus-one,
