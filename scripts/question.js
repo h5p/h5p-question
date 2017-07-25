@@ -273,7 +273,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         else if (!clickNearTop && !clickNearBottom) {
           if (clickNearLeft || clickNearRight) {
             positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
-            positionX = $click[0].offsetLeft + (clickNearLeft ? $click.width() + space : -popupWidth + -space); // DOUBLE CHECK LAST +
+            positionX = $click[0].offsetLeft + (clickNearLeft ? $click.width() + space : -popupWidth + -space);
             tailX = positionX + (clickNearLeft ? -$tail.width() / 2 : popupWidth - $tail.width() / 2);
             tailY = positionY + popupHeight / 2 - $tail.height() / 2;
             tailRotation = (clickNearLeft ? 315 : 135);
