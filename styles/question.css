@@ -219,8 +219,8 @@
 .h5p-question-plus-one,
 .h5p-question-minus-one {
   position: absolute;
-  width: 2em;
-  height: calc(2em * 0.638297872);
+  width: 1.923076923em;
+  height: calc(1.923076923em * 0.638297872);
   background-size: 100% 100%;
   right: -1.615384615em;
   top: -0.846153846em;
