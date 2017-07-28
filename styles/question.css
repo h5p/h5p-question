@@ -128,7 +128,6 @@
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }
 .h5p-joubelui-score-bar {
-  display: inline-block;
   margin-right: .5em;
 }
 .h5p-question-feedback-content {

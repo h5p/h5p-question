@@ -813,7 +813,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Feedback for readspeakers
         if (!behaviour.disableReadSpeaker) {
-          self.read(content);
+          self.read(score + '/' + maxScore + '. ' + content);
         }
 
         showFeedback = true;
