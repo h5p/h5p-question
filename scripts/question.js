@@ -413,7 +413,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       var animationTimer = 150;
-      if (sections.feedback.$element.hasClass('h5p-question-popup')) {
+      if (sections.feedback && sections.feedback.$element.hasClass('h5p-question-popup')) {
         animationTimer = 0;
       }
 
