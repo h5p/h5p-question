@@ -160,7 +160,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $tmp = $element.clone()
         .css({
           'position': 'absolute',
-          'max-height': 'none'
+          'max-height': 'none',
+          'width': '100%'
         }).appendTo($element.parent());
 
       // Apply height to element
@@ -770,85 +771,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
-     * Set feedback message.
-     * Setting the message to blank or undefined will hide it again.
+     * Remove feedback
      *
-     * @param {string} content
-     * @param {number} score The score
-     * @param {number} maxScore The maximum score for this question
-     * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
-     * @param {string} [helpText] Help text that describes the score inside a tip icon
+     * @return {H5P.Question}
      */
-    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText) {
+    self.removeFeedback = function () {
 
-      // Feedback is disabled
-      if (behaviour.disableFeedback) {
-        return self;
-      }
       clearTimeout(feedbackTransitionTimer);
 
-      if (content !== undefined) {
-        var $feedback = $('<div>', {
-          'class': 'h5p-question-feedback-container'
-        });
-        var $feedbackContent = $('<div>', {
-          'class': 'h5p-question-feedback-content'
-        }).appendTo($feedback);
+      if (sections.feedback && showFeedback) {
 
-        // Feedback text
-        $('<div>', {
-          'class': 'h5p-question-feedback-content-text',
-          'html': content
-        }).appendTo($feedbackContent);
-
-        if (helpText) {
-          JoubelUI.createTip(helpText, {helpIcon: true})
-            .appendTo($feedbackContent);
-        }
-
-        if (scoreBar === undefined) {
-          scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel);
-        }
-        scoreBar.appendTo($feedback);
-
-        // Feedback for readspeakers
-        if (!behaviour.disableReadSpeaker) {
-          self.read(score + '/' + maxScore + '. ' + content);
-        }
-
-        showFeedback = true;
-        if (sections.feedback) {
-          // Update section
-          update('feedback', $feedback);
-        }
-        else {
-          // Create section
-          register('feedback', $feedback);
-          if (initialized && $wrapper) {
-            insert(self.order, 'feedback', sections, $wrapper);
-          }
-        }
-
-        // Show feedback section
-        feedbackTransitionTimer = setTimeout(function () {
-          sections.feedback.$element.addClass('h5p-question-visible');
-          sections.buttons.$element.addClass('feedback-shown');
-          setElementHeight(sections.feedback.$element);
-          sectionsIsTransitioning = true;
-
-          // Scroll to bottom after showing feedback
-          scrollToBottom();
-
-          // Trigger resize after animation
-          feedbackTransitionTimer = setTimeout(function () {
-            sectionsIsTransitioning = false;
-            self.trigger('resize');
-            scoreBar.setScore(score);
-          }, 150);
-        }, 0);
-
-      }
-      else if (sections.feedback && showFeedback) {
         showFeedback = false;
 
         // Hide feedback section
@@ -875,6 +807,84 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Set feedback message.
+     *
+     * @param {string} [content]
+     * @param {number} score The score
+     * @param {number} maxScore The maximum score for this question
+     * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
+     * @param {string} [helpText] Help text that describes the score inside a tip icon
+     */
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText) {
+
+      // Feedback is disabled
+      if (behaviour.disableFeedback) {
+        return self;
+      }
+
+      clearTimeout(feedbackTransitionTimer);
+
+      var $feedback = $('<div>', {
+        'class': 'h5p-question-feedback-container'
+      });
+
+      var $feedbackContent = $('<div>', {
+        'class': 'h5p-question-feedback-content'
+      }).appendTo($feedback);
+
+      // Feedback text
+      $('<div>', {
+        'class': 'h5p-question-feedback-content-text',
+        'html': content
+      }).appendTo($feedbackContent);
+
+      $feedbackContent.toggleClass('has-content', content !== undefined && content.length > 0);
+
+      if (scoreBar === undefined) {
+        scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText);
+      }
+      scoreBar.appendTo($feedback);
+
+      // Feedback for readspeakers
+      if (!behaviour.disableReadSpeaker) {
+        self.read(score + '/' + maxScore + '. ' + (content ? content : ''));
+      }
+
+      showFeedback = true;
+      if (sections.feedback) {
+        // Update section
+        update('feedback', $feedback);
+      }
+      else {
+        // Create section
+        register('feedback', $feedback);
+        if (initialized && $wrapper) {
+          insert(self.order, 'feedback', sections, $wrapper);
+        }
+      }
+
+      // Show feedback section
+      feedbackTransitionTimer = setTimeout(function () {
+        sections.feedback.$element.addClass('h5p-question-visible');
+        sections.buttons.$element.addClass('feedback-shown');
+        setElementHeight(sections.feedback.$element);
+        sectionsIsTransitioning = true;
+
+        // Scroll to bottom after showing feedback
+        scrollToBottom();
+
+        // Trigger resize after animation
+        feedbackTransitionTimer = setTimeout(function () {
+          sectionsIsTransitioning = false;
+          self.trigger('resize');
+          scoreBar.setScore(score);
+        }, 150);
+      }, 0);
+
+      return self;
+    };
+
+    /**
      * Set feedback content (no animation).
      *
      * @param {string} content
@@ -888,7 +898,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
 
         // Update feedback content html
-        $('.h5p-question-feedback-content', sections.feedback.$element).html(content);
+        $('.h5p-question-feedback-content', sections.feedback.$element).html(content).addClass('has-content');
+
+        // Make sure the height is correct
+        setElementHeight(sections.feedback.$element);
       }
 
       return self;
