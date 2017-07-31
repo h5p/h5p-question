@@ -15,7 +15,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'introduction', 'content', 'explanation', 'feedback', 'buttons', 'read'];
+    self.order = ['video', 'image', 'introduction', 'content', 'footer'];
+
+    self.footerOrder = ['explanation', 'feedback', 'scorebar', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -26,6 +28,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Wrapper when attached
     var $wrapper;
+
+    var $footer;
 
     // ScoreBar
     var scoreBar;
@@ -769,6 +773,22 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
     };
 
+    self.setFeedbackText = function () {
+      // Feedback is disabled
+      if (behaviour.disableFeedback) {
+        return self;
+      }
+
+    };
+
+    self.setScore = function () {
+      // Feedback is disabled
+      if (behaviour.disableFeedback) {
+        return self;
+      }
+
+    };
+
     /**
      * Set feedback message.
      * Setting the message to blank or undefined will hide it again.
@@ -788,6 +808,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       clearTimeout(feedbackTransitionTimer);
 
       if (content !== undefined) {
+        
         var $feedback = $('<div>', {
           'class': 'h5p-question-feedback-container'
         });
@@ -825,7 +846,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Create section
           register('feedback', $feedback);
           if (initialized && $wrapper) {
-            insert(self.order, 'feedback', sections, $wrapper);
+            insert(self.footerOrder, 'feedback', sections, $footer);
           }
         }
 
@@ -917,7 +938,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           register('explanation', explainer.getElement());
 
           if (initialized && $wrapper) {
-            insert(self.order, 'explanation', sections, $wrapper);
+            insert(self.footerOrder, 'explanation', sections, $footer);
           }
         }
       }
@@ -967,11 +988,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return self; // Already registered
       }
 
+      console.log('JALLA 1', sections);
+
       if (sections.buttons === undefined)  {
         // We have buttons, register wrapper
         register('buttons');
         if (initialized) {
-          insert(self.order, 'buttons', sections, $wrapper);
+          console.log('JALLA');
+          insert(self.footerOrder, 'buttons', sections, $footer);
         }
       }
 
@@ -1256,6 +1280,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       return self;
     };
 
+    var addSections = function (sections, order, $container) {
+      var $sections = [];
+      for (var i = 0; i < order.length; i++) {
+        var section = order[i];
+        if (sections[section]) {
+          if (sections[section].parent) {
+            // Section has a different parent
+            sections[section].$element.appendTo(sections[section].parent);
+          }
+          else {
+            $sections.push(sections[section].$element);
+          }
+          sections[section].isVisible = true;
+        }
+      }
+
+      // Only append once to DOM for optimal performance
+      $container.append($sections);
+    };
+
     /**
      * Attach content to given container.
      *
@@ -1290,24 +1334,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $container.html('')
         .addClass('h5p-question h5p-' + type);
 
-      // Add sections in given order
-      var $sections = [];
-      for (var i = 0; i < self.order.length; i++) {
-        var section = self.order[i];
-        if (sections[section]) {
-          if (sections[section].parent) {
-            // Section has a different parent
-            sections[section].$element.appendTo(sections[section].parent);
-          }
-          else {
-            $sections.push(sections[section].$element);
-          }
-          sections[section].isVisible = true;
-        }
-      }
+      // Register footer
+      register('footer');
+      $footer = sections.footer.$element;
 
-      // Only append once to DOM for optimal performance
-      $container.append($sections);
+      // Add main sections
+      addSections(sections, self.order, $container);
+
+      // Add footer subsections
+      addSections(sections, self.footerOrder, $footer);
 
       // Let others react to dom changes
       self.trigger('domChanged', {
