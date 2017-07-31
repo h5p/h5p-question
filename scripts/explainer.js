@@ -22,7 +22,7 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
       $('<div>', {
         'class': 'h5p-question-explanation-title',
         role: 'heading',
-        text: title,
+        html: title,
         appendTo: self.$explanation
       });
 
@@ -46,14 +46,14 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
         if (feedback.correct) {
           $('<span>', {
             'class': 'h5p-question-explanation-correct',
-            text: feedback.correct,
+            html: feedback.correct,
             appendTo: $content
           });
         }
         if (feedback.wrong) {
           $('<span>', {
             'class': 'h5p-question-explanation-wrong',
-            text: feedback.wrong,
+            html: feedback.wrong,
             appendTo: $content
           });
         }
@@ -62,7 +62,7 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
         if (feedback.text) {
           $('<div>', {
             'class': 'h5p-question-explanation-text',
-            text: feedback.text,
+            html: feedback.text,
             appendTo: $explanationItem
           });
         }

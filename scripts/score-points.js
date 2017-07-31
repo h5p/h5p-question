@@ -15,7 +15,7 @@
      * Create the element that displays the score point element for questions.
      *
      * @param {boolean} isCorrect
-     * @return {DOMElement}
+     * @return {HTMLElement}
      */
     self.getElement = function (isCorrect) {
       var element = document.createElement('div');
@@ -59,7 +59,7 @@
      * Trigger transition animation for the given element
      *
      * @private
-     * @param {DOMElement} element
+     * @param {HTMLElement} element
      * @return {function}
      */
     var showElement = function (element) {

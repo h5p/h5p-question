@@ -27,6 +27,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Wrapper when attached
     var $wrapper;
 
+    // Click element
+    var clickElement;
+
     // ScoreBar
     var scoreBar;
 
@@ -145,6 +148,172 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Make feedback into a popup and position relative to click.
+     *
+     * @private
+     * @param {string} [closeText] Text for the close button
+     */
+    var makeFeedbackPopup = function (closeText) {
+      var $element = sections.feedback.$element;
+      var $click = (clickElement != null ? clickElement.$element : null);
+
+      $element
+        .appendTo(sections.content.$element)
+        .addClass('h5p-question-popup');
+
+      $element.parent()
+        .addClass('h5p-has-question-popup');
+
+      // Draw the tail
+      var $tail = $('<div/>', {
+        'class': 'h5p-question-feedback-tail'
+      })
+      .hide()
+      .appendTo($element.parent());
+
+      // Draw the close button
+      var $close = $('<div/>', {
+        'class': 'h5p-question-feedback-close',
+        'tabindex': 0,
+        'title': closeText,
+        on: {
+          click: function (event) {
+            $element.remove();
+            $tail.remove();
+            event.preventDefault();
+          },
+          keydown: function (event) {
+            switch (event.which) {
+              case 13: // Enter
+              case 32: // Space
+                $element.remove();
+                $tail.remove();
+                event.preventDefault();
+            }
+          }
+        }
+      })
+      .hide()
+      .appendTo($element);
+
+      if ($click != null) {
+        if ($click.hasClass('correct')) {
+          $close.show();
+          sections.buttons.$element.hide();
+        } else {
+          sections.buttons.$element.appendTo(sections.feedback.$element);
+        }
+      }
+
+      positionFeedbackPopup($element, $click);
+    };
+
+    /**
+     * Position the feedback popup.
+     *
+     * @private
+     * @param {H5P.jQuery} $element Feedback div
+     * @param {H5P.jQuery} $click Visual click div
+     */
+    var positionFeedbackPopup = function ($element, $click) {
+      var $container = $element.parent();
+      var $tail = $element.siblings('.h5p-question-feedback-tail');
+      var popupWidth = $element.outerWidth();
+      var popupHeight = setElementHeight($element);
+      var space = 15;
+      var disableTail = false;
+      var positionY = $container.height() / 2 - popupHeight / 2;
+      var positionX = $container.width() / 2 - popupWidth / 2;
+      var tailX = 0;
+      var tailY = 0;
+      var tailRotation = 0;
+
+      if ($click != null) {
+        // Edge detection for click, takes space into account
+        var clickNearTop = ($click[0].offsetTop < space);
+        var clickNearBottom = ($click[0].offsetTop + $click.height() > $container.height() - space);
+        var clickNearLeft = ($click[0].offsetLeft < space);
+        var clickNearRight = ($click[0].offsetLeft + $click.width() > $container.width() - space);
+
+        // Click is not in a corner or close to edge, calculate position normally
+        positionX = $click[0].offsetLeft - popupWidth / 2  + $click.width() / 2;
+        positionY = $click[0].offsetTop - popupHeight - space;
+        tailX = positionX + popupWidth / 2 - $tail.width() / 2;
+        tailY = positionY + popupHeight - $tail.height() / 2;
+        tailRotation = 225;
+
+        // If popup is outside top edge, position under click instead
+        if (popupHeight + space > $click[0].offsetTop) {
+          positionY = $click[0].offsetTop + $click.height() + space;
+          tailY = positionY - $tail.height() / 2 ;
+          tailRotation = 45;
+        }
+
+        // If popup is outside left edge, position left
+        if (positionX < 0) {
+          positionX = 0;
+        }
+
+        // If popup is outside right edge, position right
+        if (positionX + popupWidth > $container.width()) {
+          positionX = $container.width() - popupWidth;
+        }
+
+        // Special cases such as corner clicks, or close to an edge, they override X and Y positions if met
+        if (clickNearTop && (clickNearLeft || clickNearRight)) {
+          positionX = $click[0].offsetLeft + (clickNearLeft ? $click.width() : -popupWidth);
+          positionY = $click[0].offsetTop + $click.height();
+          disableTail = true;
+        }
+        else if (clickNearBottom && (clickNearLeft || clickNearRight)) {
+          positionX = $click[0].offsetLeft + (clickNearLeft ? $click.width() : -popupWidth);
+          positionY = $click[0].offsetTop - popupHeight;
+          disableTail = true;
+        }
+        else if (!clickNearTop && !clickNearBottom) {
+          if (clickNearLeft || clickNearRight) {
+            positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
+            positionX = $click[0].offsetLeft + (clickNearLeft ? $click.width() + space : -popupWidth + -space);
+            tailX = positionX + (clickNearLeft ? -$tail.width() / 2 : popupWidth - $tail.width() / 2);
+            tailY = positionY + popupHeight / 2 - $tail.height() / 2;
+            tailRotation = (clickNearLeft ? 315 : 135);
+          }
+        }
+
+        // Contain popup from overflowing bottom edge
+        if (positionY + popupHeight > $container.height()) {
+          positionY = $container.height() - popupHeight;
+
+          if (popupHeight > $container.height() - ($click[0].offsetTop + $click.height() + space)) {
+            disableTail = true;
+          }
+        }
+      }
+      else {
+        disableTail = true;
+      }
+
+      // Contain popup from ovreflowing top edge
+      if (positionY < 0) {
+        positionY = 0;
+      }
+
+      $element.css({top: positionY, left: positionX});
+      $tail.css({top: tailY, left: tailX});
+
+      if (!disableTail) {
+        $tail.css({
+          'left': tailX,
+          'top': tailY,
+          'transform': 'rotate(' + tailRotation + 'deg)'
+        }).show();
+      }
+      else {
+        $tail.hide();
+      }
+    };
+
+    /**
      * Set element max height, used for animations.
      *
      * @param {H5P.jQuery} $element
@@ -244,6 +413,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
+      var animationTimer = 150;
+      if (sections.feedback && sections.feedback.$element.hasClass('h5p-question-popup')) {
+        animationTimer = 0;
+      }
+
       if (sections.buttons && numToHide === sections.buttons.$element.children().length) {
         // All buttons are going to be hidden. Hide container using transition.
         sections.buttons.$element.removeClass('h5p-question-visible');
@@ -254,7 +428,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         toggleButtonsTransitionTimer = setTimeout(function () {
           hideButtons(relocateFocus);
           sectionsIsTransitioning = false;
-        }, 150);
+        }, animationTimer);
       }
       else {
         hideButtons(relocateFocus);
@@ -267,7 +441,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Trigger resize after animation
           toggleButtonsTransitionTimer = setTimeout(function () {
             self.trigger('resize');
-          }, 150);
+          }, animationTimer);
         }
       }
 
@@ -667,7 +841,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       var sizeDetermined = false;
       var determineSize = function () {
-
         if (sizeDetermined || !$img.is(':visible')) {
           return; // Try again next time.
         }
@@ -801,6 +974,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           sectionsIsTransitioning = false;
           scoreBar.setScore(0);
         }, 150);
+
+        $wrapper.find('.h5p-question-feedback-tail').remove();
       }
 
       return self;
@@ -814,19 +989,28 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {number} maxScore The maximum score for this question
      * @param {string} [scoreBarLabel] Makes it easier for readspeakers to identify the scorebar
      * @param {string} [helpText] Help text that describes the score inside a tip icon
+     * @param {object} [popupSettings] Extra settings for popup feedback
+     * @param {boolean} [popupSettings.showAsPopup] Should the feedback display as popup?
+     * @param {string} [popupSettings.closeText] Translation for close button text
+     * @param {object} [popupSettings.click] Element representing where user clicked on screen
      */
-    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText) {
-
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, popupSettings) {
       // Feedback is disabled
       if (behaviour.disableFeedback) {
         return self;
       }
 
+      clickElement = (popupSettings != null && popupSettings.click != null ? popupSettings.click : null);
       clearTimeout(feedbackTransitionTimer);
 
       var $feedback = $('<div>', {
         'class': 'h5p-question-feedback-container'
       });
+
+      if (scoreBar === undefined) {
+        scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText);
+      }
+      scoreBar.appendTo($feedback);
 
       var $feedbackContent = $('<div>', {
         'class': 'h5p-question-feedback-content'
@@ -839,11 +1023,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }).appendTo($feedbackContent);
 
       $feedbackContent.toggleClass('has-content', content !== undefined && content.length > 0);
-
-      if (scoreBar === undefined) {
-        scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText);
-      }
-      scoreBar.appendTo($feedback);
 
       // Feedback for readspeakers
       if (!behaviour.disableReadSpeaker) {
@@ -863,23 +1042,27 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
-      // Show feedback section
-      feedbackTransitionTimer = setTimeout(function () {
-        sections.feedback.$element.addClass('h5p-question-visible');
-        sections.buttons.$element.addClass('feedback-shown');
-        setElementHeight(sections.feedback.$element);
-        sectionsIsTransitioning = true;
-
-        // Scroll to bottom after showing feedback
-        scrollToBottom();
-
-        // Trigger resize after animation
+      sections.feedback.$element.addClass('h5p-question-visible');
+      if (popupSettings != null && popupSettings.showAsPopup == true) {
+        makeFeedbackPopup(popupSettings.closeText);
+      }
+      else {
+        // Show feedback section
         feedbackTransitionTimer = setTimeout(function () {
-          sectionsIsTransitioning = false;
-          self.trigger('resize');
-          scoreBar.setScore(score);
-        }, 150);
-      }, 0);
+          setElementHeight(sections.feedback.$element);
+          sectionsIsTransitioning = true;
+
+          // Scroll to bottom after showing feedback
+          scrollToBottom();
+
+          // Trigger resize after animation
+          feedbackTransitionTimer = setTimeout(function () {
+            sectionsIsTransitioning = false;
+            self.trigger('resize');
+            scoreBar.setScore(score);
+          }, 150);
+        }, 0);
+      }
 
       return self;
     };
@@ -1357,6 +1540,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (!sectionsIsTransitioning && sections.feedback && showFeedback) {
         // Resize feedback to fit
         setElementHeight(sections.feedback.$element);
+      }
+
+      // Re-position feedback popup if in use
+      var $element = sections.feedback;
+      var $click = clickElement;
+
+      if ($element != null && $element.$element != null && $click != null && $click.$element != null) {
+        setTimeout(function() {
+          positionFeedbackPopup($element.$element, $click.$element);
+        }, 10);
       }
 
       resizeButtons();
