@@ -127,8 +127,7 @@
 
 .h5p-question-feedback.h5p-question-visible {
   opacity: 40%;
-  margin: 0em;
-  padding: 1em;
+  margin: 1em;
   opacity: 1;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }
@@ -143,7 +142,7 @@
 }
 
 .h5p-question-feedback-content.has-content {
-  display: inline-block;
+  display: block;
   margin-bottom: 0.8em;
 }
 
@@ -158,9 +157,6 @@
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
 .h5p-question-buttons.h5p-question-visible {
-  margin: 0;
-  padding-left: 1em;
-  padding-right: 1em;
   max-height: none;
   opacity: 1;
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;

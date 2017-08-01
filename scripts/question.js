@@ -1007,11 +1007,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         'class': 'h5p-question-feedback-container'
       });
 
-      if (scoreBar === undefined) {
-        scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText);
-      }
-      scoreBar.appendTo($feedback);
-
       var $feedbackContent = $('<div>', {
         'class': 'h5p-question-feedback-content'
       }).appendTo($feedback);
@@ -1021,6 +1016,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         'class': 'h5p-question-feedback-content-text',
         'html': content
       }).appendTo($feedbackContent);
+
+      if (scoreBar === undefined) {
+        scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText);
+      }
+      scoreBar.appendTo($feedback);
 
       $feedbackContent.toggleClass('has-content', content !== undefined && content.length > 0);
 
@@ -1045,6 +1045,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       sections.feedback.$element.addClass('h5p-question-visible');
       if (popupSettings != null && popupSettings.showAsPopup == true) {
         makeFeedbackPopup(popupSettings.closeText);
+        scoreBar.setScore(score);
       }
       else {
         // Show feedback section
