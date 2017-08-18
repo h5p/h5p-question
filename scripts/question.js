@@ -325,12 +325,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return;
       }
 
+      // Need to take margins into account when calculating available space
+      var sideMargins = parseFloat($element.css('margin-left'))
+        + parseFloat($element.css('margin-right'));
+      var tmpWidth = 'calc(100% - ' + sideMargins + 'px)';
+
       // Get natural element height
       var $tmp = $element.clone()
         .css({
           'position': 'absolute',
           'max-height': 'none',
-          'width': '100%'
+          'width': tmpWidth
         }).appendTo($element.parent());
 
       // Apply height to element
