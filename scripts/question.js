@@ -1415,14 +1415,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (id === undefined) {
         // Find first button that is visible.
         for (var i = 0; i < buttonOrder.length; i++) {
-          if (buttons[buttonOrder[i]].isVisible) {
+          var button = buttons[buttonOrder[i]];
+          if (button && button.isVisible) {
             // Give that button focus
-            buttons[buttonOrder[i]].$element.focus();
+            button.$element.focus();
             break;
           }
         }
       }
-      else if (buttons[id].$element.is(':visible')) {
+      else if (buttons[id] && buttons[id].$element.is(':visible')) {
         // Set focus to requested button
         buttons[id].$element.focus();
       }
