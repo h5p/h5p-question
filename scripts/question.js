@@ -964,7 +964,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Hide feedback section
         sections.feedback.$element.removeClass('h5p-question-visible');
         sections.feedback.$element.css('max-height', '');
-        sections.buttons.$element.removeClass('feedback-shown');
         sectionsIsTransitioning = true;
 
         // Detach after transition
@@ -980,7 +979,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           scoreBar.setScore(0);
         }, 150);
 
-        $wrapper.find('.h5p-question-feedback-tail').remove();
+        if ($wrapper) {
+          $wrapper.find('.h5p-question-feedback-tail').remove();
+        }
       }
 
       return self;
