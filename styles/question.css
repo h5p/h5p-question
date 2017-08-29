@@ -132,10 +132,8 @@
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }
 .h5p-question-feedback-content {
-  weight: bold;
   font-size: 1em;
   display: none;
-  margin-left: 0.8em;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
