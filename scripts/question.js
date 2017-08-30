@@ -167,9 +167,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Draw the tail
       var $tail = $('<div/>', {
         'class': 'h5p-question-feedback-tail'
-      })
-      .hide()
-      .appendTo($element.parent());
+      }).hide()
+        .appendTo($element.parent());
 
       // Draw the close button
       var $close = $('<div/>', {
@@ -198,6 +197,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       if ($click != null) {
         if ($click.hasClass('correct')) {
+          $element.addClass('h5p-question-feedback-correct');
           $close.show();
           sections.buttons.$element.hide();
         } else {
@@ -239,7 +239,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         positionX = $click[0].offsetLeft - popupWidth / 2  + $click.width() / 2;
         positionY = $click[0].offsetTop - popupHeight - space;
         tailX = positionX + popupWidth / 2 - $tail.width() / 2;
-        tailY = positionY + popupHeight - $tail.height() / 2;
+        tailY = positionY + popupHeight - ($tail.height() / 2);
         tailRotation = 225;
 
         // If popup is outside top edge, position under click instead
@@ -274,9 +274,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           if (clickNearLeft || clickNearRight) {
             positionY = $click[0].offsetTop - popupHeight / 2 + $click.width() / 2;
             positionX = $click[0].offsetLeft + (clickNearLeft ? $click.width() + space : -popupWidth + -space);
-            tailX = positionX + (clickNearLeft ? -$tail.width() / 2 : popupWidth - $tail.width() / 2);
-            tailY = positionY + popupHeight / 2 - $tail.height() / 2;
-            tailRotation = (clickNearLeft ? 315 : 135);
+            // Make sure this does not position the popup off screen
+            if (positionX < 0) {
+              positionX = 0;
+              disableTail = true;
+            }
+            else {
+              tailX = positionX + (clickNearLeft ? - $tail.width() / 2 : popupWidth - $tail.width() / 2);
+              tailY = positionY + popupHeight / 2 - $tail.height() / 2;
+              tailRotation = (clickNearLeft ? 315 : 135);
+            }
           }
         }
 
@@ -325,18 +332,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return;
       }
 
-      // Need to take margins into account when calculating available space
-      var sideMargins = parseFloat($element.css('margin-left'))
-        + parseFloat($element.css('margin-right'));
-      var tmpWidth = 'calc(100% - ' + sideMargins + 'px)';
-
       // Get natural element height
       var $tmp = $element.clone()
         .css({
           'position': 'absolute',
           'max-height': 'none',
-          'width': tmpWidth
-        }).appendTo($element.parent());
+        })
+        .appendTo($element.parent());
+
+      // Need to take margins into account when calculating available space
+      var sideMargins = parseFloat($element.css('margin-left'))
+        + parseFloat($element.css('margin-right'));
+      var tmpElWidth = $tmp.css('width') ? $tmp.css('width') : '100%';
+      $tmp.css('width', 'calc(' + tmpElWidth + ' - ' + sideMargins + 'px)');
 
       // Apply height to element
       var h = Math.round($tmp.get(0).getBoundingClientRect().height);
