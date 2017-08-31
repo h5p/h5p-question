@@ -132,10 +132,8 @@
   transition: max-height 0.15s ease, margin 0.15s ease, opacity 0.15s ease-in;
 }
 .h5p-question-feedback-content {
-  weight: bold;
   font-size: 1em;
   display: none;
-  margin-left: 0.8em;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
@@ -232,12 +230,17 @@
 
 .h5p-question-feedback.h5p-question-popup.h5p-question-visible {
   display: block;
+  box-sizing: border-box;
+  max-height: 100%;
 }
 
 .h5p-question-feedback.h5p-question-popup .h5p-question-feedback-content {
   display: block;
-  word-break: break-all;
   top: 0;
+}
+
+.h5p-question-feedback.h5p-question-popup.h5p-question-feedback-correct .h5p-question-feedback-content {
+  margin-right: 1.5em;
 }
 
 .h5p-question-feedback.h5p-question-popup .h5p-question-retry-button {
@@ -261,7 +264,7 @@
   font-size: 2.5em;
   line-height: 0.9em;
   content: '\e600';
-  color: rgb(205, 205, 205);
+  color: #707070;
 }
 
 .h5p-question-feedback-tail {
