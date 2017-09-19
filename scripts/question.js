@@ -1008,7 +1008,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} [popupSettings.closeText] Translation for close button text
      * @param {object} [popupSettings.click] Element representing where user clicked on screen
      */
-    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, popupSettings) {
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, popupSettings, scoreExplanationButtonLabel) {
       // Feedback is disabled
       if (behaviour.disableFeedback) {
         return self;
@@ -1032,7 +1032,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }).appendTo($feedbackContent);
 
       if (scoreBar === undefined) {
-        scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText);
+        scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText, scoreExplanationButtonLabel);
       }
       scoreBar.appendTo($feedback);
 
@@ -1040,7 +1040,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Feedback for readspeakers
       if (!behaviour.disableReadSpeaker) {
-        self.read(score + '/' + maxScore + '. ' + (content ? content : ''));
+        self.read(scoreBar.createLabel(score) + '. ' + (content ? content : ''));
       }
 
       showFeedback = true;
