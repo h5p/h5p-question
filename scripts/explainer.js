@@ -14,8 +14,7 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
      */
     var createHTML = function () {
       self.$explanation = $('<div>', {
-        'class': 'h5p-question-explanation-container',
-        'aria-hidden': true
+        'class': 'h5p-question-explanation-container'
       });
 
       // Add title:
@@ -28,7 +27,6 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
 
       var $explanationList = $('<ul>', {
         'class': 'h5p-question-explanation-list',
-        tabIndex: 0,
         appendTo: self.$explanation
       });
 
