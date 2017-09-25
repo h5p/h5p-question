@@ -936,6 +936,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }, 100);
     };
 
+    self.readScore = function() {
+      var $scoreText = $('.h5p-joubelui-score-bar-progress');
+      if ($scoreText && $scoreText.html() && $scoreText.html().length) {
+        self.read($scoreText.html());
+      }
+    };
+
     /**
      * Read feedback
      */
