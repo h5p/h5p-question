@@ -622,6 +622,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
 
           // Remove label
+          $button.attr('aria-label', $button.text());
           $button.html('');
           $button.addClass('truncated');
           buttons[buttonId].isTruncated = true;
