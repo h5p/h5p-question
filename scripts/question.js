@@ -337,6 +337,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         .css({
           'position': 'absolute',
           'max-height': 'none',
+          'width': '100%'
         })
         .appendTo($element.parent());
 
