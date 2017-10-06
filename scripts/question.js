@@ -337,6 +337,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         .css({
           'position': 'absolute',
           'max-height': 'none',
+          'width': '100%'
         })
         .appendTo($element.parent());
 
@@ -935,17 +936,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         readText = null;
         $read.html('');
       }, 100);
-    };
-
-    /**
-     * Force readspeaker to read the current score. Used when aria-live
-     * statements overlap and you need to use setTimeout to manually read scores
-     */
-    self.readScore = function() {
-      var $scoreText = $('.h5p-joubelui-score-bar-progress');
-      if ($scoreText && $scoreText.html() && $scoreText.html().length) {
-        self.read($scoreText.html());
-      }
     };
 
     /**
