@@ -1,4 +1,4 @@
-H5P.Question.Explainer = (function ($, EventDispatcher) {
+H5P.Question.Explainer = (function ($) {
   /**
    * Constructor
    *
@@ -65,7 +65,7 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
           });
         }
       }
-    }
+    };
 
     createHTML();
 
@@ -76,9 +76,9 @@ H5P.Question.Explainer = (function ($, EventDispatcher) {
      */
     self.getElement = function () {
       return self.$explanation;
-    }
+    };
   }
 
   return Explainer;
 
-})(H5P.jQuery, H5P.EventDispatcher);
+})(H5P.jQuery);
