@@ -1041,8 +1041,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $feedbackContent.toggleClass('has-content', content !== undefined && content.length > 0);
 
       // Feedback for readspeakers
-      if (!behaviour.disableReadSpeaker) {
-        self.read(scoreBar.createLabel(score) + '. ' + (content ? content : ''));
+      if (!behaviour.disableReadSpeaker && scoreBarLabel) {
+        self.read(scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '. ' + (content ? content : ''));
       }
 
       showFeedback = true;
