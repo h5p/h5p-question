@@ -332,12 +332,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return;
       }
 
+      // If this element is shown in the popup, we can't set width to 100%,
+      // since it already has a width set in CSS
+      var isFeedbackPopup = $element.hasClass('h5p-question-popup');
+
       // Get natural element height
       var $tmp = $element.clone()
         .css({
           'position': 'absolute',
           'max-height': 'none',
-          'width': '100%'
+          'width': isFeedbackPopup ? '' : '100%'
         })
         .appendTo($element.parent());
 
