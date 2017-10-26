@@ -332,11 +332,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return;
       }
 
+      // If this element is shown in the popup, we can't set width to 100%,
+      // since it already has a width set in CSS
+      var isFeedbackPopup = $element.hasClass('h5p-question-popup');
+
       // Get natural element height
       var $tmp = $element.clone()
         .css({
           'position': 'absolute',
           'max-height': 'none',
+          'width': isFeedbackPopup ? '' : '100%'
         })
         .appendTo($element.parent());
 
@@ -622,6 +627,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           buttonsWidth = buttonsWidth - $button.outerWidth(true) + $tmp.outerWidth(true);
 
           // Remove label
+          $button.attr('aria-label', $button.text());
           $button.html('');
           $button.addClass('truncated');
           buttons[buttonId].isTruncated = true;
@@ -1008,7 +1014,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} [popupSettings.closeText] Translation for close button text
      * @param {object} [popupSettings.click] Element representing where user clicked on screen
      */
-    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, popupSettings) {
+    self.setFeedback = function (content, score, maxScore, scoreBarLabel, helpText, popupSettings, scoreExplanationButtonLabel) {
       // Feedback is disabled
       if (behaviour.disableFeedback) {
         return self;
@@ -1032,15 +1038,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }).appendTo($feedbackContent);
 
       if (scoreBar === undefined) {
-        scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText);
+        scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText, scoreExplanationButtonLabel);
       }
       scoreBar.appendTo($feedback);
 
       $feedbackContent.toggleClass('has-content', content !== undefined && content.length > 0);
 
       // Feedback for readspeakers
-      if (!behaviour.disableReadSpeaker) {
-        self.read(score + '/' + maxScore + '. ' + (content ? content : ''));
+      if (!behaviour.disableReadSpeaker && scoreBarLabel) {
+        self.read(scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '. ' + (content ? content : ''));
       }
 
       showFeedback = true;
