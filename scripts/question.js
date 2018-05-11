@@ -155,20 +155,22 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     var makeFeedbackPopup = function (closeText) {
       var $element = sections.feedback.$element;
+      var $parent = sections.content.$element;
       var $click = (clickElement != null ? clickElement.$element : null);
 
-      $element
-        .appendTo(sections.content.$element)
-        .addClass('h5p-question-popup');
+      $element.appendTo($parent).addClass('h5p-question-popup');
 
-      $element.parent()
-        .addClass('h5p-has-question-popup');
+      if(sections.scorebar) {
+        sections.scorebar.$element.appendTo($element);
+      }
+
+      $parent.addClass('h5p-has-question-popup');
 
       // Draw the tail
       var $tail = $('<div/>', {
         'class': 'h5p-question-feedback-tail'
       }).hide()
-        .appendTo($element.parent());
+        .appendTo($parent);
 
       // Draw the close button
       var $close = $('<div/>', {
@@ -1281,11 +1283,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     var setButtonWidth = function(button) {
-      // Only need to calculate a button's width once:
-      if (button.width) {
-        return;
-      }
-
       var $button = button.$element;
       var $tmp = $button.clone()
         .css({
@@ -1429,7 +1426,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {number} [priority]
      */
     self.hideButton = function (id, priority) {
-      if (buttons[id] === undefined || buttons[id].isVisible === false) {
+      if (buttons[id] === undefined) {
         return self;
       }
 
