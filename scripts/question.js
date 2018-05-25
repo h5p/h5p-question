@@ -440,16 +440,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // All buttons are going to be hidden. Hide container using transition.
         sections.buttons.$element.removeClass('h5p-question-visible');
         sections.buttons.$element.css('max-height', '');
-        sectionsIsTransitioning = true;
+        //sectionsIsTransitioning = true;
 
         // Wait for animations before detaching buttons
-        toggleButtonsTransitionTimer = setTimeout(function () {
+        //toggleButtonsTransitionTimer = setTimeout(function () {
           hideButtons(relocateFocus);
-          sectionsIsTransitioning = false;
-        }, animationTimer);
+          //sectionsIsTransitioning = false;
+        //}, animationTimer);
       }
       else {
         hideButtons(relocateFocus);
+
+        console.log('HIDE');
 
         // Show button section
         if (!sections.buttons.$element.is(':empty')) {
@@ -1099,7 +1101,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
       else {
         // Show feedback section
-        feedbackTransitionTimer = setTimeout(function () {
+        //feedbackTransitionTimer = setTimeout(function () {
           setElementHeight(sections.feedback.$element);
           sectionsIsTransitioning = true;
 
@@ -1110,9 +1112,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           feedbackTransitionTimer = setTimeout(function () {
             sectionsIsTransitioning = false;
             self.trigger('resize');
+            console.log('JALLA');
             scoreBar.setScore(score);
+
           }, 150);
-        }, 0);
+        //}, 0);
       }
 
       return self;
@@ -1136,6 +1140,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Make sure the height is correct
         setElementHeight(sections.feedback.$element);
+
+        self.trigger('resize');
       }
 
       return self;
@@ -1469,6 +1475,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (!toggleButtonsTimer) {
         toggleButtonsTimer = setTimeout(toggleButtons, 0);
       }
+
+      //toggleButtons();
 
       return self;
     };
