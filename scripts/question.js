@@ -1419,9 +1419,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         buttonsToShow.push({id: id, priority: priority});
       }
 
-      if (!toggleButtonsTimer) {
+      /*if (!toggleButtonsTimer) {
         toggleButtonsTimer = setTimeout(toggleButtons, 0);
-      }
+      }*/
+
+      toggleButtons();
 
       return self;
     };
@@ -1472,11 +1474,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         buttonsToHide.push({id: id, priority: priority});
       }
 
-      if (!toggleButtonsTimer) {
-        toggleButtonsTimer = setTimeout(toggleButtons, 0);
-      }
+      //if (!toggleButtonsTimer) {
+      //  toggleButtonsTimer = setTimeout(toggleButtons, 0);
+      //}
 
-      //toggleButtons();
+      toggleButtons();
 
       return self;
     };
