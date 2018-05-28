@@ -795,6 +795,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} path Relative
      * @param {Object} [options] Options object
      * @param {string} [options.alt] Text representation
+     * @param {string} [options.title] Hover text
      * @param {Boolean} [options.disableImageZooming] Set as true to disable image zooming
      */
     self.setImage = function (path, options) {
@@ -815,6 +816,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $img = $('<img/>', {
         src: H5P.getPath(path, self.contentId),
         alt: (options.alt === undefined ? '' : options.alt),
+        title: (options.title === undefined ? '' : options.title),
         on: {
           load: function () {
             self.trigger('imageLoaded', this);
