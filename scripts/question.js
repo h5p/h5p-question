@@ -438,15 +438,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       if (sections.buttons && numToHide === sections.buttons.$element.children().length) {
         // All buttons are going to be hidden. Hide container using transition.
-        sections.buttons.$element.removeClass('h5p-question-visible');
-        sections.buttons.$element.css('max-height', '');
-        sectionsIsTransitioning = true;
-
-        // Wait for animations before detaching buttons
-        toggleButtonsTransitionTimer = setTimeout(function () {
-          hideButtons(relocateFocus);
-          sectionsIsTransitioning = false;
-        }, animationTimer);
+        hideSection(sections.buttons);
+        // Detach buttons
+        hideButtons(relocateFocus);
       }
       else {
         hideButtons(relocateFocus);
@@ -461,10 +455,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             self.trigger('resize');
           }, animationTimer);
         }
-      }
 
-      // Resize buttons to fit container
-      resizeButtons();
+        // Resize buttons to fit container
+        resizeButtons();
+      }
 
       toggleButtonsTimer = undefined;
     };
@@ -716,6 +710,28 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
       return -1;
+    };
+
+    /**
+     * Show a section
+     * @param {Object} section
+     */
+    var showSection = function (section) {
+      section.$element.addClass('h5p-question-visible');
+      section.isVisible = true;
+    };
+
+    /**
+     * Hide a section
+     * @param {Object} section
+     */
+    var hideSection = function (section) {
+      section.$element.css('max-height', '');
+
+      setTimeout(function () {
+        section.$element.removeClass('h5p-question-visible');
+        section.isVisible = false;
+      }, 150);
     };
 
     /**
@@ -991,14 +1007,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         showFeedback = false;
 
-        // Hide feedback section
-        sections.feedback.$element.removeClass('h5p-question-visible');
-        sections.feedback.$element.css('max-height', '');
-        sections.feedback.isVisible = false;
-
-        // Hide scorebar section
-        sections.scorebar.$element.removeClass('h5p-question-visible');
-        sections.scorebar.isVisible = false;
+        // Hide feedback & scorebar
+        hideSection(sections.scorebar, true);
+        hideSection(sections.feedback);
 
         sectionsIsTransitioning = true;
 
@@ -1042,6 +1053,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (behaviour.disableFeedback) {
         return self;
       }
+
+      toggleButtons();
 
       clickElement = (popupSettings != null && popupSettings.click != null ? popupSettings.click : null);
       clearTimeout(feedbackTransitionTimer);
@@ -1091,10 +1104,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
 
-      sections.feedback.$element.addClass('h5p-question-visible');
-      sections.feedback.isVisible = true;
-      sections.scorebar.$element.addClass('h5p-question-visible');
-      sections.scorebar.isVisible = true;
+      showSection(sections.feedback);
+      showSection(sections.scorebar);
+
+      resizeButtons();
+
       if (popupSettings != null && popupSettings.showAsPopup == true) {
         makeFeedbackPopup(popupSettings.closeText);
         scoreBar.setScore(score);
@@ -1103,6 +1117,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Show feedback section
         feedbackTransitionTimer = setTimeout(function () {
           setElementHeight(sections.feedback.$element);
+          setElementHeight(sections.scorebar.$element);
           sectionsIsTransitioning = true;
 
           // Scroll to bottom after showing feedback
@@ -1138,6 +1153,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Make sure the height is correct
         setElementHeight(sections.feedback.$element);
+
+        // Need to trigger resize when feedback has finished transitioning
+        setTimeout(self.trigger.bind(self, 'resize'), 150);
       }
 
       return self;
@@ -1250,7 +1268,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       buttons[id] = {
         isTruncated: false,
-        text: text
+        text: text,
+        isVisible: false
       };
       var $e = buttons[id].$element = JoubelUI.createButton($.extend({
         'class': 'h5p-question-' + id,
@@ -1380,7 +1399,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {Number} [priority]
      */
     self.showButton = function (id, priority) {
-      if (buttons[id] === undefined) {
+      if (buttons[id] === undefined || buttons[id].isVisible === true) {
         return self;
       }
 
@@ -1429,7 +1448,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {number} [priority]
      */
     self.hideButton = function (id, priority) {
-      if (buttons[id] === undefined) {
+      if (buttons[id] === undefined || buttons[id].isVisible === false) {
         return self;
       }
 
