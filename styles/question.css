@@ -121,14 +121,14 @@
   vertical-align: top;
   opacity: 0;
   max-height: 0;
-  transition: max-height 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
+  transition: max-height 0.15s ease, margin-top 0.15s ease, margin-bottom 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
 
 .h5p-question-scorebar.h5p-question-visible,
 .h5p-question-feedback.h5p-question-visible,
 .h5p-question-buttons.h5p-question-visible {
   opacity: 1;
-  transition: max-height 0.15s ease, opacity 0.15s ease-in;
+  transition: max-height 0.15s ease, margin-top 0.15s ease, margin-bottom 0.15s ease, opacity 0.15s ease-in;
 }
 
 .h5p-question-scorebar.h5p-question-visible {
@@ -153,7 +153,7 @@
   margin: 0 1em;
   max-height: 0;
   opacity: 0;
-  transition: max-height 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
+  transition: max-height 0.15s ease, margin-top 0.15s ease, margin-bottom 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
 
 .h5p-question-feedback.h5p-question-visible {
