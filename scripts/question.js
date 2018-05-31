@@ -440,7 +440,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         animationTimer = 0;
       }
 
-      if(numToHide === sections.buttons.$element.children().length) {
+      if (numToHide === sections.buttons.$element.children().length) {
         // All buttons are going to be hidden. Hide container using transition.
         hideSection(sections.buttons);
         // Detach buttons
