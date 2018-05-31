@@ -406,6 +406,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @private
      */
     var toggleButtons = function () {
+      // If no buttons section, return
+      if (sections.buttons === undefined) {
+        return;
+      }
 
       // Clear transition timer, reevaluate if buttons will be detached
       clearTimeout(toggleButtonsTransitionTimer);
@@ -436,7 +440,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         animationTimer = 0;
       }
 
-      if (sections.buttons && numToHide === sections.buttons.$element.children().length) {
+      if(numToHide === sections.buttons.$element.children().length) {
         // All buttons are going to be hidden. Hide container using transition.
         hideSection(sections.buttons);
         // Detach buttons
