@@ -186,7 +186,7 @@
   white-space: nowrap;
 }
 .h5p-question-buttons.has-scorebar {
-  width: calc(100% - 15em);
+  width: calc(100% - 15em - 1px); /* Need the 1px because of rounding */
   margin-left: 0;
 }
 
