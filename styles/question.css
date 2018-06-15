@@ -129,7 +129,8 @@
 }
 
 .h5p-question-scorebar.h5p-question-visible {
-  min-width: 13em;
+  width: 13em;
+  max-width: calc(100% - 2em);
   margin: 0 0 1em 1em;
   padding-right: 0.5em;
   display: inline-block;
@@ -185,7 +186,7 @@
   white-space: nowrap;
 }
 .h5p-question-buttons.has-scorebar {
-  width: calc(100% - 15em);
+  width: calc(100% - 15em - 1px); /* Need the 1px because of rounding */
   margin-left: 0;
 }
 
