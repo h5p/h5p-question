@@ -634,7 +634,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     var toggleFullWidthScorebar = function(enabled) {
-      if (sections.scorebar && sections.scorebar.isVisible) {
+      if (sections.scorebar &&
+          sections.scorebar.$element &&
+          sections.scorebar.$element.hasClass('h5p-question-visible')) {
         sections.buttons.$element.addClass('has-scorebar');
         sections.buttons.$element.toggleClass('wrap', enabled);
         sections.scorebar.$element.toggleClass('full-width', enabled);
@@ -1014,7 +1016,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         showFeedback = false;
 
         // Hide feedback & scorebar
-        hideSection(sections.scorebar, true);
+        hideSection(sections.scorebar);
         hideSection(sections.feedback);
 
         sectionsIsTransitioning = true;
