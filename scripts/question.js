@@ -361,9 +361,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $tmp.remove();
 
       if (h > 0 && sections.buttons && sections.buttons.$element === $element) {
-
         // Make sure buttons section is visible
-        sections.buttons.$element.addClass('h5p-question-visible');
+        showSection(sections.buttons);
 
         // Resize buttons after resizing button section
         setTimeout(resizeButtons, 150);
@@ -451,7 +450,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Show button section
         if (!sections.buttons.$element.is(':empty')) {
-          sections.buttons.$element.addClass('h5p-question-visible');
+          showSection(sections.buttons);
           setElementHeight(sections.buttons.$element);
 
           // Trigger resize after animation
@@ -635,7 +634,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     var toggleFullWidthScorebar = function(enabled) {
-      if (sections.scorebar && sections.scorebar.isVisible) {
+      if (sections.scorebar &&
+          sections.scorebar.$element &&
+          sections.scorebar.$element.hasClass('h5p-question-visible')) {
         sections.buttons.$element.addClass('has-scorebar');
         sections.buttons.$element.toggleClass('wrap', enabled);
         sections.scorebar.$element.toggleClass('full-width', enabled);
@@ -731,10 +732,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     var hideSection = function (section) {
       section.$element.css('max-height', '');
+      section.isVisible = false;
 
       setTimeout(function () {
-        section.$element.removeClass('h5p-question-visible');
-        section.isVisible = false;
+        // Only hide if section hasn't been set to visible in the meantime
+        if (!section.isVisible) {
+          section.$element.removeClass('h5p-question-visible');
+        }
       }, 150);
     };
 
@@ -1012,7 +1016,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         showFeedback = false;
 
         // Hide feedback & scorebar
-        hideSection(sections.scorebar, true);
+        hideSection(sections.scorebar);
         hideSection(sections.feedback);
 
         sectionsIsTransitioning = true;
@@ -1058,6 +1062,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return self;
       }
 
+      // Need to toggle buttons right away to avoid flickering/blinking
+      // Note: This means content types should invoke hide/showButton before setFeedback
       toggleButtons();
 
       clickElement = (popupSettings != null && popupSettings.click != null ? popupSettings.click : null);
@@ -1302,7 +1308,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Button should be visible
         $e.appendTo(sections.buttons.$element);
         buttons[id].isVisible = true;
-        sections.buttons.$element.addClass('h5p-question-visible');
+        showSection(sections.buttons);
       }
 
       return self;
@@ -1403,7 +1409,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {Number} [priority]
      */
     self.showButton = function (id, priority) {
-      if (buttons[id] === undefined || buttons[id].isVisible === true) {
+      var aboutToBeHidden = existsInArray(id, 'id', buttonsToHide) !== -1;
+      if (buttons[id] === undefined || (buttons[id].isVisible === true && !aboutToBeHidden)) {
         return self;
       }
 
@@ -1452,7 +1459,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {number} [priority]
      */
     self.hideButton = function (id, priority) {
-      if (buttons[id] === undefined || buttons[id].isVisible === false) {
+      var aboutToBeShown = existsInArray(id, 'id', buttonsToShow) !== -1;
+      if (buttons[id] === undefined || (buttons[id].isVisible === false && !aboutToBeShown)) {
         return self;
       }
 
