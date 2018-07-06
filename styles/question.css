@@ -2,6 +2,11 @@
   background: rgba(255, 255, 255, 0.9);
   position: relative;
 }
+.h5p-question-audio {
+  width: 100%;
+  /* The fixed height is not nice, but Chrome won't display the audio element otherwise and other browsers don't mind */
+  height: 32px;
+}
 .h5p-question-video {
   line-height: 0;
 }
