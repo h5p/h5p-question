@@ -804,7 +804,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       sections.audio.instance = H5P.newRunnable(params, self.contentId, sections.audio.$element, true);
-      // TODO: resize handling
+      // The height value that is set by H5P.Audio is counter-productive here.
+      if (sections.audio.instance.audio) {
+        sections.audio.instance.audio.style.height = '';
+      }
 
       return self;
     };
