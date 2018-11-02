@@ -7,14 +7,22 @@ to create tasks that can be used inside other content types.
 Typically your question type will need to do the following (examples from fill in the blanks)
 
 1. Call the constructor from your questiontypes constructor:
+```js
 H5P.Question.call(self, 'blanks');
+```
 
-2. Set your content type's prototype to use Question's prototype:
+2. Set your content type's prototype to use `Question`'s prototype:
+```js
 Blanks.prototype = Object.create(H5P.Question.prototype);
+```
+
 2.1. But you still want to use your own constructor:
+```js
 Blanks.prototype.constructor = Blanks;
+```
 
 3. register your questions sections:
+```js
 /**
  * Registers this question type's DOM elements before they are attached.
  * Called from H5P.Question.
@@ -37,8 +45,10 @@ Blanks.prototype.registerDomElements = function () {
   // ... and buttons
   self.registerButtons();
 };
+```
 
 4. Register your buttons:
+```js
 /**
  * Create all the buttons for the task
  */
@@ -78,10 +88,11 @@ Blanks.prototype.registerButtons = function () {
   }
   self.toggleButtonVisibility(STATE_ONGOING);
 };
+```
 
-5. Toggle buttons visibility using the showButton and hideButton functions
+5. Toggle buttons visibility using the `showButton` and `hideButton` functions
 
-6. Display feedback at the end using the setFeedback function
+6. Display feedback at the end using the `setFeedback` function
 
 ## License
 
