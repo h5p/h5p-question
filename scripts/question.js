@@ -160,7 +160,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       $element.appendTo($parent).addClass('h5p-question-popup');
 
-      if(sections.scorebar) {
+      if (sections.scorebar) {
         sections.scorebar.$element.appendTo($element);
       }
 
@@ -193,16 +193,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             }
           }
         }
-      })
-      .hide()
-      .appendTo($element);
+      }).hide().appendTo($element);
 
       if ($click != null) {
         if ($click.hasClass('correct')) {
           $element.addClass('h5p-question-feedback-correct');
           $close.show();
           sections.buttons.$element.hide();
-        } else {
+        }
+        else {
           sections.buttons.$element.appendTo(sections.feedback.$element);
         }
       }
@@ -633,7 +632,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
     };
 
-    var toggleFullWidthScorebar = function(enabled) {
+    var toggleFullWidthScorebar = function (enabled) {
       if (sections.scorebar &&
           sections.scorebar.$element &&
           sections.scorebar.$element.hasClass('h5p-question-visible')) {
@@ -913,10 +912,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
               scaleImage.apply(this); // Left mouse button click
             }
           }).on('keypress', function (event) {
-          if (event.which === 32) {
-            scaleImage.apply(this); // Space bar pressed
-          }
-        });
+            if (event.which === 32) {
+              scaleImage.apply(this); // Space bar pressed
+            }
+          });
         sections.image.$element.removeClass('h5p-question-image-fill-width');
 
         sizeDetermined  = true; // Prevent any futher events
@@ -1314,7 +1313,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       return self;
     };
 
-    var setButtonWidth = function(button) {
+    var setButtonWidth = function (button) {
       var $button = button.$element;
       var $tmp = $button.clone()
         .css({
@@ -1576,7 +1575,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
            (self.registerDomElements instanceof Function ||
            typeof self.registerDomElements === 'function')) {
 
-           // Give the question type a chance to register before attaching
+          // Give the question type a chance to register before attaching
           self.registerDomElements();
         }
 
@@ -1655,7 +1654,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $click = clickElement;
 
       if ($element != null && $element.$element != null && $click != null && $click.$element != null) {
-        setTimeout(function() {
+        setTimeout(function () {
           positionFeedbackPopup($element.$element, $click.$element);
         }, 10);
       }
