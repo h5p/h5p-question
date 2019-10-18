@@ -1280,6 +1280,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         text: text,
         isVisible: false
       };
+      // The button might be <button> or <a>
+      // (dependent on options.href set or not)
+      var isAnchorTag = (options.href !== undefined);
       var $e = buttons[id].$element = JoubelUI.createButton($.extend({
         'class': 'h5p-question-' + id,
         html: text,
@@ -1287,21 +1290,24 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         on: {
           click: function (event) {
             handleButtonClick();
-            if (options.href !== undefined) {
+            if (isAnchorTag) {
               event.preventDefault();
-            }
-          },
-          keydown: function (event) {
-            switch (event.which) {
-              case 13: // Enter
-              case 32: // Space
-                handleButtonClick();
-                event.preventDefault();
             }
           }
         }
       }, options));
       buttonOrder.push(id);
+
+      // The button might be <button> or <a>. If <a>, the space key is not
+      // triggering the click event, must therefore handle this here:
+      if (isAnchorTag) {
+        $e.on('keypress', function (event) {
+          if (event.which === 32) { // Space
+            handleButtonClick();
+            event.preventDefault();
+          }
+        });
+      }
 
       if (visible === undefined || visible) {
         // Button should be visible
