@@ -888,9 +888,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           determineImgWidth();
         }
         else {
-          $img.load(function () {
-            determineImgWidth();
-          });
+          $img.on('load', determineImgWidth);
         }
 
         // Skip adding zoom functionality
