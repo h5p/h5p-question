@@ -793,14 +793,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {object} params
      */
     self.setAudio = function (params) {
+      params.params = params.params || {};
+
       sections.audio = {
         $element: $('<div/>', {
           'class': 'h5p-question-audio',
         })
       };
 
-      if (disableAutoPlay && params.params.autoplay) {
+      if (disableAutoPlay) {
         params.params.autoplay = false;
+      }
+      else if (params.params.playerMode === 'transparent') {
+        params.params.autoplay = true; // false doesn't make sense for transparent audio
       }
 
       sections.audio.instance = H5P.newRunnable(params, self.contentId, sections.audio.$element, true);
