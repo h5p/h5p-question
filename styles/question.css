@@ -2,6 +2,16 @@
   background: rgba(255, 255, 255, 0.9);
   position: relative;
 }
+.h5p-question-audio {
+  margin: 1em 1em 0 1em;
+  width: calc(100% - 2em);
+}
+.h5p-question-audio .h5p-audio-inner > button {
+  font-size: 1.5em;
+}
+.h5p-question-audio .h5p-audio-inner.h5p-audio-transparent {
+  display: none;
+}
 .h5p-question-video {
   line-height: 0;
 }
@@ -339,4 +349,8 @@
 .h5p-question-hidden-one {
   opacity: 0;
   transform: translateY(100%);
+}
+
+.h5p-question .h5p-audio-controls {
+  margin-top: 4em;
 }
