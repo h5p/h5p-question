@@ -1272,6 +1272,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {Object} [options] Options for button
      * @param {Object} [extras] Extra options
      * @param {ConfirmationDialog} [extras.confirmationDialog] Confirmation dialog
+     * @param {Object} [extras.contentData] Content data
+     * @params {string} [extras.textIfSubmitting] Text to display if submitting
      */
     self.addButton = function (id, text, clicked, visible, options, extras) {
       if (buttons[id]) {
@@ -1309,6 +1311,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           clicked();
         }
       };
+
+      const isSubmitting = extras.contentData
+        && (extras.contentData.isScoringEnabled || extras.contentData.isReportingEnabled);
+
+      if (isSubmitting && extras.textIfSubmitting) {
+        text = extras.textIfSubmitting;
+      }
 
       buttons[id] = {
         isTruncated: false,
