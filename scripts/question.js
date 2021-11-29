@@ -1276,7 +1276,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       };
 
-      const isSubmitting = extras.standalone && extras.contentData
+      const isSubmitting = extras.contentData && extras.contentData.standalone && extras.contentData
         && (extras.contentData.isScoringEnabled || extras.contentData.isReportingEnabled);
 
       if (isSubmitting && extras.textIfSubmitting) {
