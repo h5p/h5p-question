@@ -15,7 +15,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'introduction', 'content', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
+    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -788,11 +788,44 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * An audio player to display above the task.
+     *
+     * @param {object} params
+     */
+    self.setAudio = function (params) {
+      params.params = params.params || {};
+
+      sections.audio = {
+        $element: $('<div/>', {
+          'class': 'h5p-question-audio',
+        })
+      };
+
+      if (disableAutoPlay) {
+        params.params.autoplay = false;
+      }
+      else if (params.params.playerMode === 'transparent') {
+        params.params.autoplay = true; // false doesn't make sense for transparent audio
+      }
+
+      sections.audio.instance = H5P.newRunnable(params, self.contentId, sections.audio.$element, true);
+      // The height value that is set by H5P.Audio is counter-productive here.
+      if (sections.audio.instance.audio) {
+        sections.audio.instance.audio.style.height = '';
+      }
+
+      return self;
+    };
+
+    /**
      * Will stop any playback going on in the task.
      */
     self.pause = function () {
       if (sections.video && sections.video.isVisible) {
         sections.video.instance.pause();
+      }
+      if (sections.audio && sections.audio.isVisible) {
+        sections.audio.instance.pause();
       }
     };
 
@@ -802,6 +835,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     self.play = function () {
       if (sections.video && sections.video.isVisible) {
         sections.video.instance.play();
+      }
+      if (sections.audio && sections.audio.isVisible) {
+        sections.audio.instance.play();
       }
     };
 
