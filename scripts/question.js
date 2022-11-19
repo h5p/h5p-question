@@ -662,7 +662,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           buttonsWidth -= button.width.max - button.width.min;
 
           // Remove label
-          button.$element.attr('aria-label', $button.text()).html('').addClass('truncated');
+          if (!button.ariaLabel) {
+            $button.attr('aria-label', $button.text());
+          }
+          $button.html('').addClass('truncated');
           button.isTruncated = true;
           if (buttonsWidth <= maxButtonsWidth) {
             // Buttons are small enough.
@@ -692,6 +695,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
           // Restore label
           button.$element.html(button.text);
+          if (!button.ariaLabel) {
+            button.$element.removeAttr('aria-label');
+          }
           button.$element.removeClass('truncated');
           button.isTruncated = false;
         }
@@ -1322,15 +1328,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       buttons[id] = {
         isTruncated: false,
         text: text,
-        isVisible: false
+        isVisible: false,
+        ariaLabel: options['aria-label']
       };
+
+      console.log('ADD BUTTON', buttons[id]);
+
       // The button might be <button> or <a>
       // (dependent on options.href set or not)
       var isAnchorTag = (options.href !== undefined);
       var $e = buttons[id].$element = JoubelUI.createButton($.extend({
         'class': 'h5p-question-' + id,
         html: text,
-        title: text,
         on: {
           click: function (event) {
             handleButtonClick();
@@ -1341,6 +1350,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }, options));
       buttonOrder.push(id);
+
+
 
       // The button might be <button> or <a>. If <a>, the space key is not
       // triggering the click event, must therefore handle this here:
