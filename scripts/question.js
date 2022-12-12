@@ -1,3 +1,5 @@
+H5P.Tooltip = H5P.Tooltip || function() {};
+
 H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
   /**
@@ -660,9 +662,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         if (!button.isTruncated && button.isVisible) {
           var $button = button.$element;
           buttonsWidth -= button.width.max - button.width.min;
+          // Set tooltip (needed by H5P.Tooltip)
+          let buttonText = $button.text();
+          $button.attr('data-tooltip', buttonText);
 
+          // Use button text as aria label if a specific one isn't provided
+          if (!button.ariaLabel) {
+            button.attr('aria-label', buttonText);
+          }
           // Remove label
-          button.$element.attr('aria-label', $button.text()).html('').addClass('truncated');
+          $button.html('').addClass('truncated');
           button.isTruncated = true;
           if (buttonsWidth <= maxButtonsWidth) {
             // Buttons are small enough.
@@ -692,6 +701,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
           // Restore label
           button.$element.html(button.text);
+
+          // Remove tooltip (used by H5P.Tooltip)
+          button.$element.removeAttr('data-tooltip');
+
+          // Remove aria-label if a specific one isn't provided
+          if (!button.ariaLabel) {
+            button.$element.removeAttr('aria-label');
+          }
+
           button.$element.removeClass('truncated');
           button.isTruncated = false;
         }
@@ -1322,15 +1340,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       buttons[id] = {
         isTruncated: false,
         text: text,
-        isVisible: false
+        isVisible: false,
+        ariaLabel: options['aria-label']
       };
+
       // The button might be <button> or <a>
       // (dependent on options.href set or not)
       var isAnchorTag = (options.href !== undefined);
       var $e = buttons[id].$element = JoubelUI.createButton($.extend({
         'class': 'h5p-question-' + id,
         html: text,
-        title: text,
         on: {
           click: function (event) {
             handleButtonClick();
@@ -1341,6 +1360,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }, options));
       buttonOrder.push(id);
+
+      H5P.Tooltip($e.get(0), {tooltipSource: 'data-tooltip'});
 
       // The button might be <button> or <a>. If <a>, the space key is not
       // triggering the click event, must therefore handle this here:
