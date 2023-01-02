@@ -867,6 +867,20 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     };
 
     /**
+     * Process HTML escaped string for use as attribute value,
+     * e.g. for alt text or title attributes.
+     *
+     * @param {string} value
+     * @return {string} WARNING! Do NOT use for innerHTML.
+     */
+    self.massageAttributeOutput = function (value) {
+      const dparser = new DOMParser().parseFromString(value, 'text/html');
+      const div = document.createElement('div');
+      div.innerHTML = dparser.documentElement.textContent;;
+      return div.textContent || div.innerText || '';
+    };
+
+    /**
      * Add task image.
      *
      * @param {string} path Relative
@@ -892,8 +906,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Image element
       var $img = $('<img/>', {
         src: H5P.getPath(path, self.contentId),
-        alt: (options.alt === undefined ? '' : options.alt),
-        title: (options.title === undefined ? '' : options.title),
+        alt: (options.alt === undefined ? '' : self.massageAttributeOutput(options.alt)),
         on: {
           load: function () {
             self.trigger('imageLoaded', this);
@@ -902,6 +915,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         },
         appendTo: $imgWrap
       });
+
+      if (options.title !== undefined) {
+        H5P.Tooltip($img.get(0), {
+          text: self.massageAttributeOutput(options.title),
+          classes: ['h5p-image-tooltip'],
+          position: 'bottom'
+        });
+      }
 
       // Disable image zooming
       if (options.disableImageZooming) {
