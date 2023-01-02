@@ -668,7 +668,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
           // Use button text as aria label if a specific one isn't provided
           if (!button.ariaLabel) {
-            button.attr('aria-label', buttonText);
+            $button.attr('aria-label', buttonText);
           }
           // Remove label
           $button.html('').addClass('truncated');
