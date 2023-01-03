@@ -907,6 +907,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var $img = $('<img/>', {
         src: H5P.getPath(path, self.contentId),
         alt: (options.alt === undefined ? '' : self.massageAttributeOutput(options.alt)),
+        title: (options.title === undefined ? '' : self.massageAttributeOutput(options.title)),
         on: {
           load: function () {
             self.trigger('imageLoaded', this);
@@ -915,14 +916,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         },
         appendTo: $imgWrap
       });
-
-      if (options.title !== undefined) {
-        H5P.Tooltip($img.get(0), {
-          text: self.massageAttributeOutput(options.title),
-          classes: ['h5p-image-tooltip'],
-          position: 'bottom'
-        });
-      }
 
       // Disable image zooming
       if (options.disableImageZooming) {
