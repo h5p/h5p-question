@@ -1352,6 +1352,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         html: text,
         on: {
           click: function (event) {
+            // Make sure that the button becomes the active element after click
+            // See https://bugs.webkit.org/show_bug.cgi?id=22261 for more details about how Safari behaves
+            if (document.activeElement !== this) {
+              $(this).focus();
+            }
+
             handleButtonClick();
             if (isAnchorTag) {
               event.preventDefault();
