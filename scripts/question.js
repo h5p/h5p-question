@@ -888,6 +888,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} [options.alt] Text representation
      * @param {string} [options.title] Hover text
      * @param {Boolean} [options.disableImageZooming] Set as true to disable image zooming
+     * @property {Object} [l10n] Translatable fields
+     * @property {string} [l10n.expandImage] Localization strings
+     * @property {string} [l10n.minimizeImage] Localization string
+
      */
     self.setImage = function (path, options) {
       options = options ? options : {};
@@ -963,6 +967,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return;
       }
 
+      const setAriaLabel = () => {
+        if ($imgWrap.attr('aria-expanded') === 'true') {
+          $imgWrap.attr('aria-label', options.l10n.minimizeImage);
+        } else {
+          $imgWrap.attr('aria-label', options.l10n.expandImage);
+        }
+      };
+
       var sizeDetermined = false;
       var determineSize = function () {
         if (sizeDetermined || !$img.is(':visible')) {
@@ -976,13 +988,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           .on('click', function (event) {
             if (event.which === 1) {
               scaleImage.apply(this); // Left mouse button click
+              setAriaLabel();
             }
           }).on('keypress', function (event) {
             if (event.which === 32) {
               event.preventDefault(); // Prevent default behaviour; page scroll down
               scaleImage.apply(this); // Space bar pressed
+              setAriaLabel();
             }
           });
+
+        setAriaLabel();
+
         sections.image.$element.removeClass('h5p-question-image-fill-width');
 
         sizeDetermined  = true; // Prevent any futher events
