@@ -888,9 +888,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {string} [options.alt] Text representation
      * @param {string} [options.title] Hover text
      * @param {Boolean} [options.disableImageZooming] Set as true to disable image zooming
-     * @property {Object} [l10n] Translatable fields
-     * @property {string} [l10n.expandImage] Localization strings
-     * @property {string} [l10n.minimizeImage] Localization string
+     * @param {string} [options.expandImage] Localization strings
+     * @param {string} [options.minimizeImage] Localization string
 
      */
     self.setImage = function (path, options) {
@@ -969,9 +968,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       const setAriaLabel = () => {
         if ($imgWrap.attr('aria-expanded') === 'true') {
-          $imgWrap.attr('aria-label', options.l10n.minimizeImage);
+          $imgWrap.attr('aria-label', options.minimizeImage);
         } else {
-          $imgWrap.attr('aria-label', options.l10n.expandImage);
+          $imgWrap.attr('aria-label', options.expandImage);
         }
       };
 
