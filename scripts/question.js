@@ -1284,7 +1284,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           register('explanation', explainer.getElement());
 
           if (initialized && $wrapper) {
-            insert(self.order, 'explanation', sections, sections.result.$element, true);
+            insert(self.order, 'explanation', sections, $wrapper);
           }
         }
       }
