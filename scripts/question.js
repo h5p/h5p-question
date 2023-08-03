@@ -17,7 +17,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
+    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'result', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -125,7 +125,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $container
      * Parent container of the elements
      */
-    var insert = function (order, id, elements, $container) {
+    var insert = function (order, id, elements, $container, nested) {
       // Try to find an element id should be after
       for (var i = 0; i < order.length; i++) {
         if (order[i] === id) {
@@ -135,7 +135,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           !elements[order[i - 1]].isVisible)) {
             i--;
           }
-          if (i === 0) {
+          if (i === 0 || nested) {
             // We are on top.
             elements[id].$element.prependTo($container);
           }
@@ -1151,6 +1151,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       clickElement = (popupSettings != null && popupSettings.click != null ? popupSettings.click : null);
       clearTimeout(feedbackTransitionTimer);
 
+      var $result = $('<div>', {
+        'tabIndex': 0
+      });
+
       var $feedback = $('<div>', {
         'class': 'h5p-question-feedback-container'
       });
@@ -1170,6 +1174,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       });
       if (scoreBar === undefined) {
         scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText, scoreExplanationButtonLabel);
+        scoreBar.setScore(score);
       }
       scoreBar.appendTo($scorebar);
 
@@ -1188,14 +1193,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
       else {
         // Create section
+        register('result', $result);
         register('feedback', $feedback);
         register('scorebar', $scorebar);
         if (initialized && $wrapper) {
-          insert(self.order, 'feedback', sections, $wrapper);
-          insert(self.order, 'scorebar', sections, $wrapper);
+          insert(self.order, 'result', sections, $wrapper);
+          insert(self.order, 'scorebar', sections, $result, true);
+          insert(self.order, 'feedback', sections, $result, true);
         }
       }
 
+      showSection(sections.result);
       showSection(sections.feedback);
       showSection(sections.scorebar);
 
@@ -1276,7 +1284,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           register('explanation', explainer.getElement());
 
           if (initialized && $wrapper) {
-            insert(self.order, 'explanation', sections, $wrapper);
+            insert(self.order, 'explanation', sections, sections.result.$element, true);
           }
         }
       }
@@ -1489,6 +1497,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Trigger to content type
         self.trigger('confirmed');
+        sections.result.$element.children()[0].focus();
       });
 
       confirmationDialog.on('canceled', function () {
