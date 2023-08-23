@@ -1152,7 +1152,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       clearTimeout(feedbackTransitionTimer);
 
       var $result = $('<div>', {
-        'tabIndex': 0
+        'tabIndex': -1
       });
 
       var $feedback = $('<div>', {
