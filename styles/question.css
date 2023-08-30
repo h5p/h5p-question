@@ -244,14 +244,6 @@
   line-height: 1em;
   margin: 0;
 }
-.h5p-question .h5p-hidden-read {
-  width: 1px;
-  height: 1px;
-  top: -1px;
-  position: absolute;
-  text-indent: 1px;
-  overflow: hidden;
-}
 
 .h5p-question-popups {
   position: absolute;

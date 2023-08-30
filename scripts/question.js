@@ -76,9 +76,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Feedback transition timer
     var feedbackTransitionTimer;
 
-    // Used when reading messages to the user
-    var $read, readText;
-
     /**
      * Register section with given content.
      *
@@ -1042,26 +1039,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * setTimeout for animations.
      */
     self.read = function (content) {
-      if (!$read) {
-        return; // Not ready yet
+      if (typeof content !== 'undefined') {
+        $('.h5p-question-feedback-content-text').text(content);
       }
-
-      if (readText) {
-        // Combine texts if called multiple times
-        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content;
-      }
-      else {
-        readText = content;
-      }
-
-      // Set text
-      $read.html(readText);
-
-      setTimeout(function () {
-        // Stop combining when done reading
-        readText = null;
-        $read.html('');
-      }, 100);
+      $('#h5p-question-feedback-area').focus();
     };
 
     /**
@@ -1152,6 +1133,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       clearTimeout(feedbackTransitionTimer);
 
       var $result = $('<div>', {
+        'id': 'h5p-question-feedback-area',
         'tabIndex': -1
       });
 
@@ -1223,11 +1205,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Scroll to bottom after showing feedback
           scrollToBottom();
 
+          scoreBar.setScore(score); // set score before animation ends so that read speakers read the right value
+
           // Trigger resize after animation
           feedbackTransitionTimer = setTimeout(function () {
             sectionsIsTransitioning = false;
             self.trigger('resize');
-            scoreBar.setScore(score);
           }, 150);
         }, 0);
       }
@@ -1365,6 +1348,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
         else {
           clicked();
+          self.readFeedback();
         }
       };
 
@@ -1497,7 +1481,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Trigger to content type
         self.trigger('confirmed');
-        sections.result.$element.children()[0].focus();
+        self.readFeedback();
       });
 
       confirmationDialog.on('canceled', function () {
@@ -1688,13 +1672,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Give the question type a chance to register before attaching
           self.registerDomElements();
         }
-
-        // Create section for reading messages
-        $read = $('<div/>', {
-          'aria-live': 'polite',
-          'class': 'h5p-hidden-read'
-        });
-        register('read', $read);
         self.trigger('registerDomElements');
       }
 
