@@ -17,7 +17,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'result', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
+    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -122,7 +122,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $container
      * Parent container of the elements
      */
-    var insert = function (order, id, elements, $container, nested) {
+    var insert = function (order, id, elements, $container) {
       // Try to find an element id should be after
       for (var i = 0; i < order.length; i++) {
         if (order[i] === id) {
@@ -132,7 +132,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           !elements[order[i - 1]].isVisible)) {
             i--;
           }
-          if (i === 0 || nested) {
+          if (i === 0) {
             // We are on top.
             elements[id].$element.prependTo($container);
           }
@@ -1042,7 +1042,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (typeof content !== 'undefined') {
         $('.h5p-question-feedback-content-text').text(content);
       }
-      $('#h5p-question-feedback-area').focus();
+      $('.h5p-hidden-read').text(content + ' ' + $('.h5p-joubelui-score-bar-progress').text());
+      $('.h5p-hidden-read').focus();
     };
 
     /**
@@ -1132,13 +1133,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       clickElement = (popupSettings != null && popupSettings.click != null ? popupSettings.click : null);
       clearTimeout(feedbackTransitionTimer);
 
-      var $result = $('<div>', {
-        'id': 'h5p-question-feedback-area',
-        'tabIndex': -1
-      });
-
       var $feedback = $('<div>', {
-        'class': 'h5p-question-feedback-container'
+        'class': 'h5p-question-feedback-container',
+        'aria-labelledby': 'h5p-question-feedback-content-text h5p-question-scorebar-container',
+        'tabindex': -1
       });
 
       var $feedbackContent = $('<div>', {
@@ -1147,11 +1145,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Feedback text
       $('<div>', {
+        'id': 'h5p-question-feedback-content-text',
         'class': 'h5p-question-feedback-content-text',
         'html': content
       }).appendTo($feedbackContent);
 
       var $scorebar = $('<div>', {
+        'id': 'h5p-question-scorebar-container',
         'class': 'h5p-question-scorebar-container'
       });
       if (scoreBar === undefined) {
@@ -1175,17 +1175,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
       else {
         // Create section
-        register('result', $result);
         register('feedback', $feedback);
         register('scorebar', $scorebar);
         if (initialized && $wrapper) {
-          insert(self.order, 'result', sections, $wrapper);
-          insert(self.order, 'scorebar', sections, $result, true);
-          insert(self.order, 'feedback', sections, $result, true);
+          insert(self.order, 'feedback', sections);
+          insert(self.order, 'scorebar', sections);
         }
       }
 
-      showSection(sections.result);
       showSection(sections.feedback);
       showSection(sections.scorebar);
 
@@ -1672,6 +1669,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Give the question type a chance to register before attaching
           self.registerDomElements();
         }
+
+        // Create section for reading messages
+        var $read = $('<div/>', {
+          'tabindex': -1,
+          'class': 'h5p-hidden-read'
+        });
+        register('read', $read);
         self.trigger('registerDomElements');
       }
 
