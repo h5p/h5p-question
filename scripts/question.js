@@ -1042,7 +1042,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (typeof content !== 'undefined') {
         $('.h5p-question-feedback-content-text').text(content);
       }
-      $('.h5p-hidden-read').text(content + ' ' + $('.h5p-joubelui-score-bar-progress').text());
+      $('.h5p-hidden-read').text($('.h5p-question-feedback-content-text').text() + ' ' + $('.h5p-joubelui-score-bar-progress').text());
       $('.h5p-hidden-read').focus();
     };
 
