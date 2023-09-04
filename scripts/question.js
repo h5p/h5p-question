@@ -1135,7 +1135,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       var $feedback = $('<div>', {
         'class': 'h5p-question-feedback-container',
-        'aria-labelledby': 'h5p-question-feedback-content-text h5p-question-scorebar-container',
         'tabindex': -1
       });
 
@@ -1145,13 +1144,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Feedback text
       $('<div>', {
-        'id': 'h5p-question-feedback-content-text',
         'class': 'h5p-question-feedback-content-text',
         'html': content
       }).appendTo($feedbackContent);
 
       var $scorebar = $('<div>', {
-        'id': 'h5p-question-scorebar-container',
         'class': 'h5p-question-scorebar-container'
       });
       if (scoreBar === undefined) {
