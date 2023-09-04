@@ -17,7 +17,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
+    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'read', 'scorebar', 'buttons'];
 
     // Keep track of registered sections
     var sections = {};
@@ -1042,7 +1042,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (typeof content !== 'undefined') {
         $('.h5p-question-feedback-content-text').text(content);
       }
-      $('.h5p-hidden-read').text($('.h5p-question-feedback-content-text').text() + ' ' + $('.h5p-joubelui-score-bar-progress').text());
+      $('.h5p-hidden-read').text(self.toRead);
       $('.h5p-hidden-read').focus();
     };
 
@@ -1161,7 +1161,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Feedback for readspeakers
       if (!behaviour.disableReadSpeaker && scoreBarLabel) {
-        self.read(scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '. ' + (content ? content : ''));
+        self.toRead = (content ? content : '') + ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
+        self.readFeedback();
       }
 
       showFeedback = true;
