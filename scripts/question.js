@@ -17,7 +17,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'result', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
+    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'read', 'scorebar', 'buttons'];
 
     // Keep track of registered sections
     var sections = {};
@@ -76,9 +76,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Feedback transition timer
     var feedbackTransitionTimer;
 
-    // Used when reading messages to the user
-    var $read, readText;
-
     /**
      * Register section with given content.
      *
@@ -125,7 +122,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $container
      * Parent container of the elements
      */
-    var insert = function (order, id, elements, $container, nested) {
+    var insert = function (order, id, elements, $container) {
       // Try to find an element id should be after
       for (var i = 0; i < order.length; i++) {
         if (order[i] === id) {
@@ -135,7 +132,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           !elements[order[i - 1]].isVisible)) {
             i--;
           }
-          if (i === 0 || nested) {
+          if (i === 0) {
             // We are on top.
             elements[id].$element.prependTo($container);
           }
@@ -1042,26 +1039,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * setTimeout for animations.
      */
     self.read = function (content) {
-      if (!$read) {
-        return; // Not ready yet
+      if (typeof content !== 'undefined') {
+        $('.h5p-question-feedback-content-text').text(content);
       }
-
-      if (readText) {
-        // Combine texts if called multiple times
-        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content;
-      }
-      else {
-        readText = content;
-      }
-
-      // Set text
-      $read.html(readText);
-
-      setTimeout(function () {
-        // Stop combining when done reading
-        readText = null;
-        $read.html('');
-      }, 100);
+      $('.h5p-hidden-read').text(self.toRead);
+      $('.h5p-hidden-read').focus();
     };
 
     /**
@@ -1151,12 +1133,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       clickElement = (popupSettings != null && popupSettings.click != null ? popupSettings.click : null);
       clearTimeout(feedbackTransitionTimer);
 
-      var $result = $('<div>', {
-        'tabIndex': -1
-      });
-
       var $feedback = $('<div>', {
-        'class': 'h5p-question-feedback-container'
+        'class': 'h5p-question-feedback-container',
+        'tabindex': -1
       });
 
       var $feedbackContent = $('<div>', {
@@ -1181,8 +1160,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $feedbackContent.toggleClass('has-content', content !== undefined && content.length > 0);
 
       // Feedback for readspeakers
-      if (!behaviour.disableReadSpeaker && scoreBarLabel) {
-        self.read(scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '. ' + (content ? content : ''));
+      if (!behaviour.disableReadSpeaker) {
+        self.toRead = (content ? content : '');
+        if (scoreBarLabel) {
+          self.toRead += ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
+        }
+        self.readFeedback();
       }
 
       showFeedback = true;
@@ -1193,17 +1176,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
       else {
         // Create section
-        register('result', $result);
         register('feedback', $feedback);
         register('scorebar', $scorebar);
         if (initialized && $wrapper) {
-          insert(self.order, 'result', sections, $wrapper);
-          insert(self.order, 'scorebar', sections, $result, true);
-          insert(self.order, 'feedback', sections, $result, true);
+          insert(self.order, 'feedback', sections);
+          insert(self.order, 'scorebar', sections);
         }
       }
 
-      showSection(sections.result);
       showSection(sections.feedback);
       showSection(sections.scorebar);
 
@@ -1223,11 +1203,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Scroll to bottom after showing feedback
           scrollToBottom();
 
+          scoreBar.setScore(score); // set score before animation ends so that read speakers read the right value
+
           // Trigger resize after animation
           feedbackTransitionTimer = setTimeout(function () {
             sectionsIsTransitioning = false;
             self.trigger('resize');
-            scoreBar.setScore(score);
           }, 150);
         }, 0);
       }
@@ -1365,6 +1346,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
         else {
           clicked();
+          self.readFeedback();
         }
       };
 
@@ -1497,7 +1479,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Trigger to content type
         self.trigger('confirmed');
-        sections.result.$element.children()[0].focus();
+        self.readFeedback();
       });
 
       confirmationDialog.on('canceled', function () {
@@ -1690,8 +1672,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
 
         // Create section for reading messages
-        $read = $('<div/>', {
-          'aria-live': 'polite',
+        var $read = $('<div/>', {
+          'tabindex': -1,
           'class': 'h5p-hidden-read'
         });
         register('read', $read);
