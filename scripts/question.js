@@ -1160,9 +1160,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $feedbackContent.toggleClass('has-content', content !== undefined && content.length > 0);
 
       // Feedback for readspeakers
-      self.toRead = (content ? content : '');
-      if (!behaviour.disableReadSpeaker && scoreBarLabel) {
-        self.toRead += ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
+      if (!behaviour.disableReadSpeaker) {
+        self.toRead = (content ? content : '');
+        if (scoreBarLabel) {
+          self.toRead += ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
+        }
         self.readFeedback();
       }
 
