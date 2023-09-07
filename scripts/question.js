@@ -1042,7 +1042,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (typeof content !== 'undefined') {
         $('.h5p-question-feedback-content-text').text(content);
       }
-      $('.h5p-hidden-read').text(self.toRead);
+      $('.h5p-hidden-read').text(content);
       $('.h5p-hidden-read').focus();
     };
 
@@ -1161,11 +1161,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Feedback for readspeakers
       if (!behaviour.disableReadSpeaker) {
-        self.toRead = (content ? content : '');
+        let toRead = (content ? content : '');
         if (scoreBarLabel) {
-          self.toRead += ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
+          toRead += ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
         }
-        self.readFeedback();
+        self.read(toRead);
       }
 
       showFeedback = true;
@@ -1346,7 +1346,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
         else {
           clicked();
-          self.readFeedback();
         }
       };
 
@@ -1479,7 +1478,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Trigger to content type
         self.trigger('confirmed');
-        self.readFeedback();
       });
 
       confirmationDialog.on('canceled', function () {
