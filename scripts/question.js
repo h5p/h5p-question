@@ -1042,14 +1042,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (typeof content !== 'undefined') {
         $('.h5p-question-feedback-content-text').text(content);
       }
-      $('.h5p-hidden-read').text(self.toRead);
+      $('.h5p-hidden-read').text(content);
       $('.h5p-hidden-read').focus();
     };
 
     /**
      * Read feedback
      */
-    self.readFeedback = function () {
+    self.readFeedback = function (message) {
       var invalidFeedback =
         behaviour.disableReadSpeaker ||
         !showFeedback ||
@@ -1062,7 +1062,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       var $feedbackText = $('.h5p-question-feedback-content-text', sections.feedback.$element);
       if ($feedbackText && $feedbackText.html() && $feedbackText.html().length) {
-        self.read($feedbackText.html());
+        self.read(message || $feedbackText.html());
       }
     };
 
@@ -1161,11 +1161,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Feedback for readspeakers
       if (!behaviour.disableReadSpeaker) {
-        self.toRead = (content ? content : '');
+        let toRead = (content ? content : '');
         if (scoreBarLabel) {
-          self.toRead += ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
+          toRead += ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
         }
-        self.readFeedback();
+        self.readFeedback(toRead);
       }
 
       showFeedback = true;
