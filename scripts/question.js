@@ -1049,7 +1049,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     /**
      * Read feedback
      */
-    self.readFeedback = function (message) {
+    self.readFeedback = function () {
       var invalidFeedback =
         behaviour.disableReadSpeaker ||
         !showFeedback ||
@@ -1062,7 +1062,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       var $feedbackText = $('.h5p-question-feedback-content-text', sections.feedback.$element);
       if ($feedbackText && $feedbackText.html() && $feedbackText.html().length) {
-        self.read(message || $feedbackText.html());
+        self.read($feedbackText.html());
       }
     };
 
@@ -1165,7 +1165,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         if (scoreBarLabel) {
           toRead += ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
         }
-        self.readFeedback(toRead);
+        self.read(toRead);
       }
 
       showFeedback = true;
@@ -1346,7 +1346,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
         else {
           clicked();
-          self.readFeedback();
         }
       };
 
@@ -1479,7 +1478,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Trigger to content type
         self.trigger('confirmed');
-        self.readFeedback();
       });
 
       confirmationDialog.on('canceled', function () {
