@@ -375,14 +375,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {boolean} [relocateFocus] Find a new button to focus
      */
     var hideButtons = function (relocateFocus) {
+      if (relocateFocus) {
+        self.focusButton();
+      }
+
       for (var i = 0; i < buttonsToHide.length; i++) {
         hideButton(buttonsToHide[i].id);
       }
       buttonsToHide = [];
-
-      if (relocateFocus) {
-        self.focusButton();
-      }
     };
 
     /**
@@ -1039,11 +1039,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * setTimeout for animations.
      */
     self.read = function (content) {
-      if (typeof content !== 'undefined') {
-        $('.h5p-question-feedback-content-text').text(content);
-      }
       $('.h5p-hidden-read').text(content);
-      $('.h5p-hidden-read').focus();
     };
 
     /**
@@ -1604,9 +1600,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     self.focusButton = function (id) {
       if (id === undefined) {
         // Find first button that is visible.
+        // Avoid buttons that are about to be hidden
         for (var i = 0; i < buttonOrder.length; i++) {
           var button = buttons[buttonOrder[i]];
-          if (button && button.isVisible) {
+          if (button && button.isVisible && (existsInArray(buttonOrder[i], 'id', buttonsToHide) === -1)) {
             // Give that button focus
             button.$element.focus();
             break;
@@ -1671,8 +1668,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // Create section for reading messages
         var $read = $('<div/>', {
-          'tabindex': -1,
-          'class': 'h5p-hidden-read'
+          'class': 'h5p-hidden-read',
+          'aria-live': 'polite',
         });
         register('read', $read);
         self.trigger('registerDomElements');
