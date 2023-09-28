@@ -1043,6 +1043,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.read = function (content) {
       $('.h5p-hidden-read').text(content);
+
+      setTimeout(function () {
+        // Reset the live region when done reading
+        $('.h5p-hidden-read').html('');
+      }, 100);
     };
 
     /**
