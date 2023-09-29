@@ -412,13 +412,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       clearTimeout(toggleButtonsTransitionTimer);
 
       // Show buttons
-      // Hide the section to prevent the changes from being read
-      sections.buttons.$element.attr('aria-hidden', true);
       for (var i = 0; i < buttonsToShow.length; i++) {
         insert(buttonOrder, buttonsToShow[i].id, buttons, sections.buttons.$element);
         buttons[buttonsToShow[i].id].isVisible = true;
       }
-      sections.buttons.$element.attr('aria-hidden', false);
       buttonsToShow = [];
 
       // Hide buttons
