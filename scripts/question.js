@@ -17,7 +17,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'read', 'scorebar', 'buttons'];
+    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -1153,7 +1153,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       });
       if (scoreBar === undefined) {
         scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText, scoreExplanationButtonLabel);
-        scoreBar.setScore(score);
       }
       scoreBar.appendTo($scorebar);
 
@@ -1179,8 +1178,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         register('feedback', $feedback);
         register('scorebar', $scorebar);
         if (initialized && $wrapper) {
-          insert(self.order, 'feedback', sections);
-          insert(self.order, 'scorebar', sections);
+          insert(self.order, 'feedback', sections, $wrapper);
+          insert(self.order, 'scorebar', sections, $wrapper);
         }
       }
 
