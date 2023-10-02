@@ -17,7 +17,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     EventDispatcher.call(self);
 
     // Register default section order
-    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'read', 'scorebar', 'buttons'];
+    self.order = ['video', 'image', 'audio', 'introduction', 'content', 'explanation', 'feedback', 'scorebar', 'buttons', 'read'];
 
     // Keep track of registered sections
     var sections = {};
@@ -75,6 +75,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Feedback transition timer
     var feedbackTransitionTimer;
+
+    // Used when reading messages to the user
+    var $read, readText;
 
     /**
      * Register section with given content.
@@ -1039,11 +1042,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * setTimeout for animations.
      */
     self.read = function (content) {
-      if (typeof content !== 'undefined') {
-        $('.h5p-question-feedback-content-text').text(content);
+      if (!$read) {
+        return; // Not ready yet
       }
-      $('.h5p-hidden-read').text(content);
-      $('.h5p-hidden-read').focus();
+
+      if (readText) {
+        // Combine texts if called multiple times
+        readText += (readText.substr(-1, 1) === '.' ? ' ' : '. ') + content;
+      }
+      else {
+        readText = content;
+      }
+
+      // Set text
+      $read.html(readText);
+
+      setTimeout(function () {
+        // Stop combining when done reading
+        readText = null;
+        $read.html('');
+      }, 100);
     };
 
     /**
@@ -1134,8 +1152,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       clearTimeout(feedbackTransitionTimer);
 
       var $feedback = $('<div>', {
-        'class': 'h5p-question-feedback-container',
-        'tabindex': -1
+        'class': 'h5p-question-feedback-container'
       });
 
       var $feedbackContent = $('<div>', {
@@ -1153,19 +1170,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       });
       if (scoreBar === undefined) {
         scoreBar = JoubelUI.createScoreBar(maxScore, scoreBarLabel, helpText, scoreExplanationButtonLabel);
-        scoreBar.setScore(score);
       }
       scoreBar.appendTo($scorebar);
 
       $feedbackContent.toggleClass('has-content', content !== undefined && content.length > 0);
 
       // Feedback for readspeakers
-      if (!behaviour.disableReadSpeaker) {
-        let toRead = (content ? content : '');
-        if (scoreBarLabel) {
-          toRead += ' ' + scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '.';
-        }
-        self.read(toRead);
+      if (!behaviour.disableReadSpeaker && scoreBarLabel) {
+        self.read(scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '. ' + (content ? content : ''));
       }
 
       showFeedback = true;
@@ -1179,8 +1191,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         register('feedback', $feedback);
         register('scorebar', $scorebar);
         if (initialized && $wrapper) {
-          insert(self.order, 'feedback', sections);
-          insert(self.order, 'scorebar', sections);
+          insert(self.order, 'feedback', sections, $wrapper);
+          insert(self.order, 'scorebar', sections, $wrapper);
         }
       }
 
@@ -1203,12 +1215,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           // Scroll to bottom after showing feedback
           scrollToBottom();
 
-          scoreBar.setScore(score); // set score before animation ends so that read speakers read the right value
-
           // Trigger resize after animation
           feedbackTransitionTimer = setTimeout(function () {
             sectionsIsTransitioning = false;
             self.trigger('resize');
+            scoreBar.setScore(score);
           }, 150);
         }, 0);
       }
@@ -1670,8 +1681,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
 
         // Create section for reading messages
-        var $read = $('<div/>', {
-          'tabindex': -1,
+        $read = $('<div/>', {
+          'aria-live': 'polite',
           'class': 'h5p-hidden-read'
         });
         register('read', $read);
