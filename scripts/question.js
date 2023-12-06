@@ -971,7 +971,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           ? options.minimizeImage 
           : options.expandImage;
           
-          $imgWrap.attr('aria-label', `${options.alt} ${ariaLabel}`);
+          $imgWrap.attr('aria-label', `${ariaLabel} ${options.alt}`);
         };
 
       var sizeDetermined = false;
