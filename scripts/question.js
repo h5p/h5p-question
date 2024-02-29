@@ -1464,7 +1464,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Determine parent element
       if (options.$parentElement) {
-        confirmationDialog.appendTo(options.$parentElement.get(0));
+        const parentElement = options.$parentElement.get(0);
+        let dialogParent;
+        // If using h5p-content, dialog will not appear on embedded fullscreen
+        if (parentElement.classList.contains('h5p-content')) {
+          dialogParent = parentElement.querySelector('.h5p-container');
+        }
+
+        confirmationDialog.appendTo(dialogParent ?? parentElement);
       }
       else {
 
