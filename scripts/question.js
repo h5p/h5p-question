@@ -445,6 +445,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         hideSection(sections.buttons);
         // Detach buttons
         hideButtons(relocateFocus);
+
+        if (sections.buttons.$element.is(':empty')) {
+          // Trigger resize after animation
+          toggleButtonsTransitionTimer = setTimeout(function () {
+            self.trigger('resize');
+          }, animationTimer);
+        }
       }
       else {
         hideButtons(relocateFocus);
