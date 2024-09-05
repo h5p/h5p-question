@@ -1323,6 +1323,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {ConfirmationDialog} [extras.confirmationDialog] Confirmation dialog
      * @param {Object} [extras.contentData] Content data
      * @params {string} [extras.textIfSubmitting] Text to display if submitting
+     * @param {string} [extras.classes] Additional classes to add
      */
     self.addButton = function (id, text, clicked, visible, options, extras) {
       if (buttons[id]) {
@@ -1339,6 +1340,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       extras = extras || {};
       extras.confirmationDialog = extras.confirmationDialog || {};
+      extras.classes = extras.classes || '';
       options = options || {};
 
       var confirmationDialog =
@@ -1379,7 +1381,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // (dependent on options.href set or not)
       var isAnchorTag = (options.href !== undefined);
       var $e = buttons[id].$element = JoubelUI.createButton($.extend({
-        'class': 'h5p-question-' + id,
+        'class': 'h5p-question-' + id + ' ' + extras.classes,
         html: text,
         on: {
           click: function (event) {
