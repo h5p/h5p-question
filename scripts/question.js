@@ -9,8 +9,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
    * @class H5P.Question
    * @extends H5P.EventDispatcher
    * @param {string} type
+   * @param {string} classes Classes to add to the main container
    */
-  function Question(type) {
+  function Question(type, classes) {
     var self = this;
 
     // Inheritance
@@ -1699,7 +1700,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Prepare container
       $wrapper = $container;
       $container.html('')
-        .addClass('h5p-question h5p-' + type);
+        .addClass('h5p-question h5p-' + type + classes);
 
       // Add sections in given order
       var $sections = [];
