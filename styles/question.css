@@ -350,3 +350,18 @@
   opacity: 0;
   transform: translateY(100%);
 }
+
+/* H5P THEME */
+
+.h5p-question-feedback-and-score-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.h5p-theme .h5p-question-feedback {
+  grid-column: 1 / -1;
+}
+
+.h5p-theme .h5p-question-buttons {
+  width: 100%;
+}

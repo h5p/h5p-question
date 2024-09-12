@@ -9,9 +9,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
    * @class H5P.Question
    * @extends H5P.EventDispatcher
    * @param {string} type
-   * @param {string} classes Classes to add to the main container
+   * @param {boolean} theme Use the components from the new theme
    */
-  function Question(type, classes) {
+  function Question(type, theme) {
     var self = this;
 
     // Inheritance
@@ -1099,6 +1099,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         showFeedback = false;
 
         // Hide feedback & scorebar
+        if (theme) {
+          insert(self.order, 'feedback', sections, $wrapper);
+          insert(self.order, 'scorebar', sections, $wrapper);
+          insert(self.order, 'buttons', sections, $wrapper);
+
+          $wrapper.find('.h5p-question-feedback-and-score-container').remove();
+        }
+
         hideSection(sections.scorebar);
         hideSection(sections.feedback);
 
@@ -1195,6 +1203,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           insert(self.order, 'feedback', sections, $wrapper);
           insert(self.order, 'scorebar', sections, $wrapper);
         }
+      }
+
+      if (theme) {
+        const $container = $('<div>', {
+          'class': 'h5p-question-feedback-and-score-container'
+        });
+
+        sections.feedback.$element.after($container);
+
+        $container
+          .append(sections.feedback.$element)
+          .append(sections.scorebar.$element)
+          .append(sections.buttons.$element);
       }
 
       showSection(sections.feedback);
@@ -1702,7 +1723,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Prepare container
       $wrapper = $container;
       $container.html('')
-        .addClass('h5p-question h5p-' + type + classes);
+        .addClass('h5p-question h5p-' + type + (theme ? ' h5p-theme' : ''));
 
       // Add sections in given order
       var $sections = [];
