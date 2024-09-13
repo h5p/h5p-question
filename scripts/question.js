@@ -967,12 +967,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       const setAriaLabel = () => {
-        const ariaLabel = $imgWrap.attr('aria-expanded') === 'true'
-          ? options.minimizeImage 
+        let ariaLabel = $imgWrap.attr('aria-expanded') === 'true'
+          ? options.minimizeImage
           : options.expandImage;
-          
-          $imgWrap.attr('aria-label', `${ariaLabel} ${options.alt}`);
-        };
+
+        if (options.alt) {
+          ariaLabel = `${ariaLabel} ${options.alt}`;
+        }
+
+        $imgWrap.attr('aria-label', ariaLabel);
+      };
 
       var sizeDetermined = false;
       var determineSize = function () {
