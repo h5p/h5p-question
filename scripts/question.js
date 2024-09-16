@@ -140,6 +140,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             // We are on top.
             elements[id].$element.prependTo($container);
           }
+          else if (
+            theme && 
+            sections[order[i - 1]]?.parent?.attr('class').includes('h5p-question-main-content')
+          ) {
+            // Add after parent element
+            elements[id].$element.insertAfter(sections[order[i - 1]].parent);
+          }
           else {
             // Add after element
             elements[id].$element.insertAfter(elements[order[i - 1]].$element);
@@ -1104,7 +1111,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           insert(self.order, 'scorebar', sections, $wrapper);
           insert(self.order, 'buttons', sections, $wrapper);
 
-          $wrapper.find('.h5p-question-feedback-and-score-container').remove();
+          $wrapper.find('.h5p-question-evaluation-container').remove();
         }
 
         hideSection(sections.scorebar);
@@ -1206,13 +1213,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       if (theme) {
-        const $container = $('<div>', {
-          'class': 'h5p-question-feedback-and-score-container'
+        const $evaluation = $('<div>', {
+          'class': 'h5p-question-evaluation-container'
         });
 
-        sections.feedback.$element.after($container);
+        sections.feedback.$element.after($evaluation);
 
-        $container
+        $evaluation
           .append(sections.feedback.$element)
           .append(sections.scorebar.$element)
           .append(sections.buttons.$element);
@@ -1724,6 +1731,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       $wrapper = $container;
       $container.html('')
         .addClass('h5p-question h5p-' + type + (theme ? ' h5p-theme' : ''));
+
+      if (theme) {
+        const $mainContent = $('<div>', {
+          'class': 'h5p-question-main-content'
+        }).appendTo($wrapper);
+
+        sections.image.parent = $mainContent;
+        sections.introduction.parent = $mainContent;
+        sections.content.parent = $mainContent;
+      }
 
       // Add sections in given order
       var $sections = [];
