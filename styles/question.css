@@ -187,10 +187,10 @@
 }
 .h5p-question-buttons.h5p-question-visible {
   display: inline-block;
-  width: calc(100% - 1.5em);
-  margin-left: 1em;
-  margin-right: 0.5em;
-  margin-bottom: 1em;
+  width: calc(100% - var(--spacing-s));
+  margin-left: var(--spacing-s);
+  margin-right: var(--spacing-s);
+  margin-bottom: var(--spacing-s);
 }
 
 
