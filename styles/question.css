@@ -1,5 +1,5 @@
 .h5p-question {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--ui-base);
   position: relative;
 }
 .h5p-question-audio {
@@ -87,7 +87,7 @@
   content: "\f067";
   right: 0.7em;
   top: 0.7em;
-  color: #fff;
+  color: var(--ui-base);
   font-size: 10px;
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
@@ -104,7 +104,7 @@
 }
 
 .h5p-question-introduction {
-  margin: 1em;
+  margin: var(--spacing-m);
   font-size: 1.125em;
   line-height: 1;
 }
@@ -116,7 +116,7 @@
 }
 
 .h5p-question-content {
-  margin: 1em;
+  padding: 0 var(--spacing-m);
 }
 
 .h5p-question-content.h5p-has-question-popup {
@@ -152,7 +152,7 @@
 }
 
 .h5p-question-scorebar .h5p-joubelui-score-bar {
-  width: 100%;
+background: none;
 }
 
 .h5p-question-feedback {
@@ -187,12 +187,12 @@
 }
 .h5p-question-buttons.h5p-question-visible {
   display: inline-block;
-  width: calc(100% - var(--spacing-s));
-  margin-left: var(--spacing-s);
-  margin-right: var(--spacing-s);
-  margin-bottom: var(--spacing-s);
+  margin: var(--spacing-m);
 }
 
+.h5p-question-evaluation-container .h5p-question-buttons.h5p-question-visible{
+  margin: 0;
+}
 
 .h5p-question-buttons .h5p-joubelui-button,
 .h5p-question-buttons .h5p-joubelui-button:first-child:last-child {
@@ -276,7 +276,7 @@
   max-width: 100%;
   margin: 0;
   z-index: 3;
-  background-color: white;
+  background-color: var(--ui-base);
   box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.59);
   border-radius: 1em;
   padding: 1.5em;
@@ -327,7 +327,7 @@
   width: 1em;
   height: 1em;
   z-index: 3;
-  background-color: white;
+  background-color: var(--ui-base);
   box-shadow: -2px -2px 0px 0px rgba(0, 0, 0, 0.18);
   transform: rotate(225deg);
 }
@@ -360,8 +360,15 @@
 .h5p-theme .h5p-question-evaluation-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background-color: var(--contrast-cta-light);
+  background-color: var(--alternative-light);
   padding: var(--spacing-m);
+  margin-top: var(--spacing-m);
+}
+
+.h5p-theme .h5p-question-evaluation-container:after {
+  background-color: red;
+  height: 3px;
+  display: block;
 }
 
 .h5p-theme .h5p-question-feedback .h5p-question-visible{
@@ -399,9 +406,13 @@
   border: none;
 }
 
+.h5p-theme .h5p-joubelui-score-bar-star-shadow{
+  fill: var(--contrast-cta-light);
+}
+
 .h5p-theme .h5p-joubelui-score-bar-progress-wrapper{
   background: var(--contrast-cta-light);
-  height: 0.5rem;
+  height: 0.7rem;
 }
 
 .h5p-theme .h5p-joubelui-score-bar-star{
