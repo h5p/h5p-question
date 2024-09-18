@@ -357,7 +357,7 @@
 
 /* H5P THEME */
 
-.h5p-theme .h5p-question-feedback-and-score-container {
+.h5p-theme .h5p-question-evaluation-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
   background-color: var(--contrast-cta-light);
@@ -384,11 +384,11 @@
   width: 100%;
 }
 
-.h5p-theme .h5p-question-feedback-and-score-container .h5p-question-buttons.h5p-question-visible{
+.h5p-theme .h5p-question-evaluation-container .h5p-question-buttons.h5p-question-visible{
     text-align: right;
 }
 
-.h5p-theme .h5p-question-feedback-and-score-container .h5p-question-buttons.h5p-question-visible{
+.h5p-theme .h5p-question-evaluation-container .h5p-question-buttons.h5p-question-visible{
   margin-bottom: 0px;
 }
 .h5p-theme .h5p-question-feedback.h5p-question-visible {
