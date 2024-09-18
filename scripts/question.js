@@ -1112,6 +1112,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           insert(self.order, 'buttons', sections, $wrapper);
 
           $wrapper.find('.h5p-question-evaluation-container').remove();
+          $wrapper.find('.h5p-pattern-container').remove();
         }
 
         hideSection(sections.scorebar);
@@ -1223,6 +1224,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           .append(sections.feedback.$element)
           .append(sections.scorebar.$element)
           .append(sections.buttons.$element);
+
+        $evaluation.after($('<div>', {
+          class: 'h5p-pattern-container',
+          html: '<div class="h5p-theme-pattern"></div>'
+        }));
       }
 
       showSection(sections.feedback);

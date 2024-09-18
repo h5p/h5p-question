@@ -401,6 +401,13 @@ background: none;
 .h5p-theme .h5p-question-feedback.h5p-question-visible {
   margin: 0em;
 }
+
+.h5p-theme .h5p-pattern-container {
+  position: relative;
+  height: var(--spacing-l);
+  background-color: var(--contrast-cta-light);
+}
+
 .h5p-theme .h5p-joubelui-score-bar{
   padding: var(--spacing-s);
   border: none;
