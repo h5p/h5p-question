@@ -1737,9 +1737,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'class': 'h5p-question-main-content'
         }).appendTo($wrapper);
 
-        sections.image.parent = $mainContent;
-        sections.introduction.parent = $mainContent;
-        sections.content.parent = $mainContent;
+        if (sections.image) {
+          sections.image.parent = $mainContent;
+        }
+        if (sections.introduction) {
+          sections.introduction.parent = $mainContent;
+        }
+        if (sections.content) {
+          sections.content.parent = $mainContent;
+        }
       }
 
       // Add sections in given order
