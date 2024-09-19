@@ -152,7 +152,7 @@
 }
 
 .h5p-question-scorebar .h5p-joubelui-score-bar {
-background: none;
+/*background: none;*/
 }
 
 .h5p-question-feedback {
@@ -187,7 +187,7 @@ background: none;
 }
 .h5p-question-buttons.h5p-question-visible {
   display: inline-block;
-  margin: var(--spacing-m);
+  margin: var(--spacing-s) var(--spacing-m) var(--spacing-m) var(--spacing-m);
 }
 
 .h5p-question-evaluation-container .h5p-question-buttons.h5p-question-visible{
@@ -404,8 +404,15 @@ background: none;
 
 .h5p-theme .h5p-pattern-container {
   position: relative;
-  height: var(--spacing-l);
-  background-color: var(--contrast-cta-light);
+  height: var(--spacing-m);
+  background-color: var(--alternative-light);
+  
+}
+
+.h5p-theme .h5p-pattern-container .h5p-theme-pattern{
+  background-color: var(--alternative-base);
+  opacity: 100%;
+  mask-size: 30%;
 }
 
 .h5p-theme .h5p-joubelui-score-bar{
@@ -414,7 +421,7 @@ background: none;
 }
 
 .h5p-theme .h5p-joubelui-score-bar-star-shadow{
-  fill: var(--contrast-cta-light);
+  /*fill: var(--contrast-cta-light);*/
 }
 
 .h5p-theme .h5p-joubelui-score-bar-progress-wrapper{
