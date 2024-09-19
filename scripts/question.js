@@ -1106,17 +1106,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         showFeedback = false;
 
         // Hide feedback & scorebar
-        if (theme) {
-          insert(self.order, 'feedback', sections, $wrapper);
-          insert(self.order, 'scorebar', sections, $wrapper);
-          insert(self.order, 'buttons', sections, $wrapper);
-
-          $wrapper.find('.h5p-question-evaluation-container').remove();
-          $wrapper.find('.h5p-pattern-container').remove();
-        }
-
         hideSection(sections.scorebar);
         hideSection(sections.feedback);
+
+        if (theme) {
+          $wrapper.find('.h5p-question-evaluation-container').addClass('hiding');
+          $wrapper.find('.h5p-pattern-container').addClass('hiding');
+        }
 
         sectionsIsTransitioning = true;
 
@@ -1126,6 +1122,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           if (!showFeedback) {
             sections.feedback.$element.children().detach();
             sections.scorebar.$element.children().detach();
+
+            if (theme) {
+              $wrapper.find('.h5p-question-evaluation-container').removeClass('evaluation-mode');
+              $wrapper.find('.h5p-question-evaluation-container').removeClass('hiding');
+              $wrapper.find('.h5p-pattern-container').remove();
+            }
 
             // Trigger resize after animation
             self.trigger('resize');
@@ -1214,16 +1216,24 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       if (theme) {
-        const $evaluation = $('<div>', {
-          'class': 'h5p-question-evaluation-container'
-        });
+        let $evaluation = $wrapper.find('.h5p-question-evaluation-container');
 
-        sections.feedback.$element.after($evaluation);
+        // Hasn't been created yet
+        if (!$evaluation.length) {
+          $evaluation = $('<div>', {
+            'class': 'h5p-question-evaluation-container'
+          });
 
-        $evaluation
-          .append(sections.feedback.$element)
-          .append(sections.scorebar.$element)
-          .append(sections.buttons.$element);
+          sections.feedback.$element.after($evaluation);
+        }
+
+        if (!$evaluation.find('.h5p-question-feedback-contaniner').length) {
+          $evaluation
+            .prepend(sections.scorebar.$element)
+            .prepend(sections.feedback.$element)
+        }
+
+        $evaluation.addClass('evaluation-mode');
 
         $evaluation.after($('<div>', {
           class: 'h5p-pattern-container',
@@ -1743,6 +1753,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'class': 'h5p-question-main-content'
         }).appendTo($wrapper);
 
+        const $evaluation = $('<div>', {
+          'class': 'h5p-question-evaluation-container'
+        }).appendTo($wrapper);
+
         if (sections.image) {
           sections.image.parent = $mainContent;
         }
@@ -1751,6 +1765,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
         if (sections.content) {
           sections.content.parent = $mainContent;
+        }
+        if (sections.buttons) {
+          sections.buttons.parent = $evaluation;
         }
       }
 
