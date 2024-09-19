@@ -352,6 +352,11 @@
   transform: translateY(100%);
 }
 
+
+
+
+
+
 /* H5P THEME */
 
 .h5p-theme .h5p-question {
@@ -409,6 +414,7 @@
 }
 
 .h5p-theme .h5p-question-feedback {
+  color: var(--text-primary);
   grid-column: 1 / -1;
 }
 
@@ -484,6 +490,6 @@
   fill: var(--contrast-cta-light);
 }
 
-.h5p-joubelui-score-bar-star-border {
+.h5p-theme .h5p-joubelui-score-bar-star-border {
   stroke: var(--contrast-cta-light);
 }
