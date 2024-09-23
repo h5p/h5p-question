@@ -359,8 +359,8 @@
 
 /* H5P THEME */
 
-.h5p-theme .h5p-question {
-  background-color: (255, 255, 255, 0.9);
+.h5p-theme.h5p-question {
+  background-color: var(--ui-base) !important;
 }
 
 .h5p-theme .h5p-question-introduction {
@@ -386,7 +386,7 @@
 .h5p-theme .h5p-question-evaluation-container.evaluation-mode {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background-color: var(--alternative-light);
+  background-color: var(--alternative-base);
   margin-top: var(--spacing-m);
 
   transition: height 0.15s ease, opacity 0.05s ease-in;
