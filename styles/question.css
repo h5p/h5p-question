@@ -353,10 +353,6 @@
 }
 
 
-
-
-
-
 /* H5P THEME */
 
 .h5p-theme.h5p-question {
@@ -428,6 +424,53 @@
 
 .h5p-theme .h5p-question-buttons {
   width: 100%;
+  container-type: inline-size;
+}
+
+.h5p-theme .h5p-theme-primary-cta {
+  padding: var(--spacing-s) calc(var(--spacing-l));
+  background-color: var(--main-cta-base);
+  color: var(--contrast-cta);
+  border-radius: var(--border-radius-medium);
+  cursor: pointer;
+  font-size: var(--font-size-l);
+
+  transition: all 0.1s linear 0s;
+  transition-property: text-indent, padding;
+}
+
+.h5p-theme .h5p-theme-primary-cta:hover {
+  padding: var(--spacing-s) calc(var(--spacing-l) - 0.75em);
+  background-color: var(--main-cta-light);
+}
+
+.h5p-theme .h5p-theme-primary-cta:active {
+  background-color: var(--main-cta-dark);
+}
+
+.h5p-theme .h5p-theme-secondary-cta {
+  background-color: var(--ui-base);
+  color: var(--main-cta-base);
+  border-radius: var(--border-radius-medium);
+  border: solid 3px var(--main-cta-base);
+  padding: var(--spacing-xs) var(--spacing-s);
+  font-size: var(--font-size-l);
+
+  transition: all 0.1s linear 0s;
+  transition-property: text-indent, padding;
+}
+
+.h5p-theme .h5p-theme-secondary-cta:hover {
+  background-color: var(--main-cta-base);
+  border-color: var(--main-cta-base);
+  color: var(--contrast-cta);
+  cursor: pointer;
+}
+
+.h5p-theme .h5p-theme-secondary-cta:active {
+  background-color: var(--main-cta-dark);
+  border-color: var(--main-cta-dark);
+  color: var(--contrast-cta);
 }
 
 .h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons.h5p-question-visible {
@@ -492,4 +535,36 @@
 
 .h5p-theme .h5p-joubelui-score-bar-star-border {
   stroke: var(--contrast-cta-light);
+}
+
+.h5p-theme .h5p-question-plus-one-container,
+.h5p-theme .h5p-question-minus-one-container {
+  width: 1.923076923em;
+  height: calc(1.923076923em * 0.638297872);
+  border-radius: 5px;
+}
+
+.h5p-theme .h5p-question-plus-one-container {
+  background-color: var(--feedback-correct-secondary);
+}
+
+.h5p-theme .h5p-question-minus-one-container {
+  background-color: var(--feedback-incorrect-secondary);
+}
+
+.h5p-theme .h5p-question-plus-one,
+.h5p-theme .h5p-question-minus-one {
+  background-image: none;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+.h5p-theme .h5p-question-plus-one {
+  mask-image: url(../images/plus-one-transparent.svg);
+  background-color: var(--feedback-correct-main);
+}
+
+.h5p-theme .h5p-question-minus-one {
+  mask-image: url(../images/minus-one-transparent.svg);
+  background-color: var(--feedback-incorrect-main);
 }

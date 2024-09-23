@@ -603,7 +603,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
           else if (buttonsWidth.min < availableWidth) {
             // Is it room for everyone on the right side of the score bar with truncating?
-            if (buttonsWidth.current > availableWidth) {
+            if (buttonsWidth.current > availableWidth && !theme) {
               removeButtonLabels(buttonsWidth.current, availableWidth);
             }
             else {
@@ -1426,7 +1426,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var isAnchorTag = (options.href !== undefined);
       var $e = buttons[id].$element = JoubelUI.createButton($.extend({
         'class': 'h5p-question-' + id + ' ' + extras.classes,
-        html: text,
+        html: theme ? '<span>' + text + '</span>' : text,
         on: {
           click: function (event) {
             handleButtonClick();
