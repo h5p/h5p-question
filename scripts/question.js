@@ -1506,7 +1506,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         headerText: options.l10n.header,
         dialogText: options.l10n.body,
         cancelText: options.l10n.cancelLabel,
-        confirmText: options.l10n.confirmLabel
+        confirmText: options.l10n.confirmLabel,
+        theme: theme
       });
 
       // Determine parent element
