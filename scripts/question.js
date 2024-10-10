@@ -30,6 +30,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Wrapper when attached
     var $wrapper;
 
+    // Main content container when attached
+    var $mainContent;
+
+    // Evaluation (and button) container when attached
+    var $evaluation;
+
     // Click element
     var clickElement;
 
@@ -156,6 +162,33 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
     };
+
+    /**
+     * Create the evaluation container
+     * 
+     * @param {H5P.jQuery} $sibling Sibling to append after
+     */
+    const createEvaluationContainer = ($sibling) => {
+      // Hasn't been created yet
+      if (!$evaluation) {
+        $evaluation = $('<div>', {
+          'class': 'h5p-question-evaluation-container'
+        });
+      }
+
+      if (!$evaluation.parent().length
+        && !$sibling?.parent().hasClass('h5p-question-evaluation-container')
+      ){
+        $sibling.after($evaluation);
+
+        $evaluation.after($('<div>', {
+          class: 'h5p-pattern-container',
+          html: '<div class="h5p-theme-pattern"></div>'
+        }));
+      }
+
+      $evaluation.removeClass('hiding');
+    }
 
     /**
      * Make feedback into a popup and position relative to click.
@@ -1110,8 +1143,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         hideSection(sections.feedback);
 
         if (theme) {
-          $wrapper.find('.h5p-question-evaluation-container').addClass('hiding');
-          $wrapper.find('.h5p-pattern-container').addClass('hiding');
+          $evaluation.addClass('hiding');
         }
 
         sectionsIsTransitioning = true;
@@ -1124,14 +1156,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             sections.scorebar.$element.children().detach();
 
             if (theme) {
-              $wrapper.find('.h5p-question-evaluation-container').removeClass('evaluation-mode');
-              $wrapper.find('.h5p-question-evaluation-container').removeClass('hiding');
-              $wrapper.find('.h5p-pattern-container').remove();
+              $evaluation.removeClass('evaluation-mode');
             }
 
             // Trigger resize after animation
             self.trigger('resize');
           }
+
+          if (theme) {
+            $evaluation.removeClass('hiding');
+          }
+
           sectionsIsTransitioning = false;
           scoreBar.setScore(0);
         }, 150);
@@ -1216,29 +1251,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       if (theme) {
-        let $evaluation = $wrapper.find('.h5p-question-evaluation-container');
+        createEvaluationContainer(sections.feedback.$element);
 
-        // Hasn't been created yet
-        if (!$evaluation.length) {
-          $evaluation = $('<div>', {
-            'class': 'h5p-question-evaluation-container'
-          });
-
-          sections.feedback.$element.after($evaluation);
-        }
-
-        if (!$evaluation.find('.h5p-question-feedback-contaniner').length) {
+        if (!$evaluation.find('.h5p-question-feedback-container').length) {
           $evaluation
             .prepend(sections.scorebar.$element)
             .prepend(sections.feedback.$element)
         }
 
         $evaluation.addClass('evaluation-mode');
-
-        $evaluation.after($('<div>', {
-          class: 'h5p-pattern-container',
-          html: '<div class="h5p-theme-pattern"></div>'
-        }));
       }
 
       showSection(sections.feedback);
@@ -1750,13 +1771,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         .addClass('h5p-question h5p-' + type + (theme ? ' h5p-theme' : ''));
 
       if (theme) {
-        const $mainContent = $('<div>', {
+        $mainContent = $('<div>', {
           'class': 'h5p-question-main-content'
         }).appendTo($wrapper);
 
-        const $evaluation = $('<div>', {
-          'class': 'h5p-question-evaluation-container'
-        }).appendTo($wrapper);
+        createEvaluationContainer($mainContent);
 
         if (sections.image) {
           sections.image.parent = $mainContent;
@@ -1766,6 +1785,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
         if (sections.content) {
           sections.content.parent = $mainContent;
+        }
+        if (sections.feedback) {
+          sections.feedback.parent = $evaluation;
+        }
+        if (sections.scorebar) {
+          sections.scorebar.parent = $evaluation;
         }
         if (sections.buttons) {
           sections.buttons.parent = $evaluation;
