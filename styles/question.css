@@ -81,6 +81,7 @@
   width: 100%;
 }
 
+
 .h5p-question-image-scalable:before {
   position: absolute;
   font-family: 'H5PFontAwesome4';
@@ -573,4 +574,8 @@
 .h5p-theme .h5p-question-minus-one {
   mask-image: url(../images/minus-one-transparent.svg);
   background-color: var(--feedback-incorrect-main);
+}
+
+.h5p-theme .h5p-question-image {
+  margin: var(--spacing-s);
 }
