@@ -383,13 +383,30 @@
 }
 
 .h5p-theme .h5p-question-evaluation-container.evaluation-mode {
- 
   display: grid;
   grid-template-columns: 1fr 1fr;
   background-color: var(--h5p-theme-alternative-light);
   margin-top: var(--h5p-theme-spacing-m);
   transition: height 0.15s ease, opacity 0.05s ease-in;
 }
+
+/* BREAK FEEDBACK INTO 3 LINES WHEN INSIDE SINGLE CHOICE SET */
+
+.h5p-theme.h5p-single-choice-set .h5p-question-evaluation-container.evaluation-mode{
+  grid-template-columns: 1fr;
+  text-align: center;
+}
+.h5p-theme.h5p-single-choice-set .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons.h5p-question-visible{
+  text-align: center;
+  margin-top: var(--h5p-theme-spacing-m);
+}
+
+
+/* hide progressbar in evaluation mode of SCS */
+body:has(.h5p-theme .h5p-question-evaluation-container.evaluation-mode) .h5p-joubelui-progressbar {
+  display: none;
+}
+
 
 @media only screen and (max-width: 640px) {
   .h5p-theme .h5p-question-evaluation-container.evaluation-mode  {
