@@ -434,7 +434,7 @@ body:has(.h5p-theme .h5p-question-evaluation-container.evaluation-mode) .h5p-jou
   transition: height 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
 
-.h5p-theme .h5p-pattern-container .h5p-theme-pattern{
+.h5p-theme .h5p-pattern-container .h5p-theme-pattern {
   background-color: var(--h5p-theme-alternative-base);
   opacity: 100%;
   mask-size: 30%;
