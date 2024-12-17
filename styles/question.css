@@ -74,7 +74,7 @@
 
 .h5p-question-image-scalable {
   cursor: pointer;
-  width: 35%;
+  width: calc(35% * var(--h5p-theme-scaling));
 }
 
 .h5p-question-image.h5p-question-image-fill-width .h5p-question-image-scalable{
@@ -153,7 +153,7 @@
 }
 
 .h5p-question-scorebar .h5p-joubelui-score-bar {
-  width: 100%;
+  width: calc(100% * var(--h5p-theme-scaling));
 }
 
 .h5p-question-feedback {
