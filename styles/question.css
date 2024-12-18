@@ -6,9 +6,11 @@
   margin: 1em 1em 0 1em;
   width: calc(100% - 2em);
 }
+/*
 .h5p-question-audio .h5p-audio-inner > button {
   font-size: 1.5em;
 }
+*/
 .h5p-question-audio .h5p-audio-inner.h5p-audio-transparent {
   display: none;
 }
