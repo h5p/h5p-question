@@ -6,11 +6,11 @@
   margin: 1em 1em 0 1em;
   width: calc(100% - 2em);
 }
-/*
+
 .h5p-question-audio .h5p-audio-inner > button {
   font-size: 1.5em;
 }
-*/
+
 .h5p-question-audio .h5p-audio-inner.h5p-audio-transparent {
   display: none;
 }
@@ -18,8 +18,9 @@
   line-height: 0;
 }
 .h5p-question-video > video {
-  width: 100%;
+
 }
+
 .h5p-question-image {
   text-align: left;
   margin: 0 0 1em;
@@ -68,15 +69,15 @@
 .h5p-question-image-fill-width .h5p-question-image-wrap,
 .h5p-no-frame > .h5p-question .h5p-question-image-wrap,
 .h5p-transparent > div > .h5p-question .h5p-question-image-wrap {
-  -webkit-transform: translate(0, 0);
-  transform: translate(0, 0);
+  /*-webkit-transform: translate(0, 0);
+  transform: translate(0, 0);*/
   margin: 0;
   max-width: 100%;
 }
 
 .h5p-question-image-scalable {
   cursor: pointer;
-  width: calc(35% * var(--h5p-theme-scaling));
+  width: 35%;
 }
 
 .h5p-question-image.h5p-question-image-fill-width .h5p-question-image-scalable{
@@ -152,10 +153,6 @@
 .h5p-question-scorebar.full-width {
   min-width: auto;
   width: calc(100% - 2em);
-}
-
-.h5p-question-scorebar .h5p-joubelui-score-bar {
-  width: calc(100% * var(--h5p-theme-scaling));
 }
 
 .h5p-question-feedback {
@@ -628,5 +625,41 @@ body:has(.h5p-theme .h5p-question-evaluation-container.evaluation-mode) .h5p-jou
 }
 
 .h5p-theme .h5p-question-image {
-  margin: var(--h5p-theme-spacing-s);
+  margin: var(--h5p-theme-spacing-m);
 }
+
+.h5p-theme .h5p-question-audio .h5p-audio-inner > button {
+  font-size: var(--h5p-theme-font-size-m);
+}
+
+.h5p-theme .h5p-question-video {
+  line-height: 0;
+  margin: var(--h5p-theme-spacing-m) var(--h5p-theme-spacing-m) 0 var(--h5p-theme-spacing-m);
+  width: calc(100% - calc(2*var(--h5p-theme-spacing-m)));
+}
+
+.h5p-theme .h5p-question-scorebar .h5p-joubelui-score-bar {
+  width: calc(100% * var(--h5p-theme-scaling));
+}
+
+.h5p-theme .h5p-question-image-scalable {
+  cursor: pointer;
+  width: calc(35% * var(--h5p-theme-scaling));
+}
+
+.h5p-theme .h5p-question-audio {
+  margin: var(--h5p-theme-spacing-m) var(--h5p-theme-spacing-m) 0 var(--h5p-theme-spacing-m);
+  width: calc(100% - calc(2*var(--h5p-theme-spacing-m)));
+}
+
+.h5p-theme .h5p-question-video {
+  line-height: 0;
+  margin: var(--h5p-theme-spacing-m) var(--h5p-theme-spacing-m) 0 var(--h5p-theme-spacing-m);
+  width: calc(100% - calc(2*var(--h5p-theme-spacing-m)));
+}
+.h5p-theme .h5p-question-image-wrap {
+  -webkit-transform: unset;
+  transform: unset;
+  margin-bottom: 0px;
+}
+
