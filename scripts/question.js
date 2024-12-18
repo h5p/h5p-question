@@ -1777,24 +1777,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         createEvaluationContainer($mainContent);
 
-        if (sections.image) {
-          sections.image.parent = $mainContent;
-        }
-        if (sections.introduction) {
-          sections.introduction.parent = $mainContent;
-        }
-        if (sections.content) {
-          sections.content.parent = $mainContent;
-        }
-        if (sections.feedback) {
-          sections.feedback.parent = $evaluation;
-        }
-        if (sections.scorebar) {
-          sections.scorebar.parent = $evaluation;
-        }
-        if (sections.buttons) {
-          sections.buttons.parent = $evaluation;
-        }
+        Object.keys(sections).forEach(section => {
+          if (['feedback', 'scorebar', 'buttons'].includes(section)) {
+            sections[section].parent = $evaluation;
+            console.log(section);
+          }
+          else {
+            sections[section].parent = $mainContent;
+          }
+        });
       }
 
       // Add sections in given order
