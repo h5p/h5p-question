@@ -562,7 +562,6 @@ body:has(.h5p-theme .h5p-question-evaluation-container.evaluation-mode) .h5p-jou
 }
 
 .h5p-theme .h5p-question-image-scalable:focus:before {
-  z-index: 3000;
   outline: 2px ridge var(--h5p-theme-main-cta-base);
   outline-offset: 2px;
 }
