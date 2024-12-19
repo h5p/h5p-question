@@ -1780,7 +1780,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         Object.keys(sections).forEach(section => {
           if (['feedback', 'scorebar', 'buttons'].includes(section)) {
             sections[section].parent = $evaluation;
-            console.log(section);
           }
           else {
             sections[section].parent = $mainContent;
