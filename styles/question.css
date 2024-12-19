@@ -390,7 +390,7 @@
 
 /* If no children, or only empty child containers */
 .h5p-theme .h5p-question-evaluation-container:empty,
-.h5p-theme .h5p-question-evaluation-container:not(.h5p-question-buttons):has(.h5p-question-feedback:empty):has(.h5p-question-scorebar:empty) {
+.h5p-theme .h5p-question-evaluation-container:not(:has(.h5p-question-buttons)):has(.h5p-question-feedback:empty):has(.h5p-question-scorebar:empty) {
   padding: 0;
 }
 
