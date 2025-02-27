@@ -361,13 +361,14 @@
 
 .h5p-theme .h5p-question-introduction {
   margin: var(--h5p-theme-spacing-m);
+  font-size: var(--h5p-theme-font-size-xl);
+  color: var(--h5p-theme-text-primary);
+  font-weight: 600;
 }
 
 .h5p-theme .h5p-question-content {
   padding: 0 var(--h5p-theme-spacing-m);
   margin: unset;
-
-  
 }
 
 .h5p-theme .h5p-question-feedback-content-text {
