@@ -221,7 +221,6 @@
   margin-right: 0;
 }
 
-
 .h5p-no-frame > .h5p-question > .h5p-question-buttons.wrap,
 .h5p-transparent > div > .h5p-question > .h5p-question-buttons.wrap {
   width: 100%;
@@ -240,17 +239,6 @@
 .h5p-transparent > div > .h5p-question .h5p-question-content,
 .h5p-transparent > div > .h5p-question .h5p-question-evaluation-container {
   padding-left: 0;
-}
-
-/*REMOVE THEME BACKGROOUND ELEMENTS WHEN "TRANSPARENT" IS ON */
-.h5p-theme .h5p-transparent .h5p-theme-lines{
-  background-image: none;
-}
-.h5p-theme .h5p-transparent .h5p-question-content,
-.h5p-theme .h5p-transparent .h5p-drag-droppable-words-container,
-.h5p-theme .h5p-transparent .h5p-mark-the-words .h5p-word-inner{
-  background-color: unset;
-  border: none;
 }
 
 /* CP specific styles */
@@ -675,8 +663,21 @@
   margin: var(--h5p-theme-spacing-m) var(--h5p-theme-spacing-m) 0 var(--h5p-theme-spacing-m);
   width: calc(100% - calc(2*var(--h5p-theme-spacing-m)));
 }
+
 .h5p-theme .h5p-question-image-wrap {
   -webkit-transform: unset;
   transform: unset;
   margin-bottom: 0px;
+}
+
+/* Remove theme background elements when "Transparent" is on */
+.h5p-theme .h5p-transparent .h5p-theme-lines {
+  background-image: none;
+}
+
+.h5p-theme .h5p-transparent .h5p-question-content,
+.h5p-theme .h5p-transparent .h5p-drag-droppable-words-container,
+.h5p-theme .h5p-transparent .h5p-mark-the-words .h5p-word-inner {
+  background-color: unset;
+  border: none;
 }
