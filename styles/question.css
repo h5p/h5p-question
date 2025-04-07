@@ -214,24 +214,43 @@
 
 /* Remove margins when no frame or transparent */
 .h5p-no-frame > .h5p-question > *,
-.h5p-transparent > div > .h5p-question > * {
+.h5p-transparent > div > .h5p-question > *,
+.h5p-transparent > div > .h5p-question .h5p-question-main-content > *,
+.h5p-transparent > div > .h5p-question .h5p-question-evaluation-container > * {
   margin-left: 0 !important;
   margin-right: 0;
 }
+
 
 .h5p-no-frame > .h5p-question > .h5p-question-buttons.wrap,
 .h5p-transparent > div > .h5p-question > .h5p-question-buttons.wrap {
   width: 100%;
 }
 
-.h5p-no-frame > .h5p-question > *:first-child,
-.h5p-transparent > div > .h5p-question > *:first-child {
+.h5p-no-frame > .h5p-question > *:last-child,
+.h5p-transparent > div > .h5p-question > *:last-child,
+.h5p-transparent > div > .h5p-question .h5p-question-evaluation-container > *:last-child {
+  margin-bottom: 0;
+}
+
+.h5p-transparent > div > .h5p-question .h5p-question-main-content > *:first-child {
   margin-top: 0;
 }
 
-.h5p-no-frame > .h5p-question > *:last-child,
-.h5p-transparent > div > .h5p-question > *:last-child {
-  margin-bottom: 0;
+.h5p-transparent > div > .h5p-question .h5p-question-content,
+.h5p-transparent > div > .h5p-question .h5p-question-evaluation-container {
+  padding-left: 0;
+}
+
+/*REMOVE THEME BACKGROOUND ELEMENTS WHEN "TRANSPARENT" IS ON */
+.h5p-theme .h5p-transparent .h5p-theme-lines{
+  background-image: none;
+}
+.h5p-theme .h5p-transparent .h5p-question-content,
+.h5p-theme .h5p-transparent .h5p-drag-droppable-words-container,
+.h5p-theme .h5p-transparent .h5p-mark-the-words .h5p-word-inner{
+  background-color: unset;
+  border: none;
 }
 
 /* CP specific styles */
@@ -356,7 +375,7 @@
 /* H5P THEME */
 
 .h5p-theme.h5p-question {
-  background-color: var(--h5p-theme-ui-base) !important;
+  background-color: var(--h5p-theme-ui-base);
 }
 
 .h5p-theme .h5p-question-introduction {
