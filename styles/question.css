@@ -491,7 +491,7 @@
   color: var(--h5p-theme-contrast-cta);
   border-radius: var(--h5p-theme-border-radius-medium);
   cursor: pointer;
-  font-size: var(--h5p-theme-font-size-l);
+  font-size: var(--h5p-theme-font-size-m);
   border: solid 3px var(--h5p-theme-main-cta-base);
   transition: all 0.1s linear 0s;
   transition-property: text-indent, padding;
@@ -514,7 +514,7 @@
   border-radius: var(--h5p-theme-border-radius-medium);
   border: solid 3px var(--h5p-theme-main-cta-base) !important;
   padding: var(--h5p-theme-spacing-xs) var(--h5p-theme-spacing-s);
-  font-size: var(--h5p-theme-font-size-l);
+  font-size: var(--h5p-theme-font-size-m);
 
   transition: all 0.1s linear 0s;
   transition-property: text-indent, padding;
