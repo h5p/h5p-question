@@ -429,6 +429,7 @@
 }
 
 .h5p-theme .h5p-pattern-container {
+  display: none;
   position: relative;
   height: var(--h5p-theme-spacing-s);
   background-color: var(--h5p-theme-alternative-light);
