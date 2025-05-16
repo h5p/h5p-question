@@ -182,7 +182,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         $sibling.after($evaluation);
 
         $evaluation.after($('<div>', {
-          class: 'h5p-pattern-container',
+          class: 'h5p-theme-pattern-container',
           html: '<div class="h5p-theme-pattern"></div>'
         }));
       }
