@@ -9,9 +9,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
    * @class H5P.Question
    * @extends H5P.EventDispatcher
    * @param {string} type
-   * @param {boolean} theme Use the components from the new theme
+   * @param {object} options A set of options for question
+   * @param {boolean} options.theme Use the components from the new theme
    */
-  function Question(type, theme) {
+  function Question(type, { theme }) {
     var self = this;
 
     // Inheritance
