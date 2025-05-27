@@ -1446,21 +1446,19 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // The button might be <button> or <a>
       // (dependent on options.href set or not)
       var isAnchorTag = (options.href !== undefined);
-      var $e = buttons[id].$element = JoubelUI.createButton($.extend({
-        'class': 'h5p-question-' + id + ' ' + extras.classes,
-        html: theme ? '<span>' + text + '</span>' : text,
-        on: {
-          click: function (event) {
-            handleButtonClick();
-            if (isAnchorTag) {
-              event.preventDefault();
-            }
+      var $e = buttons[id].$element = $(H5P.Components.Button({
+        ...options,
+        classes: 'h5p-question-' + id + ' ' + extras.classes,
+        innerHTML: theme ? '<span>' + text + '</span>' : text,
+        onClick: function (event) {
+          handleButtonClick();
+          if (isAnchorTag) {
+            event.preventDefault();
           }
-        }
-      }, options));
+        },
+        tooltipSource: 'data-tooltip'
+      }));
       buttonOrder.push(id);
-
-      H5P.Tooltip($e.get(0), {tooltipSource: 'data-tooltip'});
 
       // The button might be <button> or <a>. If <a>, the space key is not
       // triggering the click event, must therefore handle this here:
