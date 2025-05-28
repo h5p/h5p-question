@@ -1389,7 +1389,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {ConfirmationDialog} [extras.confirmationDialog] Confirmation dialog
      * @param {Object} [extras.contentData] Content data
      * @params {string} [extras.textIfSubmitting] Text to display if submitting
-     * @param {string} [extras.classes] Additional classes to add
+     * @param {string} [extras.styleType] Which button variant to use. The options are
+     *                                    primary (default), secondary, nav
+     * @param {string} [extras.icon] Which icon to use, will be prepended with "h5p-theme-"
      */
     self.addButton = function (id, text, clicked, visible, options, extras) {
       if (buttons[id]) {
@@ -1406,7 +1408,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       extras = extras || {};
       extras.confirmationDialog = extras.confirmationDialog || {};
-      extras.classes = extras.classes || '';
+      extras.styleType = extras.styleType || '';
+      extras.icon = extras.icon || '';
       options = options || {};
 
       var confirmationDialog =
@@ -1451,8 +1454,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (theme) {
         $e = buttons[id].$element = $(H5P.Components.Button({
           ...options,
-          classes: 'h5p-question-' + id + ' ' + extras.classes,
+          classes: 'h5p-question-' + id + ' ',
           label: text,
+          styleType: extras.styleType,
+          icon: extras.icon,
           onClick: function (event) {
             handleButtonClick();
             if (isAnchorTag) {
@@ -1463,7 +1468,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }));
       } else {
         $e = buttons[id].$element = JoubelUI.createButton($.extend({
-          'class': 'h5p-question-' + id + ' ' + extras.classes,
+          'class': 'h5p-question-' + id,
           html: text,
           on: {
             click: function (event) {
