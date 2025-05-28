@@ -1446,18 +1446,37 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // The button might be <button> or <a>
       // (dependent on options.href set or not)
       var isAnchorTag = (options.href !== undefined);
-      var $e = buttons[id].$element = $(H5P.Components.Button({
-        ...options,
-        classes: 'h5p-question-' + id + ' ' + extras.classes,
-        innerHTML: theme ? '<span>' + text + '</span>' : text,
-        onClick: function (event) {
-          handleButtonClick();
-          if (isAnchorTag) {
-            event.preventDefault();
+
+      var $e;
+      if (theme) {
+        $e = buttons[id].$element = $(H5P.Components.Button({
+          ...options,
+          classes: 'h5p-question-' + id + ' ' + extras.classes,
+          label: text,
+          onClick: function (event) {
+            handleButtonClick();
+            if (isAnchorTag) {
+              event.preventDefault();
+            }
+          },
+          tooltipSource: 'data-tooltip'
+        }));
+      } else {
+        $e = buttons[id].$element = JoubelUI.createButton($.extend({
+          'class': 'h5p-question-' + id + ' ' + extras.classes,
+          html: text,
+          on: {
+            click: function (event) {
+              handleButtonClick();
+              if (isAnchorTag) {
+                event.preventDefault();
+              }
+            }
           }
-        },
-        tooltipSource: 'data-tooltip'
-      }));
+        }, options));
+        H5P.Tooltip($e.get(0), {tooltipSource: 'data-tooltip'});
+      }
+
       buttonOrder.push(id);
 
       // The button might be <button> or <a>. If <a>, the space key is not
