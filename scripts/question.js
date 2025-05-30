@@ -1389,7 +1389,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {ConfirmationDialog} [extras.confirmationDialog] Confirmation dialog
      * @param {Object} [extras.contentData] Content data
      * @params {string} [extras.textIfSubmitting] Text to display if submitting
-     * @param {string} [extras.classes] Additional classes to add
+     * @param {string} [extras.styleType] Which button variant to use. The options are
+     *                                    primary (default), secondary, nav
+     * @param {string} [extras.icon] Which icon to use, will be prepended with "h5p-theme-"
      */
     self.addButton = function (id, text, clicked, visible, options, extras) {
       if (buttons[id]) {
@@ -1406,7 +1408,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       extras = extras || {};
       extras.confirmationDialog = extras.confirmationDialog || {};
-      extras.classes = extras.classes || '';
+      extras.styleType = extras.styleType || '';
+      extras.icon = extras.icon || '';
       options = options || {};
 
       var confirmationDialog =
@@ -1446,21 +1449,40 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // The button might be <button> or <a>
       // (dependent on options.href set or not)
       var isAnchorTag = (options.href !== undefined);
-      var $e = buttons[id].$element = JoubelUI.createButton($.extend({
-        'class': 'h5p-question-' + id + ' ' + extras.classes,
-        html: theme ? '<span>' + text + '</span>' : text,
-        on: {
-          click: function (event) {
+
+      var $e;
+      if (theme) {
+        $e = buttons[id].$element = $(H5P.Components.Button({
+          ...options,
+          classes: 'h5p-question-' + id + ' ',
+          label: text,
+          styleType: extras.styleType,
+          icon: extras.icon,
+          onClick: function (event) {
             handleButtonClick();
             if (isAnchorTag) {
               event.preventDefault();
             }
+          },
+          tooltipSource: 'data-tooltip'
+        }));
+      } else {
+        $e = buttons[id].$element = JoubelUI.createButton($.extend({
+          'class': 'h5p-question-' + id,
+          html: text,
+          on: {
+            click: function (event) {
+              handleButtonClick();
+              if (isAnchorTag) {
+                event.preventDefault();
+              }
+            }
           }
-        }
-      }, options));
-      buttonOrder.push(id);
+        }, options));
+        H5P.Tooltip($e.get(0), {tooltipSource: 'data-tooltip'});
+      }
 
-      H5P.Tooltip($e.get(0), {tooltipSource: 'data-tooltip'});
+      buttonOrder.push(id);
 
       // The button might be <button> or <a>. If <a>, the space key is not
       // triggering the click event, must therefore handle this here:
