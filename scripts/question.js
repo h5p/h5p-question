@@ -1454,7 +1454,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (theme) {
         $e = buttons[id].$element = $(H5P.Components.Button({
           ...options,
-          classes: 'h5p-question-' + id + ' ',
           label: text,
           styleType: extras.styleType,
           icon: extras.icon,
