@@ -413,7 +413,7 @@
 
   .h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons.h5p-question-visible {
     margin-top: var(--h5p-theme-spacing-s);
-    text-align: center !important;
+    justify-content: center;
   }
 }
 
@@ -446,10 +446,6 @@
   opacity: 0;
 }
 
-.h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons.h5p-question-visible {
-  text-align: right;
-}
-
 .h5p-theme .h5p-question-evaluation-container .h5p-question-buttons.h5p-question-visible {
   margin: 0;
 }
@@ -480,6 +476,9 @@
 }
 
 .h5p-theme .h5p-question-buttons {
+  display: flex;
+  justify-content: end;
+  gap: var(--h5p-theme-spacing-s);
   width: 100%;
   container-type: inline-size;
 }
