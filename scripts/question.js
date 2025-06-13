@@ -9,8 +9,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
    * @class H5P.Question
    * @extends H5P.EventDispatcher
    * @param {string} type
+   * @param {object} options A set of options for question
+   * @param {boolean} options.theme Use the components from the new theme
    */
-  function Question(type) {
+  function Question(type, { theme }) {
     var self = this;
 
     // Inheritance
@@ -28,6 +30,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     // Wrapper when attached
     var $wrapper;
+
+    // Main content container when attached
+    var $mainContent;
+
+    // Evaluation (and button) container when attached
+    var $evaluation;
 
     // Click element
     var clickElement;
@@ -139,6 +147,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             // We are on top.
             elements[id].$element.prependTo($container);
           }
+          else if (
+            theme && 
+            sections[order[i - 1]]?.parent?.attr('class').includes('h5p-question-main-content')
+          ) {
+            // Add after parent element
+            elements[id].$element.insertAfter(sections[order[i - 1]].parent);
+          }
           else {
             // Add after element
             elements[id].$element.insertAfter(elements[order[i - 1]].$element);
@@ -148,6 +163,33 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
       }
     };
+
+    /**
+     * Create the evaluation container
+     * 
+     * @param {H5P.jQuery} $sibling Sibling to append after
+     */
+    const createEvaluationContainer = ($sibling) => {
+      // Hasn't been created yet
+      if (!$evaluation) {
+        $evaluation = $('<div>', {
+          'class': 'h5p-question-evaluation-container'
+        });
+      }
+
+      if (!$evaluation.parent().length
+        && !$sibling?.parent().hasClass('h5p-question-evaluation-container')
+      ){
+        $sibling.after($evaluation);
+
+        $evaluation.after($('<div>', {
+          class: 'h5p-theme-pattern-container',
+          html: '<div class="h5p-theme-pattern"></div>'
+        }));
+      }
+
+      $evaluation.removeClass('hiding');
+    }
 
     /**
      * Make feedback into a popup and position relative to click.
@@ -595,7 +637,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           }
           else if (buttonsWidth.min < availableWidth) {
             // Is it room for everyone on the right side of the score bar with truncating?
-            if (buttonsWidth.current > availableWidth) {
+            if (buttonsWidth.current > availableWidth && !theme) {
               removeButtonLabels(buttonsWidth.current, availableWidth);
             }
             else {
@@ -1101,6 +1143,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         hideSection(sections.scorebar);
         hideSection(sections.feedback);
 
+        if (theme) {
+          $evaluation.addClass('hiding');
+        }
+
         sectionsIsTransitioning = true;
 
         // Detach after transition
@@ -1110,9 +1156,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             sections.feedback.$element.children().detach();
             sections.scorebar.$element.children().detach();
 
+            if (theme) {
+              $evaluation.removeClass('evaluation-mode');
+            }
+
             // Trigger resize after animation
             self.trigger('resize');
           }
+
+          if (theme) {
+            $evaluation.removeClass('hiding');
+          }
+
           sectionsIsTransitioning = false;
           scoreBar.setScore(0);
         }, 150);
@@ -1194,6 +1249,18 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           insert(self.order, 'feedback', sections, $wrapper);
           insert(self.order, 'scorebar', sections, $wrapper);
         }
+      }
+
+      if (theme) {
+        createEvaluationContainer(sections.feedback.$element);
+
+        if (!$evaluation.find('.h5p-question-feedback-container').length) {
+          $evaluation
+            .prepend(sections.scorebar.$element)
+            .prepend(sections.feedback.$element)
+        }
+
+        $evaluation.addClass('evaluation-mode');
       }
 
       showSection(sections.feedback);
@@ -1322,6 +1389,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {ConfirmationDialog} [extras.confirmationDialog] Confirmation dialog
      * @param {Object} [extras.contentData] Content data
      * @params {string} [extras.textIfSubmitting] Text to display if submitting
+     * @param {string} [extras.styleType] Which button variant to use. The options are
+     *                                    primary (default), secondary, nav
+     * @param {string} [extras.icon] Which icon to use, will be prepended with "h5p-theme-"
      */
     self.addButton = function (id, text, clicked, visible, options, extras) {
       if (buttons[id]) {
@@ -1338,6 +1408,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       extras = extras || {};
       extras.confirmationDialog = extras.confirmationDialog || {};
+      extras.styleType = extras.styleType || '';
+      extras.icon = extras.icon || '';
       options = options || {};
 
       var confirmationDialog =
@@ -1377,21 +1449,39 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // The button might be <button> or <a>
       // (dependent on options.href set or not)
       var isAnchorTag = (options.href !== undefined);
-      var $e = buttons[id].$element = JoubelUI.createButton($.extend({
-        'class': 'h5p-question-' + id,
-        html: text,
-        on: {
-          click: function (event) {
+
+      var $e;
+      if (theme) {
+        $e = buttons[id].$element = $(H5P.Components.Button({
+          ...options,
+          label: text,
+          styleType: extras.styleType,
+          icon: extras.icon,
+          onClick: function (event) {
             handleButtonClick();
             if (isAnchorTag) {
               event.preventDefault();
             }
+          },
+          tooltipSource: 'data-tooltip'
+        }));
+      } else {
+        $e = buttons[id].$element = JoubelUI.createButton($.extend({
+          'class': 'h5p-question-' + id,
+          html: text,
+          on: {
+            click: function (event) {
+              handleButtonClick();
+              if (isAnchorTag) {
+                event.preventDefault();
+              }
+            }
           }
-        }
-      }, options));
-      buttonOrder.push(id);
+        }, options));
+        H5P.Tooltip($e.get(0), {tooltipSource: 'data-tooltip'});
+      }
 
-      H5P.Tooltip($e.get(0), {tooltipSource: 'data-tooltip'});
+      buttonOrder.push(id);
 
       // The button might be <button> or <a>. If <a>, the space key is not
       // triggering the click event, must therefore handle this here:
@@ -1459,7 +1549,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         headerText: options.l10n.header,
         dialogText: options.l10n.body,
         cancelText: options.l10n.cancelLabel,
-        confirmText: options.l10n.confirmLabel
+        confirmText: options.l10n.confirmLabel,
+        theme: theme
       });
 
       // Determine parent element
@@ -1699,7 +1790,24 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       // Prepare container
       $wrapper = $container;
       $container.html('')
-        .addClass('h5p-question h5p-' + type);
+        .addClass('h5p-question h5p-' + type + (theme ? ' h5p-theme' : ''));
+
+      if (theme) {
+        $mainContent = $('<div>', {
+          'class': 'h5p-question-main-content'
+        }).appendTo($wrapper);
+
+        createEvaluationContainer($mainContent);
+
+        Object.keys(sections).forEach(section => {
+          if (['feedback', 'scorebar', 'buttons'].includes(section)) {
+            sections[section].parent = $evaluation;
+          }
+          else {
+            sections[section].parent = $mainContent;
+          }
+        });
+      }
 
       // Add sections in given order
       var $sections = [];

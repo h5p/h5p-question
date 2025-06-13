@@ -18,10 +18,16 @@
      * @return {HTMLElement}
      */
     self.getElement = function (isCorrect) {
+      var container = document.createElement('div');
+      container.classList.add(isCorrect ?
+        'h5p-question-plus-one-container' :
+        'h5p-question-minus-one-container');
+
       var element = document.createElement('div');
       element.classList.add(isCorrect ? 'h5p-question-plus-one' : 'h5p-question-minus-one');
-      element.classList.add('h5p-question-hidden-one');
-      elements.push(element);
+      container.classList.add('h5p-question-hidden-one');
+      container.append(element);
+      elements.push(container);
 
       // Schedule display animation of all added elements
       if (showElementsTimer) {
@@ -29,7 +35,7 @@
       }
       showElementsTimer = setTimeout(showElements, 0);
 
-      return element;
+      return container;
     };
 
     /**
