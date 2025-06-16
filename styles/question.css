@@ -406,6 +406,10 @@
   display: none;
 }
 
+.h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons {
+  justify-content: end;
+}
+
 @media only screen and (max-width: 640px) {
   .h5p-theme .h5p-question-evaluation-container.evaluation-mode {
     grid-template-columns: 1fr;
@@ -477,7 +481,6 @@
 
 .h5p-theme .h5p-question-buttons {
   display: flex;
-  justify-content: end;
   gap: var(--h5p-theme-spacing-s);
   width: 100%;
   container-type: inline-size;
