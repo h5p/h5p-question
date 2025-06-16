@@ -431,14 +431,14 @@
   display: block;
 }
 
-.h5p-theme .h5p-theme-pattern-container {
+.h5p-theme .h5p-question-evaluation-container + .h5p-theme-pattern-container {
   position: relative;
   height: var(--h5p-theme-spacing-s);
   background-color: var(--h5p-theme-alternative-light);
   transition: height 0.15s ease, opacity 0.15s cubic-bezier(0,1,0,1);
 }
 
-.h5p-theme .h5p-theme-pattern-container .h5p-theme-pattern {
+.h5p-theme .h5p-question-evaluation-container + .h5p-theme-pattern-container .h5p-theme-pattern {
   background-color: var(--h5p-theme-alternative-base);
   opacity: 100%;
   mask-size: 30%;
