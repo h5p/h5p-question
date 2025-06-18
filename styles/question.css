@@ -18,7 +18,7 @@
   line-height: 0;
 }
 .h5p-question-video > video {
-
+  width: 100%;
 }
 
 .h5p-question-image {
