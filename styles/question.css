@@ -18,7 +18,7 @@
   line-height: 0;
 }
 .h5p-question-video > video {
-
+  width: 100%;
 }
 
 .h5p-question-image {
@@ -548,7 +548,7 @@
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
-  background-color: color-mix(in srgb, var(--h5p-theme-main-cta-base), transparent 20%); 
+  background-color: color-mix(in srgb, var(--h5p-theme-main-cta-base), transparent 20%);
   color: var(--h5p-theme-ui-base);
   width: 2em;
   height: 2em;
