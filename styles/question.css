@@ -530,12 +530,12 @@
 
 .h5p-theme .h5p-joubelui-score-bar-progress-wrapper {
   background: var(--h5p-theme-contrast-cta-light);
-  height: 0.7rem;
+  height: 0.7em;
 }
 
 .h5p-theme .h5p-joubelui-score-bar-star {
   scale: 0.9;
-  top: -0.65rem;
+  top: -0.65em;
 }
 
 .h5p-theme .h5p-joubelui-score-numeric {
