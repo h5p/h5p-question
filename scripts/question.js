@@ -168,8 +168,15 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * Create the evaluation container
      * 
      * @param {H5P.jQuery} $sibling Sibling to append after
+     * @param {boolean} [isReattaching] True if reattaching the evaluation container
      */
-    const createEvaluationContainer = ($sibling) => {
+    const createEvaluationContainer = ($sibling, isReattaching = false) => {
+      let wasInEvaluationMode = false;
+      if (isReattaching) {
+        wasInEvaluationMode = $evaluation[0].classList.contains('evaluation-mode');
+        $evaluation = undefined;
+      }
+
       // Hasn't been created yet
       if (!$evaluation) {
         $evaluation = $('<div>', {
@@ -177,6 +184,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         });
       }
 
+      if (wasInEvaluationMode) {
+        $evaluation[0].classList.add('evaluation-mode');
+      }
+      
       if (!$evaluation.parent().length
         && !$sibling?.parent().hasClass('h5p-question-evaluation-container')
       ){
@@ -1797,7 +1808,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           'class': 'h5p-question-main-content'
         }).appendTo($wrapper);
 
-        createEvaluationContainer($mainContent);
+        createEvaluationContainer($mainContent, !!$evaluation);
 
         Object.keys(sections).forEach(section => {
           if (['feedback', 'scorebar', 'buttons'].includes(section)) {
