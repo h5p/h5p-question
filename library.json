@@ -3,7 +3,7 @@
   "machineName": "H5P.Question",
   "majorVersion": 1,
   "minorVersion": 5,
-  "patchVersion": 31,
+  "patchVersion": 32,
   "runnable": 0,
   "license": "MIT",
   "author": "Joubel",
@@ -17,6 +17,12 @@
     },
     {
       "path": "styles/explainer.css"
+    },
+    {
+      "path": "@legacy/styles/question.css"
+    },
+    {
+      "path": "@legacy/styles/explainer.css"
     }
   ],
   "preloadedJs": [
@@ -28,6 +34,15 @@
     },
     {
       "path": "scripts/score-points.js"
+    },
+    {
+      "path": "@legacy/scripts/question.js"
+    },
+    {
+      "path": "@legacy/scripts/explainer.js"
+    },
+    {
+      "path": "@legacy/scripts/score-points.js"
     }
   ],
   "preloadedDependencies": [
