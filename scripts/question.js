@@ -1315,11 +1315,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (sections.feedback && sections.feedback.$element) {
 
         if (extendContent) {
-          content = $('.h5p-question-feedback-content', sections.feedback.$element).html() + ' ' + content;
+          content = $('.h5p-question-feedback-content-text', sections.feedback.$element).html() + ' ' + content;
         }
 
         // Update feedback content html
-        $('.h5p-question-feedback-content', sections.feedback.$element).html(content).addClass('has-content');
+        $('.h5p-question-feedback-content-text', sections.feedback.$element).html(content).addClass('has-content');
 
         // Make sure the height is correct
         setElementHeight(sections.feedback.$element);
