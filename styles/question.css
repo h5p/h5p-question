@@ -653,7 +653,12 @@
   margin-right: 2em;
 }
 
+.h5p-theme .h5p-question-feedback-tail {
+  background-color: var(--h5p-theme-alternative-light);
+}
+
 .h5p-theme .h5p-question-feedback.h5p-question-popup {
+  background-color: var(--h5p-theme-alternative-light);
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
   border-radius: var(--h5p-theme-border-radius-medium);
   padding: var(--h5p-theme-spacing-m);
