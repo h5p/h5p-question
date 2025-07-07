@@ -192,11 +192,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         && !$sibling?.parent().hasClass('h5p-question-evaluation-container')
       ){
         $sibling.after($evaluation);
-
-        $evaluation.after($('<div>', {
-          class: 'h5p-theme-pattern-container',
-          html: '<div class="h5p-theme-pattern"></div>'
-        }));
       }
 
       $evaluation.removeClass('hiding');
