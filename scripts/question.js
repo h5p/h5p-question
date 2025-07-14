@@ -377,16 +377,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {H5P.jQuery} $element
      */
     var setElementHeight = function ($element) {
-      // Setting a fixed max-height on the feedback element when it has a theme can cause overflow
-      const isFeedback = $element[0].classList.contains('h5p-question-feedback');
-      const isH5PTheme = $element[0].closest('.h5p-question.h5p-theme') !== null;
-
-      if (!$element.is(':visible') || (isFeedback && isH5PTheme)) {
-        // No animation or feedback with H5P theme
-        $element.css('max-height', 'none');
-        return;
-      }
-
       // If this element is shown in the popup, we can't set width to 100%,
       // since it already has a width set in CSS
       var isFeedbackPopup = $element.hasClass('h5p-question-popup');
@@ -406,11 +396,23 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var tmpElWidth = $tmp.css('width') ? $tmp.css('width') : '100%';
       $tmp.css('width', 'calc(' + tmpElWidth + ' - ' + sideMargins + 'px)');
 
-      // Apply height to element
       var h = Math.round($tmp.get(0).getBoundingClientRect().height);
-      var fontSize = parseFloat($element.css('fontSize'));
-      var relativeH = h / fontSize;
-      $element.css('max-height', relativeH + 'em');
+
+      // Setting a fixed max-height on the feedback element when it has a theme can cause overflow
+      const isFeedback = $element[0].classList.contains('h5p-question-feedback');
+      const isH5PTheme = $element[0].closest('.h5p-question.h5p-theme') !== null;
+
+      if (!$element.is(':visible') || (isFeedback && isH5PTheme)) {
+        // No animation or feedback with H5P theme
+        $element.css('max-height', 'none');
+      }
+      else {
+        // Apply height to element
+        var fontSize = parseFloat($element.css('fontSize'));
+        var relativeH = h / fontSize;
+        $element.css('max-height', relativeH + 'em');
+      }
+
       $tmp.remove();
 
       if (h > 0 && sections.buttons && sections.buttons.$element === $element) {
