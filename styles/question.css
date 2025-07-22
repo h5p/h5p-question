@@ -214,6 +214,7 @@
 
 /* Remove margins when no frame or transparent */
 .h5p-no-frame > .h5p-question > *,
+.h5p-no-frame > .h5p-question-image > *,
 .h5p-transparent > div > .h5p-question > *,
 .h5p-transparent > div > .h5p-question .h5p-question-main-content > *,
 .h5p-transparent > div > .h5p-question .h5p-question-evaluation-container > * {
@@ -655,4 +656,22 @@
 .h5p-theme .h5p-transparent .h5p-mark-the-words .h5p-word-inner {
   background-color: unset;
   border: none;
+}
+
+/* Remove outer margins/paddings for content when the toolbar is set to OFF */
+
+.h5p-no-frame > .h5p-theme .h5p-question-image > * {
+  margin-top: 0;
+}
+
+.h5p-no-frame .h5p-theme .h5p-question-introduction {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.h5p-no-frame .h5p-theme .h5p-question-content,
+.h5p-no-frame .h5p-theme .h5p-question-evaluation-container {
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
 }
