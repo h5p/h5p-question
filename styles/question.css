@@ -214,7 +214,6 @@
 
 /* Remove margins when no frame or transparent */
 .h5p-no-frame > .h5p-question > *,
-.h5p-no-frame > .h5p-question-image > *,
 .h5p-transparent > div > .h5p-question > *,
 .h5p-transparent > div > .h5p-question .h5p-question-main-content > *,
 .h5p-transparent > div > .h5p-question .h5p-question-evaluation-container > * {
