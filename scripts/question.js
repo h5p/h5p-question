@@ -396,7 +396,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       var tmpElWidth = $tmp.css('width') ? $tmp.css('width') : '100%';
       $tmp.css('width', 'calc(' + tmpElWidth + ' - ' + sideMargins + 'px)');
 
-      var h = Math.round($tmp.get(0).getBoundingClientRect().height);
+      var h = Math.round($tmp.get(0)?.getBoundingClientRect().height ?? 0);
 
       // Setting a fixed max-height on the feedback element when it has a theme can cause overflow
       const isFeedback = $element[0].classList.contains('h5p-question-feedback');
