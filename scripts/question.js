@@ -1320,7 +1320,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         }
 
         // Update feedback content html
-        $('.h5p-question-feedback-content-text', sections.feedback.$element).html(content).addClass('has-content');
+        sections.feedback.$element[0].querySelector('.h5p-question-feedback-content').classList.add('has-content');
+        $('.h5p-question-feedback-content-text', sections.feedback.$element).html(content);
 
         // Make sure the height is correct
         setElementHeight(sections.feedback.$element);
