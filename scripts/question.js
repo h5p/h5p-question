@@ -148,7 +148,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
             elements[id].$element.prependTo($container);
           }
           else if (
-            theme && 
+            theme &&
             sections[order[i - 1]]?.parent?.attr('class').includes('h5p-question-main-content')
           ) {
             // Add after parent element
@@ -166,7 +166,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
     /**
      * Create the evaluation container
-     * 
+     *
      * @param {H5P.jQuery} $sibling Sibling to append after
      * @param {boolean} [isReattaching] True if reattaching the evaluation container
      */
@@ -187,7 +187,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (wasInEvaluationMode) {
         $evaluation[0].classList.add('evaluation-mode');
       }
-      
+
       if (!$evaluation.parent().length
         && !$sibling?.parent().hasClass('h5p-question-evaluation-container')
       ){
@@ -1022,9 +1022,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       const setAriaLabel = () => {
         const ariaLabel = $imgWrap.attr('aria-expanded') === 'true'
-          ? options.minimizeImage 
+          ? options.minimizeImage
           : options.expandImage;
-          
+
           $imgWrap.attr('aria-label', `${ariaLabel} ${options.alt}`);
         };
 
@@ -1467,6 +1467,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       if (theme) {
         $e = buttons[id].$element = $(H5P.Components.Button({
           ...options,
+          ariaLabel: options['aria-label'],
           label: text,
           styleType: extras.styleType,
           icon: extras.icon,
