@@ -659,18 +659,20 @@
 
 /* Remove outer margins/paddings for content when the toolbar is set to OFF */
 
-.h5p-no-frame > .h5p-theme .h5p-question-image > * {
-  margin-top: 0;
-}
-
-.h5p-no-frame .h5p-theme .h5p-question-introduction {
+.h5p-no-frame > .h5p-theme > .h5p-question-main-content > .h5p-question-image  {
   margin-left: 0;
   margin-right: 0;
 }
 
-.h5p-no-frame .h5p-theme .h5p-question-content,
-.h5p-no-frame .h5p-theme .h5p-question-evaluation-container {
+.h5p-no-frame > .h5p-theme > .h5p-question-main-content > .h5p-question-introduction {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.h5p-no-frame > .h5p-theme > .h5p-question-main-content > .h5p-question-content,
+.h5p-no-frame > .h5p-theme > .h5p-question-evaluation-container {
+  margin-left: 0;
+  margin-right: 0;
   padding-left: 0;
   padding-right: 0;
-  padding-bottom: 0;
 }
