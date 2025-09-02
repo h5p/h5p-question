@@ -358,6 +358,8 @@
 
 .h5p-theme.h5p-question {
   background-color: var(--h5p-theme-ui-base);
+  container-name: h5p-theme-evaluation-container;
+  container-type: inline-size;
 }
 
 .h5p-theme .h5p-question-introduction {
@@ -403,17 +405,6 @@
 
 .h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons {
   justify-content: end;
-}
-
-@media only screen and (max-width: 640px) {
-  .h5p-theme .h5p-question-evaluation-container.evaluation-mode {
-    grid-template-columns: 1fr;
-  }
-
-  .h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons.h5p-question-visible {
-    margin-top: var(--h5p-theme-spacing-s);
-    justify-content: center;
-  }
 }
 
 .h5p-theme .h5p-question-evaluation-container.hiding {
@@ -675,4 +666,22 @@
   margin-right: 0;
   padding-left: 0;
   padding-right: 0;
+}
+
+@container h5p-theme-evaluation-container (width < 350px) {
+  .h5p-theme .h5p-question-evaluation-container.evaluation-mode {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .h5p-theme .h5p-question-scorebar.h5p-question-visible {
+    margin-bottom: var(--h5p-theme-spacing-s);
+    padding-right: 0;
+  }
+
+  .h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons {
+    justify-content: center;
+  }
 }
