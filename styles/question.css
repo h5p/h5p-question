@@ -389,6 +389,7 @@
   grid-template-columns: 1fr 1fr;
   background-color: var(--h5p-theme-alternative-light);
   margin-top: var(--h5p-theme-spacing-m);
+  align-items: center;
   transition: height 0.15s ease, opacity 0.05s ease-in;
 }
 
