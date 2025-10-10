@@ -497,7 +497,7 @@
 }
 
 .h5p-theme .h5p-joubelui-score-bar-progress-wrapper {
-  background: var(--h5p-theme-contrast-cta-light);
+  background: hsl(from var(--h5p-theme-contrast-cta-white) h s l / 10%);
   height: 0.7em;
 }
 
@@ -511,7 +511,7 @@
 }
 
 .h5p-theme .h5p-joubelui-score-bar-star-fill {
-  fill: var(--h5p-theme-contrast-cta-light);
+  fill: hsl(from var(--h5p-theme-contrast-cta-white) h s l / 10%)
 }
 
 .h5p-theme .h5p-joubelui-score-bar-star-border {
