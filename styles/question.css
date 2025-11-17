@@ -667,8 +667,11 @@
 .h5p-no-frame > .h5p-theme > .h5p-question-evaluation-container {
   margin-left: 0;
   margin-right: 0;
-  padding-left: 0;
-  padding-right: 0;
+  padding-inline: 0;
+}
+
+.h5p-no-frame > .h5p-theme > .h5p-question-evaluation-container.evaluation-mode {
+  padding-inline: var(--h5p-theme-spacing-m);
 }
 
 @container h5p-theme-evaluation-container (width < 350px) {
