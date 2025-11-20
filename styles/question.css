@@ -677,9 +677,8 @@
 .h5p-theme .h5p-question-evaluation-container.evaluation-mode.container-column {
   flex-flow: column;
   justify-content: center;
-  align-items: flex-start;
 }
 
-.h5p-theme .h5p-question-evaluation-container.evaluation-mode.container-column .h5p-question-scorebar.h5p-question-visible {
-  align-self: flex-start;
+.h5p-theme .h5p-question-evaluation-container.evaluation-mode.container-column .h5p-question-buttons.h5p-question-visible {
+  justify-content: center;
 }
