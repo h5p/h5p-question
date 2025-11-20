@@ -148,6 +148,7 @@
   margin: 0 0 1em 1em;
   padding-right: 0.5em;
   display: inline-block;
+  flex: 1 1 calc(50% - 0.5em - var(--h5p-theme-spacing-s));
 }
 
 .h5p-question-scorebar.full-width {
@@ -177,7 +178,6 @@
 
 .h5p-question-visible .h5p-question-feedback-content.has-content {
   display: block;
-  margin-bottom: 0.8em;
 }
 
 .h5p-question-feedback-content-text {
@@ -385,11 +385,13 @@
 }
 
 .h5p-theme .h5p-question-evaluation-container.evaluation-mode {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--h5p-theme-spacing-s);
+  justify-content: space-between;
+  align-items: center;
   background-color: var(--h5p-theme-alternative-light);
   margin-top: var(--h5p-theme-spacing-m);
-  align-items: center;
   transition: height 0.15s ease, opacity 0.05s ease-in;
 }
 
@@ -405,7 +407,8 @@
 }
 
 .h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons {
-  justify-content: end;
+  flex: 1 1 50%;
+  justify-content: flex-end;
 }
 
 .h5p-theme .h5p-question-evaluation-container.hiding {
@@ -435,7 +438,7 @@
 
 .h5p-theme .h5p-question-feedback {
   color: var(--h5p-theme-text-primary);
-  grid-column: 1 / -1;
+  flex: 1 1 100%;
   font-weight: 600;
 }
 
@@ -672,20 +675,11 @@
   padding-inline: var(--h5p-theme-spacing-m);
 }
 
-@container h5p-theme-evaluation-container (width < 350px) {
-  .h5p-theme .h5p-question-evaluation-container.evaluation-mode {
-    display: flex;
-    flex-flow: column;
-    justify-content: center;
-    align-items: center;
-  }
+.h5p-theme .h5p-question-evaluation-container.evaluation-mode.container-column {
+  flex-flow: column;
+  justify-content: center;
+}
 
-  .h5p-theme .h5p-question-scorebar.h5p-question-visible {
-    margin-bottom: var(--h5p-theme-spacing-s);
-    padding-right: 0;
-  }
-
-  .h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons {
-    justify-content: center;
-  }
+.h5p-theme .h5p-question-evaluation-container.evaluation-mode.container-column .h5p-question-buttons.h5p-question-visible {
+  justify-content: center;
 }
