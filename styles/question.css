@@ -408,6 +408,7 @@
 
 .h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-buttons {
   flex: 1 1 50%;
+  justify-content: flex-end;
 }
 
 .h5p-theme .h5p-question-evaluation-container.hiding {
