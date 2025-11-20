@@ -674,14 +674,12 @@
   padding-inline: var(--h5p-theme-spacing-m);
 }
 
-@container h5p-theme-evaluation-container (width < 350px) {
-  .h5p-theme .h5p-question-evaluation-container.evaluation-mode {
-    flex-flow: column;
-    justify-content: center;
-    align-items: flex-start;
-  }
+.h5p-theme .h5p-question-evaluation-container.evaluation-mode.container-column {
+  flex-flow: column;
+  justify-content: center;
+  align-items: flex-start;
+}
 
-  .h5p-theme .h5p-question-evaluation-container.evaluation-mode .h5p-question-scorebar.h5p-question-visible {
-    align-self: flex-start;
-  }
+.h5p-theme .h5p-question-evaluation-container.evaluation-mode.container-column .h5p-question-scorebar.h5p-question-visible {
+  align-self: flex-start;
 }

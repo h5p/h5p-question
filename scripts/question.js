@@ -615,6 +615,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         return;
       }
 
+      const haveButtonsWrapped = () => {
+        const buttonsContainer = sections.buttons.$element.get(0);
+        const scorebarContainer = sections.scorebar.$element.get(0);
+        return buttonsContainer.offsetTop > scorebarContainer.offsetTop + scorebarContainer.offsetHeight;
+      };
+
       var go = function () {
         // Don't do anything if button elements are not visible yet
         if (!sections.buttons.$element.is(':visible')) {
@@ -671,6 +677,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           makeButtonsFit(buttonSectionWidth);
         }
       };
+
+      const scorebar = sections.scorebar?.$element.get(0).parentElement;
+      if (scorebar && theme) {
+        scorebar.classList.toggle('container-column', haveButtonsWrapped());
+      }
 
       // If visible, resize right away
       if (sections.buttons.$element.is(':visible')) {
