@@ -1449,7 +1449,26 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           if (!extras.confirmationDialog.$parentElement) {
             sections.popups.$element.removeClass('hidden');
           }
-          confirmationDialog.show($e.position().top);
+
+          let wrapperEl;
+          if (extras.confirmationDialog.$parentElement) {
+            wrapperEl = extras.confirmationDialog.$parentElement.get(0);
+          }
+          else {
+            wrapperEl = sections.popups.$element.get(0);
+          }
+
+          let offsetTop;
+
+          if (event && typeof event.clientY === 'number' && event.clientY !== 0) {
+            var wrapperRect = wrapperEl.getBoundingClientRect();
+            offsetTop = event.clientY - wrapperRect.top;
+          }
+          else {
+            offsetTop = buttons[id].$element.position().top;
+          }
+
+          confirmationDialog.show(offsetTop);
         }
         else {
           clicked();
