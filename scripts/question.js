@@ -1449,7 +1449,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           if (!extras.confirmationDialog.$parentElement) {
             sections.popups.$element.removeClass('hidden');
           }
-          confirmationDialog.show($e.position().top);
+          confirmationDialog.show($e.offset().top);
+
         }
         else {
           clicked();
