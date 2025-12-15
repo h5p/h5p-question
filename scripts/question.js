@@ -1302,8 +1302,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
           setElementHeight(sections.scorebar.$element);
           sectionsIsTransitioning = true;
 
-          // Scroll to bottom after showing feedback
-          scrollToBottom();
+          // Scroll to bottom after showing feedback only if not fullscreen
+          if (!H5P.isFullscreen) {
+            scrollToBottom();
+          }
 
           // Trigger resize after animation
           feedbackTransitionTimer = setTimeout(function () {
