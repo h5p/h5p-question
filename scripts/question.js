@@ -570,7 +570,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         currDepth = 0;
       }
       if (!maxDepth) {
-        maxDepth = 5;
+        maxDepth = 9;
       }
       // Check validation of element or if we have reached document root
       if (!$element || !($element instanceof $) || document === $element.get(0) || currDepth >= maxDepth) {
@@ -599,9 +599,16 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Scroll to bottom of scrollable ancestor
       if (scrollableAncestor) {
-        scrollableAncestor.animate({
-          scrollTop: $wrapper.css('height')
-        }, "slow");
+        scrollableAncestor.animate(
+          {
+            scrollTop:
+              scrollableAncestor.scrollTop() +
+              $wrapper.offset().top +
+              $wrapper.height() -
+              scrollableAncestor.height(),
+          },
+          'slow'
+        );
       }
     };
 
