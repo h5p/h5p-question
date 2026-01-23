@@ -15,37 +15,29 @@
 }
 
 .h5p-question-explanation-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
   background: #FFFFFF;
   border: 1px solid #e0e0e0;
-  overflow: auto;
-  overflow-x: hidden;
-
-  list-style: none;
   padding: 0;
   margin: 0;
 }
 
 .h5p-question-explanation-item {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
   padding: 0.5em;
   margin: 0;
   line-height: 1.2;
-  display: flex;
 }
 
 .h5p-question-explanation-item:not(:last-child) {
   border-bottom: 1px solid #e0e0e0;
 }
 
-.h5p-question-explanation-status {
-  display: flex;
-  flex-shrink: 0;
-  width: 8em;
-  flex-wrap: wrap;
-}
-
 .h5p-question-explanation-correct,
 .h5p-question-explanation-wrong {
-  display: inline-flex;
   font-weight: bold;
   margin-left: 0.5em;
   font-size: 0.9em;
@@ -65,7 +57,6 @@
 }
 
 .h5p-question-explanation-text {
-  display: inline-flex;
   padding-left: 1em;
   margin-left: 0.5em;
   border-left: 1px solid #ddd;
