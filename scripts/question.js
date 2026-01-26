@@ -1162,6 +1162,11 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @return {H5P.Question}
      */
     self.removeFeedback = function () {
+      if ($wrapper?.get(0)) {
+        $wrapper.get(0).dispatchEvent(new CustomEvent('h5p-question-reset', {
+          bubbles: true,
+        }));
+      }
 
       clearTimeout(feedbackTransitionTimer);
 
