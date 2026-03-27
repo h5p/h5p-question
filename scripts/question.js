@@ -1766,10 +1766,10 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
         // No buttons to focus, try to prevent lost focus
         if (!focusMoved) {
-          if (sections.scorebar.isVisible) {
+          if (sections.scorebar?.isVisible) {
             sections.scorebar.$element.focus();
           }
-          else if (sections.feedback.isVisible) {
+          else if (sections.feedback?.isVisible) {
             sections.feedback.$element.focus();
           }
         }
