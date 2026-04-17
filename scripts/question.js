@@ -432,15 +432,14 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      * @param {boolean} [relocateFocus] Find a new button to focus
      */
     var hideButtons = function (relocateFocus) {
-      // Move focus before hiding buttons, to prevent lost focus
-      if (relocateFocus) {
-        self.focusButton();
-      }
-
       for (var i = 0; i < buttonsToHide.length; i++) {
         hideButton(buttonsToHide[i].id);
       }
       buttonsToHide = [];
+
+      if (relocateFocus) {
+        self.focusButton();
+      }
     };
 
     /**
@@ -1276,10 +1275,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
         // Create section
         register('feedback', $feedback);
         register('scorebar', $scorebar);
-        // Make focusable, in case no buttons
-        sections.feedback.$element.attr('tabindex', -1);
-        sections.scorebar.$element.attr('tabindex', -1);
-
         if (initialized && $wrapper) {
           insert(self.order, 'feedback', sections, $wrapper);
           insert(self.order, 'scorebar', sections, $wrapper);
@@ -1750,30 +1745,17 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
      */
     self.focusButton = function (id) {
       if (id === undefined) {
-        let focusMoved = false;
-        const buttonObjectsToHide = buttonsToHide.map((button) => buttons[button.id]);
-
-        // Find first button that is visible, and not about to be hidden
+        // Find first button that is visible.
         for (var i = 0; i < buttonOrder.length; i++) {
           var button = buttons[buttonOrder[i]];
-          if (button && button.isVisible && !buttonObjectsToHide.includes(button)) {
+          if (button && button.isVisible) {
             // Give that button focus
             button.$element.focus();
-            focusMoved = true;
             break;
           }
         }
-
-        // No buttons to focus, try to prevent lost focus
-        if (!focusMoved) {
-          if (sections.scorebar?.isVisible) {
-            sections.scorebar.$element.focus();
-          }
-          else if (sections.feedback?.isVisible) {
-            sections.feedback.$element.focus();
-          }
-        }
-      } else if (buttons[id] && buttons[id].$element.is(':visible')) {
+      }
+      else if (buttons[id] && buttons[id].$element.is(':visible')) {
         // Set focus to requested button
         buttons[id].$element.focus();
       }
