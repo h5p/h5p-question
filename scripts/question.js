@@ -1151,7 +1151,6 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       var $feedbackText = $('.h5p-question-feedback-content-text', sections.feedback.$element);
-
       if ($feedbackText && $feedbackText.html() && $feedbackText.html().length) {
         self.read($feedbackText.html());
       }
