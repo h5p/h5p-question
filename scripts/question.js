@@ -1151,6 +1151,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
       }
 
       var $feedbackText = $('.h5p-question-feedback-content-text', sections.feedback.$element);
+
       if ($feedbackText && $feedbackText.html() && $feedbackText.html().length) {
         self.read($feedbackText.html());
       }
@@ -1262,7 +1263,7 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       // Feedback for readspeakers
       if (!behaviour.disableReadSpeaker && scoreBarLabel) {
-        self.read(scoreBarLabel.replace(':num', score).replace(':total', maxScore) + '. ' + (content ? content : ''));
+        self.read(scoreBarLabel.replace(':num', score).replace(':total', maxScore));
       }
 
       showFeedback = true;
