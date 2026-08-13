@@ -46,6 +46,9 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
     // Keep track of the feedback's visual status.
     var showFeedback;
 
+    // Set when hiding the buttons left nothing to take focus.
+    var focusScorebar = false;
+
     // Keep track of which buttons are scheduled for hiding.
     var buttonsToHide = [];
 
@@ -439,6 +442,12 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       if (relocateFocus) {
         self.focusButton();
+
+        // Nothing left to take focus. Let the scorebar have it instead, or the
+        // reading position is lost and voiceover repeat the feedback.
+        focusScorebar = !buttonOrder.some(function (id) {
+          return buttons[id].isVisible;
+        });
       }
     };
 
@@ -1260,8 +1269,8 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       $feedbackContent.toggleClass('has-content', content !== undefined && content.length > 0);
 
-      // Feedback for readspeakers
-      if (!behaviour.disableReadSpeaker && scoreBarLabel) {
+      // Feedback for voiceover
+      if (!behaviour.disableReadSpeaker && scoreBarLabel && !focusScorebar) {
         self.read(scoreBarLabel.replace(':num', score).replace(':total', maxScore));
       }
 
@@ -1295,6 +1304,13 @@ H5P.Question = (function ($, EventDispatcher, JoubelUI) {
 
       showSection(sections.feedback);
       showSection(sections.scorebar);
+
+      if (focusScorebar) {
+        focusScorebar = false;
+        // The score has to be set before the scorebar is read out by voiceover
+        scoreBar.setScore(score);
+        sections.scorebar.$element.attr('tabindex', -1).focus();
+      }
 
       resizeButtons();
 
