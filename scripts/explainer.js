@@ -25,14 +25,14 @@ H5P.Question.Explainer = (function ($) {
         appendTo: self.$explanation
       });
 
-      var $explanationList = $('<ul>', {
+      var $explanationList = $('<div>', {
         'class': 'h5p-question-explanation-list',
         appendTo: self.$explanation
       });
 
       for (var i = 0; i < explanations.length; i++) {
         var feedback = explanations[i];
-        var $explanationItem = $('<li>', {
+        var $explanationItem = $('<div>', {
           'class': 'h5p-question-explanation-item',
           appendTo: $explanationList
         });
